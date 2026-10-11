@@ -185,7 +185,7 @@
       <div class="lvlname">Level 2<small>Race the killer whale!</small></div>
     </div>
   </div>
-  <div class="sub">Tap to Play!</div>
+  <div class="sub">Pick your level!</div>
   <div class="credit">Designed by Dad (Adam Ennabe) for Aaron
     <span class="tip" id="a2hs">Tip: tap Share, then “Add to Home Screen” for full screen</span></div>
 </div>
@@ -249,7 +249,7 @@
    ================================================================ */
 const params = new URLSearchParams(location.search);
 // Timing multiplier (used by automated tests: ?speed=0.2 makes celebrations faster)
-const BUILD = '7';   // bump to bust caches for audio/icons
+const BUILD = '8';   // bump to bust caches for audio/icons
 const SPEED = Math.min(1, Math.max(0.05, parseFloat(params.get('speed')) || 1));
 const TS = Math.max(SPEED, 0.25);   // time scale for scripted scenes (killer whale reward / game over); ?speed shortens them in tests
 const MAX_LIVES = 5;
@@ -2355,7 +2355,10 @@ function startGame(lv) {
   Voice.play('intro');
   newRound();
 }
-$('start').addEventListener('click', () => startGame(startLevel));   // tap anywhere = Level 1 (or ?level=2)
+// v8: a tap on empty start-screen background no longer starts Level 1 (the dad kept landing in Aaron's game).
+// Only debug links (?level=1|2, ?boss, ?party, ?start) keep "tap anywhere to start".
+const TAP_ANYWHERE = /^[12]$/.test(params.get('level') || '') || BOSS_JUMP || params.has('party') || params.has('start');
+$('start').addEventListener('click', () => { if (TAP_ANYWHERE) startGame(startLevel); });
 $('play').addEventListener('click', e => { e.stopPropagation(); startGame(1); });
 $('play2').addEventListener('click', e => { e.stopPropagation(); startGame(2); });
 $('tryagain').addEventListener('click', e => { e.stopPropagation(); restartGame(level().id); });
