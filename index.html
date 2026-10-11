@@ -249,7 +249,7 @@
    ================================================================ */
 const params = new URLSearchParams(location.search);
 // Timing multiplier (used by automated tests: ?speed=0.2 makes celebrations faster)
-const BUILD = '6';   // bump to bust caches for audio/icons
+const BUILD = '7';   // bump to bust caches for audio/icons
 const SPEED = Math.min(1, Math.max(0.05, parseFloat(params.get('speed')) || 1));
 const TS = Math.max(SPEED, 0.25);   // time scale for scripted scenes (killer whale reward / game over); ?speed shortens them in tests
 const MAX_LIVES = 5;
@@ -2818,6 +2818,7 @@ function drawIcon(canvas, size, maskable) {
   c.restore();
   c.restore();
 }
+window.SharkCore = { Sfx, Music, Voice, VOICE_DATA, Speech, BUILD };   // v7: shared with runner.js
 window.SharkABC = {
   drawIcon, LEVELS, ALPHABET,
   get state() { return game.state; }, get index() { return game.index; }, get bounces() { return game.bounces || 0; },
@@ -2886,5 +2887,6 @@ window.SharkABC = {
 };
 })();
 </script>
+<script>(function(){var B=window.SharkCore.BUILD;document.write('<script src="runner-data.js?v='+B+'"><\/script><script src="runner.js?v='+B+'"><\/script>')})()</script>
 </body>
 </html>
