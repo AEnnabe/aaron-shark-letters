@@ -49,13 +49,13 @@ const WORLDS = {
 };
 const RL = {   // v8 numbering: each kid's card is in order (runner, harder runner, swim & grow)
   3: { ch: 'audrey', world: 'rainbow', type: 'words', bonus: 'unicorn', title: 'Runner: easy words' },
-  4: { ch: 'audrey', world: 'rainbow', type: 'words', bonus: 'unicorn', title: 'Runner: harder words' },
+  4: { ch: 'audrey', world: 'rainbow', type: 'words', bonus: 'unicorn', tap: 'balloon', title: 'Balloon Pop' },
   5: { ch: 'audrey', world: 'rainbow', type: 'words', swim: true, title: 'Swim & grow' },
   6: { ch: 'elio', world: 'volcano', type: 'math', bonus: 'dragon', title: 'Runner: adding' },
-  7: { ch: 'elio', world: 'volcano', type: 'math', bonus: 'dragon', title: 'Runner: take away' },
+  7: { ch: 'elio', world: 'castle', type: 'math', bonus: 'dragon', tap: 'knight', title: 'Knight Whack (take away)' },
   8: { ch: 'elio', world: 'castle', type: 'math', swim: true, title: 'Swim & grow' },
   9: { ch: 'mackenzie', world: 'jungle', type: 'words', bonus: 'snake', title: 'Runner: 1st grade words' },
-  10: { ch: 'mackenzie', world: 'jungle', type: 'words', bonus: 'snake', title: 'Runner: 2nd grade words' },
+  10: { ch: 'mackenzie', world: 'jungle', type: 'words', bonus: 'snake', tap: 'fruit', title: 'Fruit Catch' },
   11: { ch: 'mackenzie', world: 'jungle', type: 'words', swim: true, title: 'Swim & grow' },
   12: { ch: 'alli', world: 'garden', type: 'words', bonus: 'spider', title: 'Runner: easy words' },
   13: { ch: 'alli', world: 'garden', type: 'words', bonus: 'spider', title: 'Runner: more words' },
@@ -67,10 +67,10 @@ const RL = {   // v8 numbering: each kid's card is in order (runner, harder runn
   19: { ch: 'andrew', world: 'desert', type: 'words', bonus: 'wrestle', title: 'Runner: more words' },
   20: { ch: 'andrew', world: 'desert', type: 'words', swim: true, title: 'Swim & grow' },
   21: { ch: 'penny', world: 'ocean', type: 'words', bonus: 'dolphin', title: 'Runner: late 1st grade words' },
-  22: { ch: 'penny', world: 'ocean', type: 'words', bonus: 'dolphin', title: 'Runner: harder words' },
+  22: { ch: 'penny', world: 'ocean', type: 'words', bonus: 'dolphin', tap: 'hoop', title: 'Hoop Jump' },
   23: { ch: 'penny', world: 'ocean', type: 'words', swim: true, title: 'Swim & grow' },
   24: { ch: 'oliver', world: 'jungle', type: 'words', bonus: 'gorilla', title: 'Runner: easy words' },
-  25: { ch: 'oliver', world: 'jungle', type: 'words', bonus: 'gorilla', title: 'Runner: easiest words' },
+  25: { ch: 'oliver', world: 'jungle', type: 'words', bonus: 'gorilla', tap: 'vine', title: 'Vine Swing' },
   26: { ch: 'oliver', world: 'jungle', type: 'words', swim: true, title: 'Swim & grow' },
 };
 const LAST = 26;
@@ -336,6 +336,7 @@ function startLevel(n) {
     coins: 0, correct: 0, wrong: 0, gates: null, mode: 'run', stunT: 0, reward: null, rewards: 0, swim: null, items: [], fx: [], t: 0, bonus: null, speed: 26, decisionLog: [], log: [] });
   R.qs = buildQuestions(n); $r('rsay').style.display = 'none'; R.labels = [];
   R.deco = []; if (L.swim) return startSwim(n);
+  if (L.tap) return startTap(n);
   for (let i = 0; i < 14; i++) R.deco.push({ z: i * 7, side: i % 2 ? 1 : -1, e: pick(WORLDS[L.world].deco), off: rnd(0, 0.6) });
   layer.style.display = 'block'; panels(null); $r('rprompt').style.display = 'none'; $r('rhud').style.display = 'flex';
   preload(n); hud();
@@ -424,14 +425,14 @@ let ptr = null;
 rcv.addEventListener('pointerdown', e => { ptr = { x: e.clientX, y: e.clientY, t: performance.now() }; });
 rcv.addEventListener('pointerup', e => {
   if (!ptr) return; const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y; ptr = null;
-  if (R.state === 'bonus' || R.mode === 'swim') return;
+  if (R.state === 'bonus' || R.mode === 'swim' || R.mode === 'tap') return;
   if (Math.abs(dx) > 35 && Math.abs(dx) > Math.abs(dy)) setLane(R.lane + (dx > 0 ? 1 : -1));
   else if (dy < -40) jump();
   else if (Math.abs(dx) < 25 && Math.abs(dy) < 25) setLane(R.lane + (e.clientX < W / 2 ? -1 : 1));
 });
 rcv.addEventListener('pointercancel', () => { ptr = null; });
 addEventListener('keydown', e => {
-  if (!R.active) return;
+  if (!R.active || R.mode === 'tap') return;
   if (e.key === 'ArrowLeft') setLane(R.lane - 1); else if (e.key === 'ArrowRight') setLane(R.lane + 1); else if (e.key === 'ArrowUp' || e.key === ' ') jump();
 });
 $r('rsay').addEventListener('click', e => { e.stopPropagation(); Sfx.unlock(); const q = R.mode === 'swim' ? R.swim && R.swim.q : (R.tapq || (R.gates && R.gates.q) || R.qs[R.qi]); if (q) say(q.k + '_q'); });
@@ -1043,6 +1044,253 @@ function swimPointer(e) { if (R.mode !== 'swim' || !R.swim) return; R.swim.tx = 
 rcv.addEventListener('pointerdown', swimPointer);
 rcv.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') swimPointer(e); });
 
+
+/* ===== v10: tap-style games (each kid's 2nd runner level): Balloon Pop, Knight Whack, Fruit Catch, Hoop Jump, Vine Swing.
+   Same rules as the runner: dad's speed-up timing (+1.5 s to physically tap), reward on every right answer,
+   bump + pause on a wrong one, prompts said twice (clips), 5 hearts, win-only party. ===== */
+const TAP_GO = { balloon: 't_go_balloon', knight: 't_go_knight', fruit: 't_go_fruit', hoop: 't_go_hoop', vine: 't_go_vine' };
+const TAP_EXTRA = 1.5;
+const tapWindow = n => decisionTime(n) + TAP_EXTRA;
+const BAL_COLS = ['#ff5d8f', '#4dc4ff', '#ffd84d', '#a66bff', '#5ee07a', '#ff9a3d'];
+function startTap(n) {
+  const L = RL[n];
+  R.mode = 'tap'; R.state = 'intro'; R.tapq = null;
+  R.tg = { items: [], style: L.tap, cx: W / 2, tx: W / 2, act: null, cols: shuffle(BAL_COLS) };
+  layer.style.display = 'block'; panels(null); $r('rprompt').style.display = 'none'; $r('rhud').style.display = 'flex';
+  preload(n); Voice.decode(TAP_GO[L.tap]); hud();
+  Music.start('main');
+  if (BONUS_JUMP) { R.bonusJumped = true; startBonus(); return; }
+  const go = TAP_GO[L.tap]; const run = R.run = (R.run || 0) + 1; let begun = false;
+  const begin = () => { if (begun || R.run !== run || R.level !== n || R.state !== 'intro') return; begun = true; later(0.4, tapNext); };
+  Promise.resolve(Voice.decode(go)).catch(() => null).then(() => { if (R.level === n && R.state === 'intro') say(go, begin); });
+  setTimeout(() => { if (R.level === n) begin(); }, (dur(go) + 3.5) * 1000);
+}
+function tapNext() {
+  if (!R.active || R.mode !== 'tap' || R.state === 'over' || R.state === 'bonus' || R.state === 'won') return;
+  if (R.qi >= QUESTIONS) return levelWon();
+  const q = R.qs[R.qi], n = R.qi + 1, T = R.tg; R.state = 'tapprompt'; R.tapq = q; T.items = []; T.act = null;
+  const pr = $r('rprompt');
+  if (q.math) {
+    const m = q.math, dots = (x, c) => x <= 10 ? `<span style="color:${c}">${'●'.repeat(x)}</span>` : '';
+    pr.innerHTML = `${m.a} ${m.op === '+' ? '+' : '−'} ${m.b} = ?` + (m.a <= 10 && m.b <= 10 ? `<div class="dots">${dots(m.a, '#ff5d8f')}${m.op === '+' ? ' + ' : ' − '}${dots(m.b, '#3a8ee6')}</div>` : '');
+    pr.style.display = 'block';
+  } else { pr.style.display = 'none'; $r('rsay').style.display = 'block'; }
+  bandAt = -1;
+  say(q.k + '_q');
+  later(Math.max(PROMPT_LEAD, Math.min(2.4, dur(q.k + '_q') * 0.5)), () => {
+    if (R.tapq !== q || R.state !== 'tapprompt') return;
+    const dt = tapWindow(n);
+    T.items = q.opts.map((v, i) => ({ v, ok: v === q.ans, i, wob: -9, gone: false }));
+    T.dt = dt; T.born = R.t; R.state = 'tapq'; R.decisionLog.push({ n, dt });
+    const pickAuto = ok => { const it = T.items.find(x => x.ok === ok); if (!it) return; if (T.style === 'fruit') T.tx = columns().xs[it.i]; else tapPick(it); };
+    if (AUTO === '1') later(Math.min(0.8, dt * 0.3), () => pickAuto(true));
+    if (AUTO === '0') later(Math.min(0.8, dt * 0.3), () => pickAuto(false));
+  });
+}
+function tapPick(it) {
+  if (R.state !== 'tapq' || !it || it.gone) return;
+  const T = R.tg, q = R.tapq;
+  R.state = 'tapans';
+  const ok = !!it.ok;
+  R.log.push({ n: R.qi + 1, ok, dt: T.dt, took: +(R.t - T.born).toFixed(2) });
+  R.qi++; T.act = { it, ok, t0: R.t };
+  $r('rprompt').style.display = 'none'; $r('rsay').style.display = 'none'; bandAt = -1;
+  const pos = it.pos || { x: W / 2, y: H / 2 };
+  if (ok) {
+    R.correct++; Sfx.chime(); Sfx.sparkle(0.05);
+    const st = T.style;
+    if (st === 'balloon') { it.gone = true; Sfx.pop && Sfx.pop(); burst(pos.x, pos.y, 40, ['#ffe14d', '#ff8fc8', '#7fe3ff', '#fff', '#a66bff']); R.fx.push({ type: 'txt', text: '✨ POP!', x: pos.x, y: pos.y, t: 0, life: 1, col: '#ffe14d' }); }
+    if (st === 'knight') { Sfx.roar && Sfx.roar(); later(0.55, () => { it.gone = true; Sfx.poof && Sfx.poof(); burst(pos.x, pos.y, 36, ['#ddd', '#aaa', '#fff', '#ff9a3d']); R.fx.push({ type: 'txt', text: 'POOF!', x: pos.x, y: pos.y - 30, t: 0, life: 1, col: '#ffe14d' }); }); }
+    if (st === 'fruit') { it.gone = true; Sfx.chomp(); burst(pos.x, pos.y, 26, ['#fff', '#ffd84d', '#ff5d8f', '#5ee07a']); R.fx.push({ type: 'txt', text: 'GULP!', x: pos.x, y: pos.y - 40, t: 0, life: 1, col: '#ffe14d' }); }
+    if (st === 'hoop') { Sfx.swish && Sfx.swish(); later(0.95, () => { Sfx.splash ? Sfx.splash() : Sfx.tone(600, 200, 0.3, 'triangle', 0.15); }); }
+    if (st === 'vine') { Sfx.swish && Sfx.swish(); later(0.7, () => { it.gone = true; Sfx.chomp(); R.fx.push({ type: 'txt', text: 'BANANAS!', x: pos.x, y: pos.y - 30, t: 0, life: 1, col: '#ffe14d' }); }); }
+    R.fx.push({ type: 'txt', text: '⭐ Yes!', x: W / 2, y: H * 0.5, t: 0, life: 1.2, col: '#2fbf5a' });
+    later(T.style === 'hoop' ? 1.2 : 0.4, startReward);
+  } else tapWrong(it);
+  hud();
+  const k = q.k + (ok ? '_y' : '_n');
+  const after = () => { if (!R.active || R.mode !== 'tap') return; if (R.hearts <= 0) return gameOver(); if (R.qi === 11) return later(0.3, () => say('r_faster', () => later(0.3, tapNext))); later(0.6, tapNext); };
+  let fired = false; const once = () => { if (!fired) { fired = true; after(); } };
+  const STUN = 1.25;
+  if (ok) { say(k, once); later(dur(k) + 2.5, once); } else { later(STUN, () => say(k, once)); later(STUN + dur(k) + 2.5, once); }
+}
+function tapWrong(it) {
+  R.wrong++; R.hearts--; bonk(); Sfx.tone(220, 90, 0.35, 'square', 0.12, 0.08); R.hurtT = R.t; R.stunT = R.t;
+  if (it) it.wob = R.t;
+  const p = it && it.pos || { x: W / 2, y: H * 0.5 };
+  R.fx.push({ type: 'txt', text: 'BONK!', x: p.x, y: p.y - 20, t: 0, life: 1.2, col: '#ff5d8f' });
+}
+function tapTimeout() {   // nothing picked in time = wrong (same as running past the gates)
+  const T = R.tg; if (R.state !== 'tapq') return;
+  if (T.style === 'fruit') { const xs = columns().xs; let best = 0; xs.forEach((x, i) => { if (Math.abs(x - T.cx) < Math.abs(xs[best] - T.cx)) best = i; }); return tapPick(T.items[best]); }
+  tapPick({ ok: false, pos: { x: W / 2, y: H * 0.5 }, i: -1 });
+}
+// input: tap a column (big targets); Fruit Catch drags the snake
+let tapPtrDown = false;
+function tapPointer(e, down) {
+  if (R.mode !== 'tap' || !R.tg || R.state === 'bonus') return;
+  const T = R.tg;
+  if (T.style === 'fruit') { if (down || tapPtrDown || e.pointerType === 'touch') T.tx = clamp(e.clientX, SAFE.l + 30, W - SAFE.r - 30); return; }
+  if (!down || R.state !== 'tapq') return;
+  const C3 = columns(); const x = e.clientX, y = e.clientY;
+  if (y < topBand() - 4) return;
+  let best = null;
+  // big targets: the whole column (from the HUD down to the bottom) belongs to that answer
+  for (const it of T.items) { if (it.gone) continue; const cx = it.pos ? it.pos.x : C3.xs[it.i]; if (Math.abs(x - cx) <= C3.step / 2 && (!best || Math.abs(x - cx) < Math.abs(x - (best.pos ? best.pos.x : 0)))) best = it; }
+  if (best) tapPick(best);
+}
+rcv.addEventListener('pointerdown', e => { tapPtrDown = true; tapPointer(e, true); });
+rcv.addEventListener('pointermove', e => tapPointer(e, false));
+addEventListener('pointerup', () => { tapPtrDown = false; });
+addEventListener('keydown', e => { if (R.mode !== 'tap' || R.state !== 'tapq') return; const i = { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 1, ArrowRight: 2 }[e.key]; if (i === undefined) return; if (R.tg.style === 'fruit') R.tg.tx = columns().xs[i]; else tapPick(R.tg.items[i]); });
+
+function drawKnight(x, y, s, t, tint, duck) {   // y = feet (bottom of the window), s = height
+  g.save(); g.lineJoin = 'round'; g.lineCap = 'round';
+  ell(x, y - s * 0.3, s * 0.3, s * 0.32, tint);                                   // tabard body
+  g.fillStyle = '#ffd84d'; g.beginPath(); g.arc(x, y - s * 0.32, s * 0.08, 0, 6.28); g.fill();
+  ell(x, y - s * 0.72, s * 0.26, s * 0.24, '#c9ced8'); ell(x - s * 0.08, y - s * 0.8, s * 0.08, s * 0.05, 'rgba(255,255,255,.7)');   // helmet
+  g.fillStyle = '#3a3f4a'; rr(x - s * 0.2, y - s * 0.76, s * 0.4, s * 0.1, s * 0.04); g.fill();                                        // visor slit
+  eyes(x, y - s * 0.71, s * 0.12, false);
+  g.strokeStyle = '#ff5d8f'; g.lineWidth = s * 0.06; g.beginPath(); g.moveTo(x, y - s * 0.95); g.quadraticCurveTo(x + s * 0.25, y - s * (1.15 + Math.sin(t * 6) * 0.04), x + s * 0.32, y - s * 0.9); g.stroke();   // plume
+  ell(x + s * 0.02, y - s * 0.56, s * 0.05, s * 0.06, '#ff7a9a');                // silly tongue
+  for (const sx of [-1, 1]) { g.strokeStyle = '#c9ced8'; g.lineWidth = s * 0.09; g.beginPath(); g.moveTo(x + sx * s * 0.24, y - s * 0.42); g.lineTo(x + sx * s * 0.2, y - s * (duck ? 0.6 : 0.98)); g.stroke(); }
+  g.restore();
+}
+function drawTapTimer(T) {
+  const band = topBand(), x0 = SAFE.l + 12, w = W - SAFE.l - SAFE.r - 24, y = band - 9;
+  const left = R.state === 'tapq' ? clamp(1 - (R.t - T.born) / T.dt, 0, 1) : 0;
+  g.fillStyle = 'rgba(255,255,255,.55)'; rr(x0, y, w, 7, 3.5); g.fill();
+  if (left > 0) { g.fillStyle = left > 0.35 ? '#5ee07a' : '#ff5d8f'; rr(x0, y, w * left, 7, 3.5); g.fill(); }
+  R.timerRect = { x: x0, y, w, h: 7 };
+}
+function runTap(dt) {
+  const L = RL[R.level], C = CH[L.ch], Wd = WORLDS[L.world], T = R.tg;
+  const band = topBand(), C3 = columns(); R.labels = [];
+  const stunned = R.stunT && R.t - R.stunT < 1.25;
+  g.save();
+  if (stunned) { const k = 1 - (R.t - R.stunT) / 1.25; g.translate(rnd(-1, 1) * 12 * k, rnd(-1, 1) * 8 * k); }
+  // background
+  const sky = g.createLinearGradient(0, 0, 0, H); Wd.sky.forEach((c, i) => sky.addColorStop(i / (Wd.sky.length - 1), c)); g.fillStyle = sky; g.fillRect(-20, -20, W + 40, H + 40);
+  const cs = Math.min(H * 0.24, W * 0.3), feet = H - SAFE.b - 8;
+  const k = R.state === 'tapq' ? clamp((R.t - T.born) / T.dt, 0, 1) : (T.items.length ? 1 : 0);
+  const wantFs = Math.min(H * 0.1, 58);
+  const act = T.act, at = act ? R.t - act.t0 : 0;
+  const wob = it => it.wob > 0 && R.t - it.wob < 1.2 ? Math.sin((R.t - it.wob) * 26) * 0.25 * (1 - (R.t - it.wob) / 1.2) : 0;
+  const leaving = it => act && !it.gone && it !== act.it ? Math.min(1, at / 0.8) : 0;
+  let charX = W / 2, charY = feet, charRot = 0, charScale = 1, charDrawn = false;
+  const drawHero = () => { if (R.hurtT && R.t - R.hurtT < 0.6 && Math.floor(R.t * 16) % 2) g.globalAlpha = 0.45;
+    g.save(); g.translate(charX, charY); g.rotate(charRot); drawChar(C.kind, 0, 0, cs * charScale, R.t, C.c, { tiara: C.princess && C.kind !== 'unicorn' || L.ch === 'audrey', cool: C.cool, shadow: T.style !== 'hoop' }); g.restore(); g.globalAlpha = 1;
+    if (stunned) for (let i = 0; i < 4; i++) { const a = R.t * 7 + i * 1.57; emoji(i % 2 ? '⭐' : '💫', charX + Math.cos(a) * cs * 0.4, charY - cs * 1.05 + Math.sin(a) * cs * 0.12, cs * 0.2); }
+    R.runnerPos = { x: charX, y: charY, s: cs }; charDrawn = true; };
+  if (T.style === 'balloon') {
+    ['#ff5d8f', '#ffa53d', '#ffe14d', '#5ee07a', '#4dc4ff', '#a66bff'].forEach((c, i) => { g.strokeStyle = c; g.globalAlpha = 0.35; g.lineWidth = H * 0.03; g.beginPath(); g.arc(W / 2, H, H * (0.85 - i * 0.03), Math.PI, 0); g.stroke(); }); g.globalAlpha = 1;
+    for (let i = 0; i < 5; i++) emoji('☁️', ((i * 0.23 + R.t * 0.01) % 1.1) * W, H * (0.3 + (i % 3) * 0.18), Math.min(W, H) * 0.12);
+    g.fillStyle = '#fff0fb'; g.fillRect(0, feet - 4, W, H);
+    drawHero();
+    const rB = Math.min(C3.colW * 0.46, H * 0.12), y0 = feet - cs * 0.3 - rB, y1 = band + rB * 1.05;
+    T.items.forEach(it => {
+      if (it.gone) return;
+      const lv = leaving(it); const x = C3.xs[it.i] + Math.sin(R.t * 2 + it.i) * 6, y = y0 + (y1 - y0) * ease(k) - lv * H;
+      it.pos = { x, y }; it.hit = { x: C3.xs[it.i] - C3.step / 2, y: y - rB - 40, w: C3.step, h: rB * 2 + 140 };
+      g.save(); g.translate(x, y + rB); g.rotate(wob(it) + Math.sin(R.t * 1.7 + it.i) * 0.05); g.translate(-x, -(y + rB));
+      g.strokeStyle = 'rgba(80,60,120,.6)'; g.lineWidth = 2; g.beginPath(); g.moveTo(x, y + rB); for (let j = 1; j <= 6; j++) g.lineTo(x + Math.sin(R.t * 4 + j) * 5, y + rB + j * rB * 0.22); g.stroke();
+      ell(x, y, rB * 0.86, rB, T.cols[it.i]); ell(x - rB * 0.32, y - rB * 0.45, rB * 0.16, rB * 0.24, 'rgba(255,255,255,.6)', -0.4);
+      g.fillStyle = T.cols[it.i]; g.beginPath(); g.moveTo(x, y + rB * 0.95); g.lineTo(x - rB * 0.12, y + rB * 1.12); g.lineTo(x + rB * 0.12, y + rB * 1.12); g.fill();
+      g.restore();
+      pill(it.v + '', C3.xs[it.i], y, C3.colW, wantFs, shade(T.cols[it.i]), { minW: rB * 1.2 });
+    });
+  } else if (T.style === 'knight') {
+    g.fillStyle = Wd.ground; g.fillRect(0, feet - cs * 0.15, W, H);
+    const wallTop = band + (feet - cs - band) * 0.12, wallBot = feet - cs * 0.95;
+    g.fillStyle = '#b9b2c4'; g.fillRect(SAFE.l, wallTop, W - SAFE.l - SAFE.r, wallBot - wallTop);
+    g.strokeStyle = 'rgba(90,80,110,.35)'; g.lineWidth = 2;
+    for (let yy = wallTop; yy < wallBot; yy += 26) { g.beginPath(); g.moveTo(SAFE.l, yy); g.lineTo(W - SAFE.r, yy); g.stroke(); }
+    for (let xx = SAFE.l; xx < W - SAFE.r; xx += 44) { g.fillStyle = '#b9b2c4'; g.fillRect(xx, wallTop - 18, 26, 18); }
+    const winH = Math.min((wallBot - wallTop) * 0.62, C3.colW * 1.1), winW = Math.min(C3.colW * 0.8, winH * 0.9), winB = wallBot - (wallBot - wallTop) * 0.12;
+    C3.xs.forEach((x, i) => { g.fillStyle = '#2a2040'; rr(x - winW / 2, winB - winH, winW, winH, winW / 2); g.fill(); });
+    T.items.forEach(it => {
+      const x = C3.xs[it.i];
+      const up = R.state === 'tapq' ? ease(clamp((R.t - T.born - it.i * 0.12) / 0.3, 0, 1)) * (k > 0.92 ? 1 - (k - 0.92) / 0.08 : 1) : (it === (act && act.it) ? 1 : Math.max(0, 1 - leaving(it) * 1.5));
+      const ks = winH * 0.85, y = winB + ks * 0.15 + (1 - up) * ks;
+      it.pos = { x, y: y - ks * 0.6 }; it.hit = { x: x - C3.step / 2, y: winB - winH - 120, w: C3.step, h: winH + 160 };
+      if (!it.gone) {
+        g.save(); g.beginPath(); rr(x - winW / 2, winB - winH - ks, winW, winH + ks, winW / 2); g.clip();   // pops up out of the window
+        g.translate(x, y); g.rotate(wob(it)); drawKnight(0, 0, ks, R.t + it.i, ['#3a8ee6', '#e8553d', '#2fbf5a'][it.i]); g.restore();
+        if (up > 0.5) pill(it.v + '', x, Math.max(band + wantFs * 0.75, y - ks * 1.0 - wantFs * 0.7), C3.colW, wantFs, '#8a4a3a', { minW: C3.colW * 0.6, bg: '#fff6d8' });
+      }
+      if (act && act.ok && act.it === it && at < 0.6) {   // Elio's fire breath
+        const sx = charX, sy = feet - cs * 0.65, ex = x, ey = y - ks * 0.6, u = Math.min(1, at / 0.35);
+        for (let j = 0; j < 14; j++) { const f = j / 14 * u; emoji(pick(['🔥', '🔥', '✨']), sx + (ex - sx) * f + rnd(-8, 8), sy + (ey - sy) * f + rnd(-8, 8), cs * (0.18 + f * 0.25)); }
+      }
+    });
+    drawHero();
+  } else if (T.style === 'fruit') {
+    g.fillStyle = Wd.ground; g.fillRect(0, feet - 6, W, H);
+    for (let i = 0; i < 6; i++) emoji(i % 2 ? '🌴' : '🌳', W * (i / 5), band + Math.min(W, H) * 0.1, Math.min(W, H) * 0.2);
+    T.cx += (T.tx - T.cx) * Math.min(1, dt * 10); charX = T.cx;
+    const fr = Math.min(C3.colW * 0.3, H * 0.07), y0 = band + fr + wantFs * 1.6, y1 = feet - cs * 0.7;
+    T.fruitE = T.fruitE || shuffle(['🍎', '🍌', '🍇', '🍓', '🍊', '🍑', '🍉']);
+    T.items.forEach(it => {
+      if (it.gone) return;
+      const lv = leaving(it); const x = C3.xs[it.i], y = y0 + (y1 - y0) * (k * k * 0.4 + k * 0.6) + lv * H;
+      it.pos = { x, y };
+      g.save(); g.translate(x, y); g.rotate(wob(it) + Math.sin(R.t * 3 + it.i) * 0.1); emoji(T.fruitE[(R.qi + it.i) % T.fruitE.length], 0, 0, fr * 2); g.restore();
+      pill(it.v + '', x, Math.max(band + wantFs * 0.75, y - fr - wantFs * 0.8), C3.colW, wantFs, '#3f8f45', { minW: C3.colW * 0.6 });
+    });
+    if (R.state === 'tapq' && k >= 1) tapTimeout();   // reached her mouth: she catches whichever is above her
+    // lane hints so the child sees where to slide
+    g.globalAlpha = 0.25; C3.xs.forEach(x => { g.fillStyle = '#fff'; rr(x - C3.colW / 2, feet - 10, C3.colW, 8, 4); g.fill(); }); g.globalAlpha = 1;
+    drawHero();
+    if (R.qi === 0 && R.state === 'tapq') { const it = T.items.find(x => x.ok); if (it) { const u = (R.t % 1.6) / 1.6; emoji('👆', charX + (C3.xs[it.i] - charX) * u, feet - cs * 0.2, 44); } }
+  } else if (T.style === 'hoop') {
+    const water = Math.max(band + (H - band) * 0.55, feet - cs * 1.1);
+    g.fillStyle = '#2a8fbf'; g.fillRect(0, water, W, H); for (let i = 0; i < 14; i++) ell(((i * 113 + R.t * 60) % (W + 100)) - 50, water, 50, 10, '#7fd8ff');
+    emoji('🏝️', W * 0.88, water - 30, Math.min(W, H) * 0.14);
+    const rH = Math.min(C3.colW * 0.44, (water - band) * 0.33, H * 0.15), hy = band + (water - band) * 0.55;
+    // Penny swims or leaps through the chosen hoop
+    charX = W / 2; charY = water + cs * 0.75 + Math.sin(R.t * 3) * 4;
+    if (act && act.ok && act.it.pos && at < 1.2) {
+      const u = Math.min(1, at / 1.1), sx = W / 2, sy = water + cs * 0.75, hx = act.it.pos.x, hyy = act.it.pos.y + cs * 0.5;
+      charX = sx + (hx - sx) * Math.min(1, u * 1.6); charY = sy + (hyy - sy) * Math.sin(u * Math.PI) ; charRot = (u - 0.5) * 1.6;
+      if (at > 1.0 && !act.splash) { act.splash = 1; for (let j = 0; j < 30; j++) R.fx.push({ type: 'p', x: charX, y: water, vx: rnd(-220, 220), vy: rnd(-420, -150), t: 0, life: 0.9, col: '#bdf0ff', r: rnd(3, 8) }); R.fx.push({ type: 'txt', text: 'SPLASH!', x: charX, y: water - 40, t: 0, life: 1, col: '#fff' }); }
+    }
+    const hoopBack = [], hoopFront = [];
+    T.items.forEach(it => {
+      const lv = leaving(it); const slide = R.state === 'tapq' ? 1 - ease(clamp((R.t - T.born) / 0.35, 0, 1)) : 0;
+      const x = C3.xs[it.i], y = hy + Math.sin(R.t * 2 + it.i) * 5 + lv * H;
+      it.pos = { x, y }; it.hit = { x: x - C3.step / 2, y: y - rH - 80, w: C3.step, h: rH * 2 + 160 };
+      const col = ['#ff5d8f', '#ffd84d', '#a66bff'][it.i];
+      g.save(); g.translate(x, y); g.rotate(wob(it)); g.scale(1 - slide * 0.8, 1 - slide * 0.8); g.lineWidth = Math.max(8, rH * 0.18); g.strokeStyle = col; g.beginPath(); g.ellipse(0, 0, rH * 0.8, rH, 0, 0, 6.28); g.stroke();
+      g.setLineDash([rH * 0.2, rH * 0.2]); g.strokeStyle = '#fff'; g.lineWidth = Math.max(3, rH * 0.07); g.stroke(); g.setLineDash([]); g.restore();
+      pill(it.v + '', C3.xs[it.i], y, C3.colW, wantFs, shade(col), { minW: rH * 1.1 });
+    });
+    drawHero();
+  } else if (T.style === 'vine') {
+    g.fillStyle = Wd.ground; g.fillRect(0, feet - 6, W, H);
+    emoji('🌴', SAFE.l + 30, feet - Math.min(W, H) * 0.15, Math.min(W, H) * 0.3); emoji('🌴', W - SAFE.r - 30, feet - Math.min(W, H) * 0.15, Math.min(W, H) * 0.3);
+    const by = band + (feet - cs - band) * 0.55 + wantFs * 0.5, br = Math.min(C3.colW * 0.32, H * 0.08);
+    T.items.forEach(it => {
+      const lv = leaving(it), x0 = C3.xs[it.i], sway = Math.sin(R.t * 1.6 + it.i * 1.3) * C3.colW * 0.08 + wob(it) * C3.colW * 0.6;
+      const x = x0 + sway, y = by - lv * H * 0.8;
+      it.pos = { x, y }; it.hit = { x: x0 - C3.step / 2, y: band, w: C3.step, h: by - band + br * 2 + 60 };
+      g.strokeStyle = '#2e7d32'; g.lineWidth = Math.max(5, br * 0.18); g.beginPath(); g.moveTo(x0, -10); g.quadraticCurveTo(x0 + sway * 0.3, (y - br) / 2, x, y - br); g.stroke();
+      for (let j = 1; j < 5; j++) { const f = j / 5; emoji('🍃', x0 + (x - x0) * f * f + (j % 2 ? 10 : -10), (y - br) * f, br * 0.7); }
+      if (!it.gone) emoji('🍌', x, y, br * 2);
+      pill(it.v + '', x0, y + br + wantFs * 0.7, C3.colW, wantFs, '#5a7a2a', { minW: C3.colW * 0.6, bg: '#fffbe0' });
+    });
+    if (act && act.ok && act.it.pos && at < 1.6) {   // Oliver swings up the vine and grabs the bunch
+      const u = Math.min(1, at / 0.7), back = at > 1.1 ? Math.min(1, (at - 1.1) / 0.5) : 0, tx = act.it.pos.x, ty = act.it.pos.y + cs * 0.6;
+      const f = u * (1 - back); charX = W / 2 + (tx - W / 2) * f; charY = feet + (ty - feet) * Math.sin(f * Math.PI / 2) ; charRot = Math.sin(at * 6) * 0.3 * (1 - back);
+    }
+    drawHero();
+  }
+  if (!charDrawn) drawHero();
+  if (R.state === 'tapq' && T.style !== 'fruit' && k >= 1) tapTimeout();
+  g.restore();
+  drawTapTimer(T);
+  if (R.state === 'won' && Math.random() < 0.5) confetti(3);
+}
+
 /* ===== main loop ===== */
 let last = performance.now();
 function frame() {
@@ -1055,6 +1303,7 @@ function frame() {
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
   if (R.mode === 'swim') { runSwim(dt); drawFx(dt); return; }
   if (R.state === 'bonus') { runBonus(dt); drawFx(dt); return; }
+  if (R.mode === 'tap') { runTap(dt); drawReward(); drawFx(dt); return; }
   const stunned = R.stunT && R.t - R.stunT < 1.25;
   const target = stunned ? 0 : R.gates ? R.gates.v : (R.state === 'over' ? 0 : 24);
   if (stunned) R.speed = 0;
@@ -1069,7 +1318,7 @@ function frame() {
 }
 requestAnimationFrame(frame);
 R.startLevel = n => { document.getElementById('start').classList.add('hidden'); startLevel(n); };
-R.setLane = setLane; R.SWIM_Q = SWIM_Q; R.decisionTime = decisionTime; R.schedule = DECISION_SCHEDULE; R.RL = RL;
+R.tapPick = i => tapPick(R.tg && R.tg.items[i]); R.columns = columns; R.setLane = setLane; R.SWIM_Q = SWIM_Q; R.decisionTime = decisionTime; R.schedule = DECISION_SCHEDULE; R.RL = RL;
 // clear stale timers when (re)starting a level
 const _start = startLevel;
 })();
