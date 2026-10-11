@@ -275,7 +275,7 @@ function hud() {
 }
 function panels(which) { ['rover', 'rend'].forEach(id => { $r(id).style.display = id === which ? 'flex' : 'none'; }); }
 function preload(n) {
-  const L = RL[n]; const keys = [CH[L.ch].go, 'r_over', 'r_win', 'r_win_show', 'r_faster'];
+  const L = RL[n]; const keys = [L.type === 'words' && L.ch !== 'audrey' ? CH[L.ch].go + '_w' : CH[L.ch].go, 'r_over', 'r_win', 'r_win_show', 'r_faster'];
   R.qs.forEach(q => keys.push(q.k + '_q', q.k + '_y', q.k + '_n'));
   keys.forEach(k => Voice.decode(k));
   setTimeout(() => bonusKeys(L.bonus).forEach(k => Voice.decode(k)), 4000);
