@@ -1,0 +1,2797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Shark ABC">
+<meta name="application-name" content="Shark ABC">
+<meta name="theme-color" content="#0a5a9c">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="format-detection" content="telephone=no, email=no, address=no">
+<meta name="description" content="Aaron's Shark ABCs: swim the shark to the next letter of the alphabet. Designed by Adam Ennabe.">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=2">
+<link rel="manifest" href="manifest.webmanifest?v=2">
+<title>Aaron's Shark ABCs</title>
+<style>
+  :root{
+    --font: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Avenir Next", "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --navy:#0d2b52;
+    --cell:32px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;position:fixed;inset:0;
+    overscroll-behavior:none;touch-action:none;background:#0a5a9c;font-family:var(--font);
+    -webkit-text-size-adjust:100%;text-size-adjust:100%;color:#fff;}
+  #scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;}
+  #safe{position:fixed;visibility:hidden;pointer-events:none;
+    padding-top:env(safe-area-inset-top,0px);padding-right:env(safe-area-inset-right,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);}
+
+  /* Alphabet progress strip */
+  #strip{position:fixed;left:0;right:0;top:0;z-index:3;pointer-events:none;display:grid;
+    grid-template-columns:repeat(26,1fr);gap:4px;
+    padding:calc(env(safe-area-inset-top,0px) + 8px) calc(env(safe-area-inset-right,0px) + 10px) 6px calc(env(safe-area-inset-left,0px) + 10px);
+    background:linear-gradient(rgba(4,40,80,.45),rgba(4,40,80,0));}
+  #strip.portrait{grid-template-columns:repeat(13,1fr);}
+  #strip span{display:flex;align-items:center;justify-content:center;border-radius:28%;
+    background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.30);
+    color:rgba(255,255,255,.40);font-weight:900;font-size:calc(var(--cell) * .62);line-height:1;
+    transition:background .3s, color .3s, transform .3s;}
+  #strip.gone{visibility:hidden;}
+  #strip span.next{border-color:#fff;border-style:dashed;animation:nextPulse 1.2s ease-in-out infinite;}
+  #strip span.got{color:var(--navy);border-color:rgba(255,255,255,.9);animation:gotPop .55s cubic-bezier(.2,1.6,.4,1);}
+  @keyframes nextPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+  @keyframes gotPop{0%{transform:scale(.3)}100%{transform:scale(1)}}
+
+  .overlay{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);}
+  .hidden{display:none !important;}
+
+  /* Start screen */
+  #start{background:radial-gradient(ellipse at 50% 45%, rgba(10,90,156,.15), rgba(3,35,75,.55));}
+  #start h1{margin:0 0 2vmin;font-size:min(10vmin,76px);font-weight:900;letter-spacing:.5px;color:#fff;
+    text-shadow:0 4px 0 #0b4c86, 0 8px 24px rgba(0,0,0,.35);}
+  #start h1 .abc{color:#ffd84d;}
+  .bigbtn{appearance:none;border:0;outline:0;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    width:min(34vmin,220px);height:min(34vmin,220px);
+    background:radial-gradient(circle at 35% 30%, #fff6b8, #ffd84d 45%, #f5a623);
+    box-shadow:0 10px 0 #c97c00, 0 18px 40px rgba(0,0,0,.35), inset 0 -6px 14px rgba(201,124,0,.35);
+    animation:breathe 1.6s ease-in-out infinite;touch-action:manipulation;}
+  .bigbtn:active{transform:translateY(6px) scale(.97);box-shadow:0 4px 0 #c97c00, 0 10px 24px rgba(0,0,0,.35);}
+  .bigbtn svg{width:46%;height:46%;}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+  .sub{margin-top:3.2vmin;font-size:min(4.6vmin,28px);font-weight:800;color:#e9f6ff;text-shadow:0 2px 6px rgba(0,0,0,.35);}
+  .credit{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:0;right:0;font-size:min(3.2vmin,16px);
+    color:rgba(255,255,255,.85);font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.4);}
+  .tip{display:block;margin-top:4px;font-weight:600;opacity:.85;}
+
+  /* Letter celebration card */
+  #card{pointer-events:none;}
+  #card .inner{display:flex;align-items:center;gap:3vmin;padding:2.5vmin 5vmin;border-radius:6vmin;
+    background:rgba(255,255,255,.93);box-shadow:0 12px 40px rgba(0,40,90,.35);border:6px solid #ffd84d;
+    animation:cardIn .5s cubic-bezier(.2,1.5,.4,1);}
+  #card.out .inner{animation:cardOut .35s ease-in forwards;}
+  #card .big{font-size:min(28vmin,200px);font-weight:900;color:var(--navy);line-height:1;}
+  #card .pic{font-size:min(22vmin,160px);line-height:1;}
+  #card .word{font-size:min(6vmin,40px);font-weight:900;color:#1d6fb8;margin-top:1vmin;}
+  @keyframes cardIn{0%{transform:scale(.2) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+  @keyframes cardOut{to{transform:scale(.6);opacity:0}}
+
+  /* Final celebration */
+  #final{background:radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.10), rgba(3,35,75,.55));}
+  #final .trophy{font-size:min(26vmin,190px);line-height:1;animation:bob 1.4s ease-in-out infinite;}
+  #final h2{margin:2vmin 0 4vmin;font-size:min(9vmin,64px);font-weight:900;color:#ffd84d;text-shadow:0 4px 0 #0b4c86,0 8px 24px rgba(0,0,0,.35);}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-3vmin) rotate(4deg)}}
+
+  /* Lives: 5 hearts (bottom-left; a row in landscape, a column in portrait so they stay clear of the current) */
+  #lives{position:fixed;z-index:3;pointer-events:none;display:flex;gap:6px;--heart:clamp(26px,4.6vmin,44px);
+    left:calc(env(safe-area-inset-left,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);}
+  #lives.portrait{flex-direction:column-reverse;}
+  #lives .h{display:block;width:var(--heart);height:var(--heart);}
+  #lives svg{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 3px rgba(0,30,70,.35));transition:transform .3s, opacity .3s;}
+  #lives .h.lost svg{opacity:.45;transform:scale(.78);}
+  #lives .h.lost path{fill:#9db4cc;}
+  #lives .h.pop svg{animation:heartPop .6s ease-out;}
+  #lives .h.gain svg{animation:heartGain .7s cubic-bezier(.2,1.6,.4,1);}
+  @keyframes heartPop{0%{transform:scale(1)}30%{transform:scale(1.55) rotate(-14deg)}100%{transform:scale(.78)}}
+  @keyframes heartGain{0%{transform:scale(.2)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+
+  /* Small corner buttons (music mute, free-swim play again) */
+  .cornerbtn{position:fixed;z-index:6;appearance:none;outline:0;padding:0;margin:0;cursor:pointer;touch-action:manipulation;
+    width:56px;height:56px;border-radius:50%;background:rgba(4,40,80,.38);border:2px solid rgba(255,255,255,.5);
+    display:flex;align-items:center;justify-content:center;}
+  .cornerbtn svg{width:60%;height:60%;display:block;}
+  #mute{opacity:.72;}
+  #mute .slash{display:none;}
+  #mute.off{opacity:.9;}
+  #mute.off .slash{display:inline;}
+  #mute.land{left:calc(env(safe-area-inset-left,0px) + 12px);top:calc(var(--stripB,60px) + 10px);}
+  #mute.port{right:calc(env(safe-area-inset-right,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);}
+  #replay{width:78px;height:78px;right:calc(env(safe-area-inset-right,0px) + 12px);top:calc(var(--stripB,60px) + 10px);
+    background:radial-gradient(circle at 35% 30%, #d8ffd6, #5fd36a 45%, #2b9e3c);border:0;box-shadow:0 6px 0 #1f7a2d, 0 10px 24px rgba(0,0,0,.3);}
+  #replay:active{transform:translateY(4px);box-shadow:0 2px 0 #1f7a2d;}
+
+  /* Crocodiles-eaten counter (free swim) */
+  #counter{position:fixed;z-index:4;pointer-events:none;left:0;right:0;margin:0 auto;width:max-content;top:calc(var(--stripB,60px) + 10px);
+    display:flex;align-items:center;gap:10px;padding:4px 20px 4px 10px;border-radius:999px;background:rgba(4,40,80,.42);
+    border:3px solid rgba(255,255,255,.65);font-weight:900;font-size:min(8vmin,48px);line-height:1.1;color:#fff;text-shadow:0 2px 0 #0b4c86;}
+  #counter canvas{width:min(15vmin,90px);height:min(7.5vmin,45px);display:block;}
+  #counter.bump{animation:gotPop .45s cubic-bezier(.2,1.6,.4,1);}
+
+  /* Game over */
+  #over{background:radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.08), rgba(3,35,75,.6));}
+  #overCroc{width:min(60vmin,400px);height:min(30vmin,200px);margin-bottom:1vmin;display:block;}
+  #tryagain{background:radial-gradient(circle at 35% 30%, #d8ffd6, #5fd36a 45%, #2b9e3c);box-shadow:0 10px 0 #1f7a2d, 0 18px 40px rgba(0,0,0,.35);}
+  #tryagain:active{box-shadow:0 4px 0 #1f7a2d, 0 10px 24px rgba(0,0,0,.35);}
+
+  /* v4: level picker (start screen + end panels) */
+  .levels{display:flex;align-items:flex-end;justify-content:center;gap:min(7vmin,56px);}
+  .lvlpick{display:flex;flex-direction:column;align-items:center;}
+  .lvlname{margin-top:2.6vmin;font-size:min(5.6vmin,34px);font-weight:900;color:#fff;text-shadow:0 3px 0 #0b4c86,0 6px 16px rgba(0,0,0,.35);line-height:1.05;}
+  .lvlname small{display:block;font-size:.55em;font-weight:800;color:#e9f6ff;margin-top:2px;}
+  .bigbtn.l2{width:min(28vmin,180px);height:min(28vmin,180px);flex-direction:column;
+    background:radial-gradient(circle at 35% 30%, #d8ffd6, #5fd36a 45%, #2b9e3c);box-shadow:0 10px 0 #1f7a2d, 0 18px 40px rgba(0,0,0,.35);animation-delay:.4s;}
+  .bigbtn.l2:active{box-shadow:0 4px 0 #1f7a2d, 0 10px 24px rgba(0,0,0,.35);}
+  .bigbtn .num{font-size:min(15vmin,96px);font-weight:900;color:#0d2b52;line-height:.9;}
+  .bigbtn.l2 .num{color:#0d3b1a;font-size:min(11vmin,70px);}
+  .bigbtn canvas{width:62%;height:24%;display:block;}
+  .bigbtn.huge{width:min(42vmin,270px);height:min(42vmin,270px);}
+  .bigbtn.huge .num{font-size:min(17vmin,110px);}
+  .bigbtn.small{width:min(22vmin,140px);height:min(22vmin,140px);}
+  .bigbtn.green{background:radial-gradient(circle at 35% 30%, #d8ffd6, #5fd36a 45%, #2b9e3c);box-shadow:0 10px 0 #1f7a2d, 0 18px 40px rgba(0,0,0,.35);}
+  .endpanel{justify-content:flex-end;pointer-events:none;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 5vmin);}
+  .endpanel button{pointer-events:auto;}
+  .endpanel h2{margin:0 0 3vmin;font-size:min(9vmin,64px);font-weight:900;color:#ffd84d;text-shadow:0 4px 0 #0b4c86,0 8px 24px rgba(0,0,0,.45);}
+  .endpanel .levels{animation:cardIn .5s cubic-bezier(.2,1.5,.4,1);}
+  .endpanel .lvlname{background:rgba(4,40,80,.6);padding:.25em .7em .3em;border-radius:999px;margin-top:2vmin;}
+  .endpanel h2{background:rgba(4,40,80,.45);padding:.1em .6em .2em;border-radius:999px;}
+
+  /* v4: small level badge (for Dad) */
+  #lvl{position:fixed;z-index:3;pointer-events:none;width:56px;height:56px;border-radius:18px;background:rgba(4,40,80,.38);
+    border:2px solid rgba(255,255,255,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;color:#fff;font-weight:900;}
+  #lvl small{font-size:10px;letter-spacing:.5px;opacity:.9;}
+  #lvl b{font-size:26px;}
+  #lvl.land{left:calc(env(safe-area-inset-left,0px) + 78px);top:calc(var(--stripB,60px) + 10px);}
+  #lvl.port{right:calc(env(safe-area-inset-right,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 78px);}
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="Underwater alphabet game"></canvas>
+<div id="safe"></div>
+<div id="strip" aria-hidden="true"></div>
+<div id="lives" class="hidden" aria-hidden="true"></div>
+<div id="counter" class="hidden" aria-live="polite"><canvas id="counterCroc" aria-hidden="true"></canvas><span id="counterNum">0</span></div>
+<div id="lvl" class="land hidden" aria-label="Level"><small>LEVEL</small><b id="lvlNum">1</b></div>
+<button id="mute" class="cornerbtn land hidden" aria-label="Music on or off" aria-pressed="false">
+  <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M18 34V12l20-5v22" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="13" cy="34" rx="6" ry="5" fill="#fff"/><ellipse cx="33" cy="29" rx="6" ry="5" fill="#fff"/><path class="slash" d="M7 7L41 41" stroke="#ff5a6e" stroke-width="5" stroke-linecap="round"/></svg>
+</button>
+<button id="replay" class="cornerbtn hidden" aria-label="Play again"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M74 34 A30 30 0 1 0 80 56" fill="none" stroke="#0d3b1a" stroke-width="11" stroke-linecap="round"/><path d="M62 20 L84 30 L72 50 Z" fill="#0d3b1a" stroke="#0d3b1a" stroke-width="5" stroke-linejoin="round"/></svg></button>
+
+<div id="start" class="overlay">
+  <h1>Aaron's Shark <span class="abc">ABC</span></h1>
+  <div class="levels">
+    <div class="lvlpick">
+      <button id="play" class="bigbtn" aria-label="Tap to play level 1">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 18 L84 50 L30 82 Z" fill="#0d2b52" stroke="#0d2b52" stroke-width="10" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="lvlname" id="play1Name">Level 1</div>
+    </div>
+    <div class="lvlpick">
+      <button id="play2" class="bigbtn l2" aria-label="Play level 2: race the crocodile"><canvas class="crocIcon" aria-hidden="true"></canvas><span class="num">2</span></button>
+      <div class="lvlname">Level 2<small>Race the croc!</small></div>
+    </div>
+  </div>
+  <div class="sub">Tap to Play!</div>
+  <div class="credit">Designed by Dad (Adam Ennabe) for Aaron
+    <span class="tip" id="a2hs">Tip: tap Share, then “Add to Home Screen” for full screen</span></div>
+</div>
+
+<div id="card" class="overlay hidden" aria-live="polite">
+  <div class="inner">
+    <div class="big" id="cardLetter">A</div>
+    <div><div class="pic" id="cardPic">🍎</div><div class="word" id="cardWord">Apple</div></div>
+  </div>
+</div>
+
+<div id="final" class="overlay hidden">
+  <div class="trophy">🏆</div>
+  <h2>A to Z! Hooray!</h2>
+</div>
+
+<!-- v4: Level 1 won (shark covers the screen): go to Level 2 or play Level 1 again -->
+<div id="won" class="overlay endpanel hidden">
+  <div class="levels">
+    <div class="lvlpick">
+      <button id="toL2" class="bigbtn l2 huge" aria-label="Level 2"><canvas class="crocIcon" aria-hidden="true"></canvas><span class="num">2</span></button>
+      <div class="lvlname">Level 2!</div>
+    </div>
+    <div class="lvlpick">
+      <button id="againL1" class="bigbtn small" aria-label="Play level 1 again"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M74 34 A30 30 0 1 0 80 56" fill="none" stroke="#0d2b52" stroke-width="11" stroke-linecap="round"/><path d="M62 20 L84 30 L72 50 Z" fill="#0d2b52" stroke="#0d2b52" stroke-width="5" stroke-linejoin="round"/></svg></button>
+      <div class="lvlname">Level 1<small>again</small></div>
+    </div>
+  </div>
+</div>
+
+<!-- v4: Level 2 won (A to Z before the crocodile): play Level 2 again or go back to Level 1 -->
+<div id="won2" class="overlay endpanel hidden">
+  <h2>You beat the big crocodile!</h2>
+  <div class="levels">
+    <div class="lvlpick">
+      <button id="againL2" class="bigbtn green" aria-label="Play level 2 again"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M74 34 A30 30 0 1 0 80 56" fill="none" stroke="#0d3b1a" stroke-width="11" stroke-linecap="round"/><path d="M62 20 L84 30 L72 50 Z" fill="#0d3b1a" stroke="#0d3b1a" stroke-width="5" stroke-linejoin="round"/></svg></button>
+      <div class="lvlname">Play Again</div>
+    </div>
+    <div class="lvlpick">
+      <button id="toL1" class="bigbtn small" aria-label="Back to level 1"><span class="num">1</span></button>
+      <div class="lvlname">Level 1</div>
+    </div>
+  </div>
+</div>
+
+<div id="over" class="overlay hidden">
+  <canvas id="overCroc" aria-hidden="true"></canvas>
+  <button id="tryagain" class="bigbtn" aria-label="Try again"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M74 34 A30 30 0 1 0 80 56" fill="none" stroke="#0d3b1a" stroke-width="11" stroke-linecap="round"/><path d="M62 20 L84 30 L72 50 Z" fill="#0d3b1a" stroke="#0d3b1a" stroke-width="5" stroke-linejoin="round"/></svg></button>
+  <div class="sub">Try again!</div>
+</div>
+
+<noscript><p style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px">Please turn on JavaScript to play.</p></noscript>
+
+<script type="application/json" id="voice-lines">{"voice":"en-US-AvaNeural","rate":"-10%","lines":{"intro":{"text":"Let's swim! Drag the shark to the letter A!","dur":3.38},"again":{"text":"Here we go! Find the letter, A!","dur":2.57},"final":{"text":"Hooray! You did it! A to Z! Great job, Aaron!","dur":4.68},"wrong1":{"text":"Oops! Try again!","dur":1.85},"wrong2":{"text":"Almost! Try another one!","dur":2.18},"wrong3":{"text":"Hmm, not that one. Let's try again!","dur":3.53},"chomp":{"text":"Chomp! You ate a crocodile! Eat them all to grow bigger!","dur":4.63},"gameover":{"text":"Oh no! The crocodile got you! Let's try again!","dur":4.06},"yum1":{"text":"Yum yum!","dur":0.89},"yum2":{"text":"Chomp! Got one!","dur":1.78},"yum3":{"text":"Yummy! You're so big!","dur":2.14},"free":{"text":"Bonus time! Eat twenty crocodiles and grow super big!","dur":4.37},"snack":{"text":"Snack time! Eat the crocodiles!","dur":2.62},"snackdone":{"text":"Yum! Back to the letters!","dur":2.23},"win":{"text":"You did it! You won!","dur":1.87},"l2tap":{"text":"Tap the big button for level two!","dur":2.11},"level2":{"text":"Level two! Race the crocodile to the letter!","dur":3.07},"crocgot":{"text":"Oh no! The crocodile got it! Let's try again!","dur":3.96},"l2final":{"text":"Hooray! You beat the crocodile! A to Z! Great job, Aaron!","dur":5.52},"snackgrow":{"text":"Yum! Look, you got bigger! Back to the letters!","dur":4.08},"partygrow":{"text":"Wow! You got bigger!","dur":2.11},"party1":{"text":"Party time! Here come Aaron's shark friends!","dur":3.31},"party2":{"text":"They're back! Party time again!","dur":2.33},"n_elio":{"text":"Elio!","dur":0.72},"n_oliver":{"text":"Oliver!","dur":0.72},"n_andrew":{"text":"Andrew!","dur":0.77},"princesses":{"text":"And the shark princesses!","dur":1.66},"n_audrey":{"text":"Audrey!","dur":0.72},"n_emma":{"text":"Emma!","dur":0.55},"n_penny":{"text":"Penny!","dur":0.58},"n_mackenzie":{"text":"Mackenzie!","dur":0.89},"n_alli":{"text":"And Alli!","dur":0.84},"stinky":{"text":"Pee-yew! So stinky!","dur":2.18},"boss":{"text":"Uh oh! Here comes the biggest crocodile!","dur":3.41},"cousins":{"text":"Aaron's shark cousins are here to help! Chomp chomp!","dur":3.67},"bosshalf":{"text":"Keep biting! He's getting tired!","dur":2.47},"bosswin":{"text":"You beat the big crocodile! Aaron and his cousins win!","dur":4.13},"c_a":{"text":"A! A is for apple!","dur":2.21},"f_a":{"text":"Find the letter, A!","dur":1.37},"c_b":{"text":"B! B is for ball!","dur":1.85},"f_b":{"text":"Find the letter, B!","dur":1.27},"c_c":{"text":"C! C is for cat!","dur":2.16},"f_c":{"text":"Find the letter, C!","dur":1.34},"c_d":{"text":"D! D is for dog!","dur":2.16},"f_d":{"text":"Find the letter, D!","dur":1.37},"c_e":{"text":"E! E is for elephant!","dur":2.23},"f_e":{"text":"Find the letter E!","dur":1.25},"c_f":{"text":"F! F is for fish!","dur":2.42},"f_f":{"text":"Find the letter, F!","dur":1.34},"c_g":{"text":"G! G is for grapes!","dur":2.4},"f_g":{"text":"Find the letter, G!","dur":1.49},"c_h":{"text":"H! H is for hat!","dur":2.16},"f_h":{"text":"Find the letter, H!","dur":1.49},"c_i":{"text":"I! I is for ice cream!","dur":2.28},"f_i":{"text":"Find the letter, I!","dur":1.34},"c_j":{"text":"J! J is for juice!","dur":2.33},"f_j":{"text":"Find the letter, J!","dur":1.54},"c_k":{"text":"K! K is for kite!","dur":1.97},"f_k":{"text":"Find the letter, K!","dur":1.46},"c_l":{"text":"L! L is for lion!","dur":2.09},"f_l":{"text":"Find the letter L!","dur":1.27},"c_m":{"text":"M! M is for moon!","dur":1.92},"f_m":{"text":"Find the letter, M!","dur":1.32},"c_n":{"text":"N! N is for nest!","dur":1.99},"f_n":{"text":"Find the letter, N!","dur":1.34},"c_o":{"text":"O! O is for octopus!","dur":2.47},"f_o":{"text":"Find the letter, O!","dur":1.39},"c_p":{"text":"P! P is for pig!","dur":1.94},"f_p":{"text":"Find the letter, P!","dur":1.42},"c_q":{"text":"Q! Q is for queen!","dur":2.33},"f_q":{"text":"Find the letter, Q!","dur":1.37},"c_r":{"text":"R! R is for rainbow!","dur":2.11},"f_r":{"text":"Find the letter, R!","dur":1.44},"c_s":{"text":"S! S is for shark!","dur":2.35},"f_s":{"text":"Find the letter, S!","dur":1.34},"c_t":{"text":"T! T is for turtle!","dur":2.09},"f_t":{"text":"Find the letter, T!","dur":1.34},"c_u":{"text":"U! U is for umbrella!","dur":2.38},"f_u":{"text":"Find the letter, U!","dur":1.25},"c_v":{"text":"V! V is for volcano!","dur":2.52},"f_v":{"text":"Find the letter, V!","dur":1.39},"c_w":{"text":"W! W is for whale!","dur":2.59},"f_w":{"text":"Find the letter, W!","dur":1.75},"c_x":{"text":"X! X is for xylophone!","dur":2.52},"f_x":{"text":"Find the letter, X!","dur":1.37},"c_y":{"text":"Y! Y is for yo-yo!","dur":2.38},"f_y":{"text":"Find the letter, Y!","dur":1.56},"c_z":{"text":"Z! Z is for zebra!","dur":2.3},"f_z":{"text":"Find the letter, Z!","dur":1.34}}}</script>
+<script>
+(() => {
+'use strict';
+
+/* ================================================================
+   CONFIG: letters, words, levels
+   ================================================================ */
+const params = new URLSearchParams(location.search);
+// Timing multiplier (used by automated tests: ?speed=0.2 makes celebrations faster)
+const BUILD = '5';   // bump to bust caches for audio/icons
+const SPEED = Math.min(1, Math.max(0.05, parseFloat(params.get('speed')) || 1));
+const TS = Math.max(SPEED, 0.25);   // time scale for scripted scenes (crocodile reward / game over); ?speed shortens them in tests
+const MAX_LIVES = 5;
+const BREAK_MIN = 2, BREAK_MAX = 4;                 // Level 1: a crocodile snack break after a random 2, 3 or 4 correct letters
+const SNACK_MIN = 2, SNACK_MAX = 3;                 // crocodiles to eat in one snack break
+const SNACK_MAX_SEC = 40;                           // safety net: a snack break never lasts longer than this (crocs also swim closer after ~7 s)
+// v5 sizes are relative to the v4 starting shark (scale 1 = v4 start size)
+const L1_START_SCALE = 0.6;                         // Level 1 starts at 60% of the v4 size (still big + easy to drag)
+const L1_GROW_BREAK = 0.08, L1_MAX_SCALE = 1.35;    // he grows +0.08 at the end of every snack break (grow animation + sound), capped so he fits
+const L2_START_SCALE = 0.6, L2_GROW_PARTY = 0.2, L2_MAX_SCALE = 1.0;   // Level 2 has no snack breaks: he grows at each shark party
+const PARTY_AT = [7, 16];                           // shark party after G (7 letters done) and after P (16 letters done), both levels
+const PARTY_DANCE_SEC = [2.2, 8.5];                 // dancing time after the intros (first party: long name intros, second party: short intro)
+const WRONG_GRACE = 2.0;                            // after a wrong letter, no other wrong letter counts for this long (starts after the bounce)
+const BOSS_HP = 24;                                 // Level 2 boss crocodile: bites to win (Aaron + 8 cousins)
+const BOSS_AARON_CD = 1.1;                          // seconds between two of Aaron's bites
+const BOSS_COUSIN_EVERY = 2.3, BOSS_COUSIN_FAST = 1.4;   // a cousin darts in to bite every ~2.3 s (1.4 s when Aaron has not bitten for 4 s)
+const FEAST_GOAL = 20;                              // after Z: crocodile #20 makes the shark cover the whole screen (= you won!)
+const L2_CROC_SEC_A = 9, L2_CROC_SEC_Z = 7;         // Level 2: seconds the crocodile needs to reach the letter (at A ... at Z)
+const L2_RETRY_SLOWER = 1.25;                       // Level 2: after the crocodile wins, the repeat round is 25% slower and the right letter glows
+const MUSIC_VOL = 0.35, MUSIC_DUCK = 0.35;          // music ~9 dB under the voice (voice = 1.0); ducked another ~9 dB while a voice line plays
+// Dad / test hooks: ?level=2 (tap-anywhere starts Level 2), ?break=N (fixed snack interval), ?crocsec=S (fixed Level 2 croc time),
+// ?skip=end (Level 1 starts straight at the 20-crocodile ending), v5: ?start=G (start at a letter, e.g. G = the party comes next),
+// ?party=G or ?party=P (straight into that shark party), ?boss=1 (Level 2 straight to the big crocodile; also ?level=2&start=boss)
+const BREAK_FIXED = parseInt(params.get('break'), 10) || 0;
+const CROC_SEC_FIXED = parseFloat(params.get('crocsec')) || 0;
+const SKIP = params.get('skip') || '';
+const START_AT = (() => { const v = (params.get('start') || '').toUpperCase(); const i = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(v); return v.length === 1 && i >= 0 ? i : 0; })();
+const PARTY_JUMP = (() => { const v = (params.get('party') || '').toUpperCase(); return v === 'G' || v === '1' ? 1 : v === 'P' || v === '2' ? 2 : 0; })();
+const BOSS_JUMP = /^(1|true|yes)$/i.test(params.get('boss') || '') || /^boss$/i.test(params.get('start') || '');
+
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const WORDS = {
+  A:['apple','🍎'], B:['ball','⚽'], C:['cat','🐱'], D:['dog','🐶'], E:['elephant','🐘'],
+  F:['fish','🐟'], G:['grapes','🍇'], H:['hat','🎩'], I:['ice cream','🍦'], J:['juice','🧃'],
+  K:['kite','🪁'], L:['lion','🦁'], M:['moon','🌙'], N:['nest','🪺'], O:['octopus','🐙'],
+  P:['pig','🐷'], Q:['queen','👑'], R:['rainbow','🌈'], S:['shark','🦈'], T:['turtle','🐢'],
+  U:['umbrella','☂️'], V:['volcano','🌋'], W:['whale','🐳'], X:['xylophone','🎶'], Y:['yo-yo','🪀'],
+  Z:['zebra','🦓']
+};
+
+/* Levels. Level 1 = free swim to the letters (v5: no more current/tunnel), Level 2 = race the crocodile (race:true).
+   3 and 4 show how to extend:
+   choices      = how many letter bubbles float in the water
+   lowercase    = show lowercase letters on the bubbles */
+const LEVELS = [
+  { id:1, choices:3, lowercase:false, playable:true  },
+  { id:2, choices:3, lowercase:false, playable:true, race:true },
+  { id:3, choices:3, lowercase:true,  playable:false },
+  { id:4, choices:4, lowercase:true,  playable:false },
+];
+let levelIndex = 0;
+const startLevel = BOSS_JUMP ? 2 : (() => { const i = (parseInt(params.get('level'), 10) || 1) - 1; return LEVELS[i] && LEVELS[i].playable ? i + 1 : 1; })();
+
+/* v5: Aaron's shark friends (shark parties after G and P, and the cousins in the Level 2 boss battle).
+   Boys: tough look in their own colors. Princesses: pastel colors, a tiara, eyelashes and rosy cheeks. */
+const AARON_SKIN = { top: '#3f78bd', bot: '#6ea5e0', fin: '#3c6fae', out: '#1f4a80', belly: '#f3f8ff' };
+const FRIENDS = [
+  { name: 'Elio',      key: 'n_elio',      boy: true, skin: { top: '#2f9e8f', bot: '#63d3c1', fin: '#26887b', out: '#135a52', belly: '#effffb' } },
+  { name: 'Oliver',    key: 'n_oliver',    boy: true, skin: { top: '#e2792b', bot: '#f8ab62', fin: '#c8641d', out: '#86400e', belly: '#fff6ec' } },
+  { name: 'Andrew',    key: 'n_andrew',    boy: true, skin: { top: '#5b5fc4', bot: '#8f94ea', fin: '#4b4fab', out: '#2b2e75', belly: '#f2f3ff' } },
+  { name: 'Audrey',    key: 'n_audrey',    gem: '#7fd3ff', skin: { top: '#f0679f', bot: '#ffb0d0', fin: '#e0558e', out: '#9c2c5f', belly: '#fff2f8' } },
+  { name: 'Emma',      key: 'n_emma',      gem: '#ff6f91', skin: { top: '#9b6cf0', bot: '#cdb0ff', fin: '#8a5ce0', out: '#53309c', belly: '#f7f2ff' } },
+  { name: 'Penny',     key: 'n_penny',     gem: '#5fd36a', skin: { top: '#f47a68', bot: '#ffbfad', fin: '#e2685a', out: '#9e3d30', belly: '#fff5f1' } },
+  { name: 'Mackenzie', key: 'n_mackenzie', gem: '#ffd84d', skin: { top: '#cf52c9', bot: '#f29bee', fin: '#bb43b5', out: '#7d1f78', belly: '#fff2fe' } },
+  { name: 'Alli',      key: 'n_alli',      gem: '#ff8fb1', skin: { top: '#2db3cf', bot: '#93e6f5', fin: '#229fb9', out: '#0f6273', belly: '#f0fdff' } },
+];
+const level = () => LEVELS[levelIndex];
+const isRace = () => !!level().race;
+const show = ch => level().lowercase ? ch.toLowerCase() : ch;
+
+const FONT = getComputedStyle(document.documentElement).getPropertyValue('--font').trim() || 'sans-serif';
+const BUBBLE_COLORS = ['#ffd84d', '#ff8fb1', '#7fe0a0', '#b49cff', '#7fd3ff', '#ffb066'];
+
+/* ================================================================
+   Helpers
+   ================================================================ */
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const rand = (a, b) => a + Math.random() * (b - a);
+const easeInOut = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+const angDiff = (a, b) => { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; };
+function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+function later(fn, ms) { return setTimeout(fn, ms * SPEED); }
+
+/* ================================================================
+   Sound (Web Audio, synthesized) + Speech
+   ================================================================ */
+const Sfx = {
+  ctx: null, master: null, voiceOut: null,
+  unlock() {
+    try {
+      // iOS 16.4+: play through the ringer/silent switch like a media app
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (_) {}
+      if (!this.ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        this.ctx = new AC();
+        this.master = this.ctx.createGain();
+        this.master.gain.value = 0.55;
+        const comp = this.ctx.createDynamicsCompressor();
+        this.master.connect(comp); comp.connect(this.ctx.destination);
+        this.voiceOut = this.ctx.createGain();      // voice clips bypass the SFX compressor
+        this.voiceOut.gain.value = 1.0;
+        this.voiceOut.connect(this.ctx.destination);
+      }
+      if (this.ctx.state !== 'running') this.ctx.resume();
+      const b = this.ctx.createBuffer(1, 1, 22050), s = this.ctx.createBufferSource();
+      s.buffer = b; s.connect(this.ctx.destination); s.start(0);
+    } catch (e) { /* audio not available */ }
+  },
+  tone(f0, f1, dur, type = 'sine', vol = 0.3, delay = 0) {
+    if (!this.ctx || this.ctx.state !== 'running') return;
+    const t = this.ctx.currentTime + delay;
+    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f0, t);
+    if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(this.master);
+    o.start(t); o.stop(t + dur + 0.05);
+  },
+  boop()  { this.tone(420, 250, 0.32, 'sine', 0.32); this.tone(840, 500, 0.2, 'sine', 0.05); },
+  pop(d = 0) { this.tone(rand(480, 640), rand(1000, 1300), 0.09, 'sine', 0.16, d); },
+  blub()  { this.tone(260, 520, 0.14, 'sine', 0.12); },
+  chime() {
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+      this.tone(f, f, 0.4, 'triangle', 0.2, i * 0.09);
+      this.tone(f * 2, f * 2, 0.25, 'sine', 0.04, i * 0.09);
+    });
+  },
+  fanfare() {
+    const n = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5];
+    const d = [0, .14, .28, .42, .62, .76, .92];
+    n.forEach((f, i) => { this.tone(f, f, i === n.length - 1 ? 0.9 : 0.25, 'triangle', 0.22, d[i]); this.tone(f / 2, f / 2, 0.3, 'sine', 0.08, d[i]); });
+    for (let i = 0; i < 10; i++) this.pop(1.1 + i * 0.07);
+  },
+  ok() { return !!(this.ctx && this.ctx.state === 'running'); },
+  noise(dur, type, f0, q, vol, delay = 0, f1 = 0) {
+    if (!this.ok()) return;
+    const c = this.ctx;
+    if (!this.noiseBuf) { const n = c.sampleRate, b = c.createBuffer(1, n, n), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; this.noiseBuf = b; }
+    const t = c.currentTime + delay, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = this.noiseBuf; f.type = type; f.Q.value = q;
+    f.frequency.setValueAtTime(f0, t); if (f1) f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(this.master);
+    s.start(t, Math.random() * 0.4); s.stop(t + dur + 0.05);
+  },
+  brass(f, dur, vol, delay = 0, o = {}) {   // filtered sawtooth "horn" with a wah-wah filter sweep
+    if (!this.ok()) return;
+    const c = this.ctx, t = c.currentTime + delay;
+    const osc = c.createOscillator(), fl = c.createBiquadFilter(), g = c.createGain();
+    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(f, t);
+    if (o.bend) osc.frequency.linearRampToValueAtTime(f * o.bend, t + dur);
+    if (o.vib) { const l = c.createOscillator(), lg = c.createGain(); l.frequency.value = o.vib; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(f * 0.025, t + dur * 0.5); l.connect(lg); lg.connect(osc.frequency); l.start(t); l.stop(t + dur + 0.1); }
+    fl.type = 'lowpass'; fl.Q.value = o.q || 4;
+    const lo = o.lo || 350, hi = o.hi || 1800;
+    fl.frequency.setValueAtTime(lo, t); fl.frequency.linearRampToValueAtTime(hi, t + Math.min(0.14, dur * 0.35)); fl.frequency.linearRampToValueAtTime(lo * 1.2, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.03);
+    g.gain.setValueAtTime(vol, t + dur * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(fl); fl.connect(g); g.connect(this.master); osc.start(t); osc.stop(t + dur + 0.05);
+  },
+  chomp() { [0, 0.15].forEach(d => { this.noise(0.12, 'bandpass', 1500, 1.1, 0.6, d, 450); this.tone(240, 55, 0.14, 'square', 0.14, d); this.tone(1100, 320, 0.05, 'triangle', 0.12, d); }); },
+  swish() { this.noise(0.5, 'bandpass', 420, 0.9, 0.14, 0, 1700); },
+  burp() {
+    if (!this.ok()) return;
+    const c = this.ctx, t = c.currentTime, o = c.createOscillator(), l = c.createOscillator(), lg = c.createGain(), fl = c.createBiquadFilter(), g = c.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(125, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.6);
+    l.frequency.value = 23; lg.gain.value = 14; l.connect(lg); lg.connect(o.frequency);
+    fl.type = 'lowpass'; fl.frequency.value = 650; fl.Q.value = 3;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.38, t + 0.05); g.gain.setValueAtTime(0.38, t + 0.35); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.62);
+    o.connect(fl); fl.connect(g); g.connect(this.master); o.start(t); l.start(t); o.stop(t + 0.7); l.stop(t + 0.7);
+  },
+  sparkle(d = 0) { [1318.5, 1568, 2093].forEach((f, i) => this.tone(f, f, 0.2, 'sine', 0.1, d + i * 0.07)); },
+  sting() {   // triumphant "ta-da!"
+    [392, 523.25, 659.25].forEach((f, i) => this.brass(f, 0.13, 0.16, i * 0.09, { lo: 600, hi: 2600, q: 2 }));
+    [523.25, 659.25, 783.99, 1046.5].forEach(f => this.brass(f, 0.95, 0.11, 0.3, { lo: 700, hi: 2800, q: 1.5, vib: 6 }));
+    this.tone(261.6, 261.6, 0.9, 'triangle', 0.18, 0.3);
+    for (let i = 0; i < 6; i++) this.pop(0.35 + i * 0.08);
+  },
+  sad() {     // gentle "wah, wah, wah, waaah" (descending muted horn, minor feel, soft)
+    [233.08, 220, 207.65, 196].forEach((f, i) => this.brass(f, i === 3 ? 1.5 : 0.48, 0.22, i * 0.55, { lo: 280, hi: 1300, q: 5, vib: i === 3 ? 5.5 : 0, bend: i === 3 ? 0.97 : 1 }));
+  },
+  victory() { // v4 win jingle: quick run up, a bright "ta-da" chord with horns, pops and sparkles (~3 s)
+    const seq = [[523.25, 0], [659.25, .12], [783.99, .24], [1046.5, .36], [783.99, .6], [880, .72], [987.77, .84], [1046.5, .96], [1318.5, 1.2]];
+    seq.forEach(([f, d], i) => { const last = i === seq.length - 1; this.tone(f, f, last ? 1.5 : 0.22, 'square', 0.07, d); this.tone(f, f, last ? 1.5 : 0.26, 'triangle', 0.18, d); });
+    [523.25, 659.25, 783.99, 1046.5].forEach(f => this.brass(f, 1.5, 0.1, 1.2, { lo: 700, hi: 2800, q: 1.5, vib: 6 }));
+    this.tone(130.8, 130.8, 1.5, 'triangle', 0.2, 1.2);
+    for (let i = 0; i < 12; i++) this.pop(1.3 + i * 0.08);
+    this.sparkle(1.7); this.sparkle(2.1); this.sparkle(2.5);
+  },
+  grow() {    // v5 "power-up" grow: a quick rising square-wave arpeggio + a whoop up + sparkles (~1 s)
+    const n = [262, 330, 392, 523, 330, 392, 523, 659, 392, 523, 659, 784, 1047];
+    n.forEach((f, i) => { this.tone(f, f, 0.1, 'square', 0.06, i * 0.06); this.tone(f * 2, f * 2, 0.08, 'triangle', 0.05, i * 0.06); });
+    this.tone(260, 1300, 0.75, 'sine', 0.1, 0.02);
+    this.sparkle(0.8);
+  },
+  fart(v = 0) {   // v5 cartoon fart: a fluttering low "brrrap" (sawtooth through a low-pass, square-wave flutter) + a breathy puff
+    if (!this.ok()) return;
+    const c = this.ctx, t = c.currentTime, k = v % 3;
+    const dur = [0.8, 0.55, 1.05][k], f0 = [92, 128, 74][k], bend = [0.65, 1.35, 0.6][k];
+    const o = c.createOscillator(), lfo = c.createOscillator(), lg = c.createGain(), am = c.createOscillator(), ag = c.createGain(), amg = c.createGain();
+    const fl = c.createBiquadFilter(), g = c.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * bend, t + dur);
+    lfo.type = 'square'; lfo.frequency.setValueAtTime(30 + k * 7, t); lfo.frequency.linearRampToValueAtTime(17, t + dur);
+    lg.gain.value = f0 * 0.3; lfo.connect(lg); lg.connect(o.frequency);
+    am.type = 'sine'; am.frequency.setValueAtTime(24 + k * 5, t); am.frequency.linearRampToValueAtTime(14, t + dur);
+    ag.gain.value = 0.5; amg.gain.value = 0.5; am.connect(ag); ag.connect(amg.gain);
+    fl.type = 'lowpass'; fl.Q.value = 5; fl.frequency.setValueAtTime(950, t); fl.frequency.exponentialRampToValueAtTime(320, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.7, t + 0.025); g.gain.setValueAtTime(0.6, t + dur * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(fl); fl.connect(amg); amg.connect(g); g.connect(this.master);
+    [o, lfo, am].forEach(n => { n.start(t); n.stop(t + dur + 0.05); });
+    this.noise(dur * 0.85, 'lowpass', 700, 1, 0.16, 0.02, 180);
+  },
+  poof() { this.noise(0.6, 'bandpass', 1800, 0.8, 0.4, 0, 250); this.tone(160, 50, 0.35, 'sine', 0.3); for (let i = 0; i < 5; i++) this.pop(0.1 + i * 0.06); },
+  roar() {    // the boss crocodile arrives: a silly low wobbly growl + "dun dun duuun" (cartoon, not scary)
+    this.brass(98, 1.1, 0.2, 0, { lo: 220, hi: 900, q: 6, vib: 9, bend: 0.85 });
+    [196, 185, 147].forEach((f, i) => this.brass(f, i === 2 ? 1.0 : 0.3, 0.16, 1.0 + i * 0.36, { lo: 300, hi: 1400, q: 3, vib: i === 2 ? 6 : 0 }));
+  },
+  toot() { this.brass(523.25, 0.3, 0.12, 0, { lo: 900, hi: 3200, q: 2, bend: 1.5 }); this.brass(659.25, 0.45, 0.1, 0.18, { lo: 900, hi: 3200, q: 2, bend: 1.4, vib: 8 }); },
+};
+Sfx.counts = {};
+Sfx.log = [];   // names of the recent sound effects (read by the tests)
+['chime', 'boop', 'fanfare', 'chomp', 'swish', 'sting', 'sad', 'victory', 'grow', 'fart', 'poof', 'roar', 'toot'].forEach(k => {
+  const f = Sfx[k];
+  Sfx[k] = function (...a) { Sfx.log.push(k); if (Sfx.log.length > 200) Sfx.log.shift(); Sfx.counts[k] = (Sfx.counts[k] || 0) + 1; return f.apply(this, a); };
+});
+
+const Speech = {
+  voice: null,
+  ok: 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window,
+  pickVoice() {
+    if (!this.ok) return null;
+    const vs = speechSynthesis.getVoices() || [];
+    const novelty = /albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|kathy|ralph|grandpa|grandma|rocko|shelley|sandy|flo|eddy|reed/i;
+    const en = vs.filter(v => /^en(-|_|$)/i.test(v.lang) && !novelty.test(v.name));
+    const prefer = ['Samantha', 'Ava', 'Allison', 'Susan', 'Karen', 'Tessa', 'Moira', 'Serena', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny', 'Daniel'];
+    for (const p of prefer) {
+      const v = en.find(v => v.name.indexOf(p) === 0 && /en-US/i.test(v.lang)) || en.find(v => v.name.indexOf(p) === 0);
+      if (v) return (this.voice = v);
+    }
+    this.voice = en.find(v => /en-US/i.test(v.lang)) || en[0] || null;
+    return this.voice;
+  },
+  say(text, onend) {
+    let done = false;
+    const fin = () => { if (!done) { done = true; if (onend) onend(); } };
+    if (!this.ok) { setTimeout(fin, 10); return; }
+    try {
+      if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const v = this.voice || this.pickVoice();
+      if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'en-US';
+      u.rate = 0.82; u.pitch = 1.15; u.volume = 1;
+      u.onend = fin; u.onerror = fin;
+      speechSynthesis.speak(u);
+      setTimeout(fin, 6000); // safety net if onend never fires
+    } catch (e) { setTimeout(fin, 10); }
+  },
+};
+if (Speech.ok) { Speech.pickVoice(); speechSynthesis.onvoiceschanged = () => Speech.pickVoice(); }
+Speech.prime = function () { // unlock iOS speech inside the first tap, so the fallback can work later
+  if (!this.ok) return;
+  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (_) {}
+};
+
+/* Natural voice: pre-recorded neural-voice clips (audio/*.mp3), decoded into Web Audio buffers.
+   One line at a time: a new line cuts off the previous one. speechSynthesis is only a fallback. */
+const VOICE_DATA = (() => { try { return JSON.parse($('voice-lines').textContent); } catch (e) { return { lines: {} }; } })();
+const Voice = {
+  raw: {}, buf: {}, decoding: {}, src: null, cb: null, token: 0, lastKey: null, lastMode: null, played: 0, failed: 0, history: [],
+  url(k) { return `audio/${k}.mp3?v=${BUILD}`; },
+  fetchRaw(k) {
+    if (!this.raw[k]) this.raw[k] = fetch(this.url(k)).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
+    return this.raw[k];
+  },
+  prefetch() { Object.keys(VOICE_DATA.lines).forEach(k => this.fetchRaw(k)); },  // bytes only; decoding waits for the tap
+  decode(k) {
+    if (this.buf[k]) return Promise.resolve(this.buf[k]);
+    if (this.decoding[k]) return this.decoding[k];
+    const ctx = Sfx.ctx;
+    if (!ctx) return Promise.resolve(null);
+    this.decoding[k] = this.fetchRaw(k).then(ab => {
+      if (!ab) { this.failed++; return null; }
+      return new Promise(res => {
+        try { ctx.decodeAudioData(ab, b => { this.buf[k] = b; res(b); }, () => { this.failed++; res(null); }); }
+        catch (e) { this.failed++; res(null); }
+      });
+    });
+    return this.decoding[k];
+  },
+  decodeAll(first) {
+    const keys = Object.keys(VOICE_DATA.lines);
+    const order = first ? [first, ...keys.filter(k => k !== first)] : keys;
+    let chain = Promise.resolve();
+    order.forEach(k => { chain = chain.then(() => this.decode(k)); });
+    return chain;
+  },
+  stop() {
+    this.token++;
+    if (this.src) { try { this.src.onended = null; this.src.stop(0); } catch (_) {} this.src = null; }
+    Music.duck(false);
+    if (Speech.ok && (speechSynthesis.speaking || speechSynthesis.pending)) { try { speechSynthesis.cancel(); } catch (_) {} }
+    const cb = this.cb; this.cb = null;
+    if (cb) cb();
+  },
+  play(k, onend) {
+    this.stop();
+    const tok = this.token;
+    this.cb = onend || null; this.lastKey = k; this.history.push(k); if (this.history.length > 40) this.history.shift();
+    const done = () => { if (tok !== this.token) return; this.src = null; Music.duck(false); const cb = this.cb; this.cb = null; if (cb) cb(); };
+    const line = VOICE_DATA.lines[k];
+    const start = b => {
+      if (tok !== this.token) return;
+      Music.duck(true);
+      if (!b || !Sfx.ctx || !Sfx.voiceOut) { this.lastMode = 'speech'; Speech.say(line ? line.text : '', done); return; }
+      if (Sfx.ctx.state !== 'running') Sfx.ctx.resume();
+      const s = Sfx.ctx.createBufferSource();
+      s.buffer = b; s.connect(Sfx.voiceOut); s.onended = done;
+      this.src = s; this.lastMode = 'clip'; this.played++;
+      s.start(0);
+    };
+    if (this.buf[k]) { start(this.buf[k]); return; }
+    let settled = false;
+    const timer = setTimeout(() => { if (!settled) { settled = true; start(null); } }, 2500);
+    this.decode(k).then(b => { if (settled) return; settled = true; clearTimeout(timer); start(b); });
+  },
+};
+Voice.prefetch();
+
+/* Background music: an upbeat 16-bar loop (C major, 140 BPM; four-on-the-floor kick, claps, hi-hats, bouncy octave
+   bass, offbeat chord stabs, a catchy square-wave "toy" melody with a little echo, glockenspiel in the B section).
+   It is rendered once with an OfflineAudioContext (no files, no network) and looped seamlessly as an AudioBuffer
+   (the release tail is folded back into the start). It plays under the voice (ducked while a line plays). */
+/* v5: the same engine also renders the shark-party loop (kind = 'party'): 8 bars of disco-pop at 124 BPM in F major,
+   open hi-hats on the off-beats, a bouncy party melody. */
+function renderMusic(kind) {
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  if (!OAC) return Promise.resolve(null);
+  const PARTY = kind === 'party';
+  const SR = 32000, BPM = PARTY ? 124 : 140, beat = 60 / BPM, e8 = beat / 2, s16 = beat / 4, BARS = PARTY ? 8 : 16, bar = beat * 4;
+  const loopN = Math.round(BARS * bar * SR), tailN = Math.round(1.5 * SR);
+  let oc; try { oc = new OAC(1, loopN + tailN, SR); } catch (e) { return Promise.resolve(null); }
+  const out = oc.createGain(); out.gain.value = 0.5; out.connect(oc.destination);
+  const leadBus = oc.createGain(); leadBus.connect(out);
+  const dl = oc.createDelay(1), fb = oc.createGain(), wet = oc.createGain();
+  dl.delayTime.value = e8 * 1.5; fb.gain.value = 0.22; wet.gain.value = 0.3;
+  leadBus.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(out);
+  const nb = oc.createBuffer(1, SR, SR), nd = nb.getChannelData(0);
+  for (let i = 0; i < SR; i++) nd[i] = Math.random() * 2 - 1;
+  const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+  const NOTE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  const midi = n => { const m = /^([A-G])(#|b)?(\d)$/.exec(n); return 12 * (+m[3] + 1) + NOTE[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0); };
+  // one shared filter per instrument (keeps the node count, and the render time, low)
+  const bus = (type, freq, q, dest) => { const f = oc.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q; f.connect(dest || out); return f; };
+  const bassBus = bus('lowpass', 700, 0.9), leadF = bus('lowpass', 3200, 0.7, leadBus), stabF = bus('lowpass', 2400, 0.7);
+  const hatBus = bus('highpass', 7000, 0.7), snBus = bus('bandpass', 1800, 0.8), crashBus = bus('highpass', 5000, 0.7);
+  function voice(type, f, t, dur, vol, dest, decay) {
+    const o = oc.createOscillator(), g = oc.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.006);
+    if (decay) g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    else { g.gain.setValueAtTime(vol, t + Math.max(0.01, dur - 0.04)); g.gain.linearRampToValueAtTime(0, t + dur); }
+    o.connect(g); g.connect(dest || out); o.start(t); o.stop(t + dur + 0.02);
+  }
+  function noise(t, dur, dest, vol) {
+    const s = oc.createBufferSource(), g = oc.createGain();
+    s.buffer = nb; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    s.connect(g); g.connect(dest); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02);
+  }
+  const kick = t => { const o = oc.createOscillator(), g = oc.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.13); g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.3); o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.32); };
+  const snare = (t, v) => { noise(t, 0.17, snBus, 0.55 * v); voice('triangle', 185, t, 0.09, 0.3 * v, out, true); };
+  const hat = (t, v) => noise(t, 0.04, hatBus, v);
+  const CH = { C: [48, [60, 64, 67]], G: [43, [59, 62, 67]], Am: [45, [60, 64, 69]], F: [41, [60, 65, 69]], Em: [40, [59, 64, 67]],
+    Dm: [38, [62, 65, 69]], Bb: [46, [58, 62, 65]] };
+  const PROG = PARTY ? ['F', 'Dm', 'Bb', 'C', 'F', 'Dm', 'Bb', 'C'] : ['C', 'G', 'Am', 'F', 'C', 'G', 'F/G', 'C', 'F', 'G', 'Em', 'Am', 'F', 'G', 'C', 'G'];
+  const MEL = PARTY ? [
+    'F5 . A5 . C6 . A5 F5', 'D5 . F5 . A5 - . .', 'Bb4 . D5 . F5 . D5 Bb4', 'C5 . E5 . G5 - G5 .',
+    'F5 . A5 . C6 . D6 C6', 'A5 . F5 . D5 - . .', 'D5 . F5 . Bb5 . A5 G5', 'G5 . A5 . F5 - - .',
+  ] : [   // one bar per string, eighth notes; '-' holds, '.' rests
+    'C5 . C5 E5 G5 . E5 .', 'D5 . D5 G5 B5 - - .', 'C6 . B5 A5 G5 . E5 .', 'F5 . E5 D5 C5 - - .',
+    'C5 . C5 E5 G5 . E5 .', 'D5 . D5 G5 B5 . D6 .', 'A5 . G5 F5 E5 . D5 .', 'C5 - - . G4 A4 B4 .',
+    'A5 - A5 G5 F5 . A5 .', 'B5 - B5 A5 G5 . B5 .', 'G5 . E5 . B4 . E5 G5', 'A5 - - . E5 . C5 .',
+    'F5 . A5 . C6 . A5 .', 'G5 . B5 . D6 . B5 .', 'C6 . G5 . E5 . G5 .', 'D5 . E5 . F5 . B4 .',
+  ];
+  for (let b = 0; b < BARS; b++) {
+    const t0 = b * bar, names = PROG[b].split('/');
+    const chordAt = i => CH[names.length > 1 && i >= 4 ? names[1] : names[0]];
+    for (let q = 0; q < 4; q++) kick(t0 + q * beat);
+    snare(t0 + beat, 1); snare(t0 + 3 * beat, 1);
+    if (PARTY) {   // disco: open hats on the off-beats, a clap layer, a little tambourine shimmer
+      for (let i = 0; i < 16; i++) { if (i % 4 === 2) noise(t0 + i * s16, 0.12, hatBus, 0.2); else hat(t0 + i * s16, i % 2 ? 0.04 : 0.06); }
+      noise(t0 + beat + 0.01, 0.12, snBus, 0.3); noise(t0 + 3 * beat + 0.01, 0.12, snBus, 0.3);
+      if (b === 3 || b === 7) for (let k = 0; k < 4; k++) snare(t0 + 3 * beat + k * s16, 0.4 + k * 0.15);
+    } else {
+      for (let i = 0; i < 16; i++) hat(t0 + i * s16, i % 4 === 2 ? 0.16 : i % 2 ? 0.05 : 0.07);
+      if (b === 7) { snare(t0 + 3.5 * beat, 0.6); snare(t0 + 3.75 * beat, 0.8); }
+      if (b === 15) for (let k = 0; k < 4; k++) snare(t0 + 3 * beat + k * s16, 0.45 + k * 0.15);
+    }
+    if (b === 0 || b === 8) noise(t0, 1.1, crashBus, 0.2);
+    for (let i = 0; i < 8; i++) {
+      const [root, tri] = chordAt(i), t = t0 + i * e8, bm = root + (i % 2 ? 12 : 0);
+      voice('square', hz(bm), t, e8 * 0.85, 0.3, bassBus, true);
+      if (i % 2) tri.forEach(m => voice('square', hz(m), t, 0.13, 0.04, stabF, true));
+    }
+    if (b >= 8 || (PARTY && b >= 4)) { const tri = chordAt(0)[1]; voice('sine', hz(tri[2] + 24), t0, 0.6, 0.07, out, true); voice('sine', hz(tri[1] + 24), t0 + beat * 2, 0.6, 0.05, out, true); }
+    const tok = MEL[b].split(' ');
+    for (let i = 0; i < tok.length; i++) {
+      if (tok[i] === '.' || tok[i] === '-') continue;
+      let len = 1; while (tok[i + len] === '-') len++;
+      const f = hz(midi(tok[i])), t = t0 + i * e8, dur = len * e8 * 0.9;
+      voice('square', f, t, dur, 0.11, leadF);
+      voice('triangle', f / 2, t, dur, 0.06, leadBus);
+    }
+  }
+  return new Promise(res => {
+    let done = false;
+    const fin = buf => {
+      if (done) return; done = true;
+      if (!buf) { res(null); return; }
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < tailN && loopN + i < d.length; i++) d[i] += d[loopN + i];   // fold the tail into the start = seamless loop
+      let peak = 0; for (let i = 0; i < loopN; i++) { const a = Math.abs(d[i]); if (a > peak) peak = a; }
+      if (peak > 0) { const k = 0.85 / peak; for (let i = 0; i < d.length; i++) d[i] *= k; }
+      buf._loopEnd = loopN / SR;
+      res(buf);
+    };
+    oc.oncomplete = e => fin(e.renderedBuffer);
+    try { const p = oc.startRendering(); if (p && p.then) p.then(fin, () => fin(null)); } catch (e) { fin(null); }
+  });
+}
+const Music = {
+  buf: null, bufs: {}, rendering: {}, src: null, srcGain: null, srcKind: null, kind: 'main', out: null, duckG: null, muteG: null, an: null,
+  muted: false, ducked: false, want: false, starts: 0,
+  init() { try { this.muted = localStorage.getItem('sharkabc.musicMuted') === '1'; } catch (_) {} },
+  nodes() {
+    if (this.out || !Sfx.ctx) return !!this.out;
+    const c = Sfx.ctx;
+    this.out = c.createGain(); this.out.gain.value = MUSIC_VOL;
+    this.duckG = c.createGain(); this.duckG.gain.value = this.ducked ? MUSIC_DUCK : 1;
+    this.muteG = c.createGain(); this.muteG.gain.value = this.muted ? 0 : 1;
+    this.out.connect(this.duckG); this.duckG.connect(this.muteG); this.muteG.connect(c.destination);
+    try { this.an = c.createAnalyser(); this.an.fftSize = 2048; this.muteG.connect(this.an); } catch (_) {}
+    return true;
+  },
+  render(kind = 'main') {
+    if (!this.rendering[kind]) this.rendering[kind] = renderMusic(kind).then(b => { this.bufs[kind] = b; if (kind === 'main') this.buf = b; return b; }).catch(() => null);
+    return this.rendering[kind];
+  },
+  start(kind = 'main') {   // v5: 'main' (140 BPM loop) or 'party' (shark party loop); switching crossfades
+    this.want = true; this.kind = kind;
+    if (!this.nodes() || (this.src && this.srcKind === kind)) return;
+    this.render(kind).then(b => {
+      if (!b || !this.want || this.kind !== kind || (this.src && this.srcKind === kind) || !Sfx.ctx) return;
+      if (this.src) this.fadeOut(0.5);
+      const c = Sfx.ctx, t = c.currentTime, s = c.createBufferSource(), g = c.createGain();
+      s.buffer = b; s.loop = true; s.loopStart = 0; s.loopEnd = b._loopEnd;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(1, t + 0.5);
+      s.connect(g); g.connect(this.out); s.start(t);
+      this.src = s; this.srcGain = g; this.srcKind = kind; this.starts++;
+    });
+  },
+  fadeOut(fade) {
+    const s = this.src, g = this.srcGain; this.src = null; this.srcGain = null; this.srcKind = null;
+    if (!s || !Sfx.ctx) return;
+    const t = Sfx.ctx.currentTime;
+    try { g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + fade); s.stop(t + fade + 0.05); }
+    catch (_) { try { s.stop(); } catch (__) {} }
+  },
+  stop(fade = 0.35) {
+    this.want = false;
+    const s = this.src, g = this.srcGain; this.src = null; this.srcGain = null; this.srcKind = null;
+    if (!s || !Sfx.ctx) return;
+    const t = Sfx.ctx.currentTime;
+    try { g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + fade); s.stop(t + fade + 0.05); }
+    catch (_) { try { s.stop(); } catch (__) {} }
+  },
+  duck(on) {
+    this.ducked = on;
+    if (!this.duckG) return;
+    const t = Sfx.ctx.currentTime, p = this.duckG.gain;
+    p.cancelScheduledValues(t); p.setValueAtTime(p.value, t); p.setTargetAtTime(on ? MUSIC_DUCK : 1, t, on ? 0.05 : 0.3);
+  },
+  setMuted(m) {
+    this.muted = m;
+    try { localStorage.setItem('sharkabc.musicMuted', m ? '1' : '0'); } catch (_) {}
+    if (this.muteG) { const t = Sfx.ctx.currentTime, p = this.muteG.gain; p.cancelScheduledValues(t); p.setValueAtTime(p.value, t); p.linearRampToValueAtTime(m ? 0 : 1, t + 0.15); }
+  },
+  level() {   // RMS of what the music actually outputs (after duck + mute); used by the tests
+    if (!this.an) return 0;
+    const a = new Uint8Array(this.an.fftSize); this.an.getByteTimeDomainData(a);
+    let s = 0; for (let i = 0; i < a.length; i++) { const v = (a[i] - 128) / 128; s += v * v; }
+    return Math.sqrt(s / a.length);
+  },
+};
+Music.init();
+setTimeout(() => Music.render('main').then(() => setTimeout(() => Music.render('party'), 400)), 300);   // render both loops in the background while the start screen shows
+
+/* ================================================================
+   Canvas + layout
+   ================================================================ */
+const cv = $('scene'), ctx = cv.getContext('2d');
+const strip = $('strip');
+let W = 0, H = 0, DPR = 1, portrait = false;
+let G = null;            // play-area geometry + reference sizes
+let bgCache = null;      // static background canvas
+const scene = { weeds: [], bubbles: [], fish: [], rays: [] };
+
+for (let i = 0; i < 26; i++) { const s = document.createElement('span'); s.textContent = ALPHABET[i]; strip.appendChild(s); }
+const cells = Array.from(strip.children);
+
+function safeArea() {
+  const cs = getComputedStyle($('safe'));
+  return { t: parseFloat(cs.paddingTop) || 0, r: parseFloat(cs.paddingRight) || 0, b: parseFloat(cs.paddingBottom) || 0, l: parseFloat(cs.paddingLeft) || 0 };
+}
+
+function layoutStrip() {
+  strip.classList.toggle('portrait', portrait);
+  cells.forEach((c, i) => { c.textContent = show(ALPHABET[i]); });
+  const cols = portrait ? 13 : 26;
+  const sa = safeArea();
+  const inner = W - sa.l - sa.r - 20 - (cols - 1) * 4;
+  const cell = Math.max(12, Math.min(48, inner / cols));
+  strip.style.gridAutoRows = cell + 'px';
+  strip.style.setProperty('--cell', cell + 'px');
+  updateStrip();
+}
+
+function updateStrip() {
+  cells.forEach((c, i) => {
+    const got = i < game.index && !c.dataset.pending;
+    c.classList.toggle('got', got);
+    c.style.background = got ? `hsl(${Math.round(i * 360 / 26)},90%,74%)` : '';
+    c.classList.toggle('next', i === game.index && /^(play|celebrate|snack|snackEnd|crocwin|party|partyEnd)$/.test(game.state));
+  });
+}
+
+/* ---- Play-area geometry (v5: open water, no current). The sizes keep the v4 formulas as the reference:
+   G.L = the v4 starting shark length (shark.scale 1), G.bubbleR = the big letter-bubble radius. ---- */
+function buildGeometry() {
+  const n = 3;
+  const sa = safeArea();
+  const sb = strip.getBoundingClientRect();
+  const x0 = sa.l + 10, x1 = W - sa.r - 10, y0 = sb.bottom + 8, y1 = H - sa.b - 10;
+  const pw = Math.max(50, x1 - x0), ph = Math.max(50, y1 - y0);
+  const latLen = portrait ? pw : ph;
+  const m = Math.min(pw, ph);
+  const latM = 4, gap = Math.max(14, m * 0.04);
+  const bubbleR = Math.max(16, Math.min(m * 0.15, 125, (latLen - 2 * latM - 6 * (n - 1)) / (2 * n)));
+  const D = (latLen - 2 * (bubbleR + latM)) / (n - 1);
+  const r = Math.max(10, Math.min((D - gap) / 2, bubbleR * 0.95, m * 0.16));
+  const L = r * 2.8;
+  G = { L, bubbleR, pw, ph, x0, x1, y0, y1, fwd: portrait ? -Math.PI / 2 : 0 };
+}
+// where the letter bubbles may float (open water, away from the hearts / buttons and from the shark's start spot)
+function letterZone() {
+  const R = curR(), m = R + 12, top = stripBottom + 12 + R, bot = H - SA.b - 12 - R;
+  if (portrait) return { x0: SA.l + m, x1: Math.max(SA.l + m + 1, W - SA.r - m), y0: top, y1: Math.max(top + 1, bot) };   // the shark's body is kept clear in layoutLetters()
+  return { x0: Math.max(SA.l + m, W * 0.4), x1: Math.max(W * 0.4 + 1, W - SA.r - m), y0: top, y1: Math.max(top + 1, bot) };
+}
+function layoutLetters() {   // random, well-spaced spots for this round's bubbles
+  if (isRace() || !game.letters.length) return;
+  const z = letterZone(), R = curR(), home = startPos(), Ls = sharkLen();
+  // the shark at his start spot as a capsule (tail -> nose along his heading), so bubbles may sit beside a slim shark
+  // (he levels out horizontally when resting, so on portrait screens both the start heading and level are kept clear,
+  //  and also wherever he is right now, so a new round's letters never pop up on top of him)
+  const caps = [[home, 0], [home, Math.PI], [shark, shark.heading], [shark, 0], [shark, Math.PI]].map(([c, a]) => {
+    const fx = Math.cos(a), fy = Math.sin(a);
+    return [{ x: c.x - fx * Ls * 0.55, y: c.y - fy * Ls * 0.55 }, { x: c.x + fx * Ls * 0.5, y: c.y + fy * Ls * 0.5 }];
+  });
+  const segD = p => Math.min(...caps.map(([tail, nose]) => { const dx = nose.x - tail.x, dy = nose.y - tail.y, u = clamp(((p.x - tail.x) * dx + (p.y - tail.y) * dy) / (dx * dx + dy * dy || 1), 0, 1); return Math.hypot(p.x - tail.x - dx * u, p.y - tail.y - dy * u); }));
+  const huds = ['lives', 'mute', 'lvl'].map(id => $(id)).filter(e => e && !e.classList.contains('hidden')).map(e => e.getBoundingClientRect()).filter(r => r.width > 0);
+  const hudGap = p => Math.min(1e9, ...huds.map(r => Math.hypot(Math.max(r.left - p.x, 0, p.x - r.right), Math.max(r.top - p.y, 0, p.y - r.bottom)) - R * 1.1));
+  let best = null, bestScore = -1;
+  for (let tries = 0; tries < 1500 && bestScore < 1; tries++) {
+    const pts = game.letters.map(() => ({ x: rand(z.x0, z.x1), y: rand(z.y0, z.y1) }));
+    let minD = Infinity, minS = Infinity, minH = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      minS = Math.min(minS, segD(pts[i]) - Ls * 0.2 - R);
+      minH = Math.min(minH, hudGap(pts[i]));
+      for (let j = i + 1; j < pts.length; j++) minD = Math.min(minD, dist(pts[i], pts[j]));
+    }
+    let score = Math.min(minD / (2.6 * R), (minS + R) / (1.3 * R));   // >= 1: bubbles 2.6 R apart, >= 0.3 R clear of his body
+    if (minH < 0) score *= 0.5;   // never on top of the hearts / music button / level badge if it can be helped
+    if (score > bestScore) { bestScore = score; best = pts; }
+  }
+  game.letters.forEach((l, i) => { l.x = best[i].x; l.y = best[i].y; });
+}
+
+/* ---- Decorative scene (seaweed, bubbles, fish, light rays) ---- */
+function buildScene() {
+  const m = Math.min(W, H);
+  const sandTop = H - Math.max(26, H * 0.07);
+  scene.sandTop = sandTop;
+  const nWeeds = Math.round(W / 70) + 4;
+  scene.weeds = [];
+  const greens = ['#2fa36b', '#3cc47f', '#22915c', '#57d18d', '#1f8a5a'];
+  for (let i = 0; i < nWeeds; i++) {
+    scene.weeds.push({ x: rand(0, W), y: sandTop + rand(4, 18), h: rand(0.1, 0.26) * H, w: rand(8, 16) * Math.max(0.7, m / 700),
+      phase: rand(0, 6.28), speed: rand(0.8, 1.4), color: greens[i % greens.length], segs: 9 });
+  }
+  scene.weeds.sort((a, b) => a.y - b.y);
+  scene.bubbles = [];
+  const nB = Math.round((W * H) / 26000) + 12;
+  for (let i = 0; i < nB; i++) scene.bubbles.push(newBubble(true));
+  scene.fish = [];
+  const fishColors = ['#ffb347', '#ff7aa2', '#ffe066', '#8be9fd'];
+  for (let i = 0; i < 4; i++) scene.fish.push({ x: rand(0, W), y: rand(0.2, 0.8) * H, s: rand(0.6, 1) * Math.max(14, m * 0.028), v: rand(18, 40) * (Math.random() < .5 ? -1 : 1), phase: rand(0, 6), color: fishColors[i] });
+  scene.rays = [];
+  for (let i = 0; i < 5; i++) scene.rays.push({ x: rand(0.05, 0.95) * W, w: rand(0.05, 0.12) * W, phase: rand(0, 6), a: rand(0.05, 0.1) });
+  buildBackground(sandTop);
+}
+function newBubble(anywhere) {
+  return { x: rand(0, W), y: anywhere ? rand(0, H) : H + rand(10, 60), r: rand(2.5, 9) * Math.max(0.8, Math.min(W, H) / 700), v: rand(22, 60), phase: rand(0, 6.28), front: Math.random() < 0.18 };
+}
+
+function buildBackground(sandTop) {
+  bgCache = document.createElement('canvas');
+  bgCache.width = Math.round(W * DPR); bgCache.height = Math.round(H * DPR);
+  const c = bgCache.getContext('2d');
+  c.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const g = c.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#5fd0f3'); g.addColorStop(0.35, '#2a9ee0'); g.addColorStop(1, '#0b5aa0');
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+  // distant soft rocks
+  c.fillStyle = 'rgba(8,70,130,0.35)';
+  for (let i = 0; i < 6; i++) { const x = (i + 0.3) * W / 5.5, rw = rand(0.12, 0.22) * W, rh = rand(0.06, 0.13) * H; c.beginPath(); c.ellipse(x, sandTop + 6, rw / 2, rh, 0, Math.PI, 0); c.fill(); }
+  // sand
+  const sg = c.createLinearGradient(0, sandTop - 10, 0, H);
+  sg.addColorStop(0, '#f6e3a8'); sg.addColorStop(1, '#e2c27a');
+  c.fillStyle = sg; c.beginPath(); c.moveTo(0, H); c.lineTo(0, sandTop);
+  for (let x = 0; x <= W + 20; x += 20) c.lineTo(x, sandTop + Math.sin(x * 0.015) * 6 + Math.sin(x * 0.041) * 3);
+  c.lineTo(W, H); c.closePath(); c.fill();
+  // sand speckles
+  c.fillStyle = 'rgba(180,140,70,0.35)';
+  for (let i = 0; i < W / 6; i++) { c.beginPath(); c.arc(rand(0, W), rand(sandTop + 8, H), rand(0.8, 2), 0, 7); c.fill(); }
+  // coral clusters
+  const coralColors = ['#ff7f9e', '#ff9f6b', '#c48bff'];
+  for (let i = 0; i < 3; i++) drawCoral(c, rand(0.05, 0.95) * W, sandTop + 10, Math.max(30, Math.min(W, H) * 0.09), coralColors[i]);
+  // starfish + shells
+  for (let i = 0; i < 3; i++) drawStar(c, rand(0.05, 0.95) * W, rand(sandTop + 14, H - 8), Math.max(8, Math.min(W, H) * 0.018), '#ff8a65');
+}
+function drawCoral(c, x, y, s, color) {
+  c.save(); c.translate(x, y); c.strokeStyle = color; c.lineCap = 'round';
+  const branch = (len, ang, w, depth) => {
+    if (depth <= 0) return;
+    c.save(); c.rotate(ang); c.lineWidth = w; c.beginPath(); c.moveTo(0, 0); c.lineTo(0, -len); c.stroke();
+    c.translate(0, -len); branch(len * 0.7, -0.5, w * 0.72, depth - 1); branch(len * 0.7, 0.45, w * 0.72, depth - 1); c.restore();
+  };
+  branch(s * 0.55, 0, s * 0.16, 3); c.restore();
+}
+function drawStar(c, x, y, r, color) {
+  c.save(); c.translate(x, y); c.rotate(rand(0, 1)); c.fillStyle = color; c.beginPath();
+  for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * 0.45 : r; c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+  c.closePath(); c.fill(); c.restore();
+}
+
+/* ================================================================
+   Shark drawing (local coords, facing +x, length L, centered)
+   ================================================================ */
+function sharkBodyPath(L) {   // the shark's body outline (also used to measure how much of the screen he covers)
+  const body = new Path2D();
+  body.moveTo(-L * 0.41, -L * 0.05);
+  body.bezierCurveTo(-L * 0.2, -L * 0.15, 0, -L * 0.235, L * 0.22, -L * 0.2);
+  body.bezierCurveTo(L * 0.38, -L * 0.17, L * 0.5, -L * 0.08, L * 0.56, -L * 0.005);
+  body.bezierCurveTo(L * 0.5, L * 0.11, L * 0.32, L * 0.21, L * 0.08, L * 0.215);
+  body.bezierCurveTo(-L * 0.12, L * 0.215, -L * 0.27, L * 0.12, -L * 0.41, L * 0.05);
+  body.closePath();
+  return body;
+}
+function drawShark(c, L, o) {
+  // v2 "cool & tough" shark: pointy snout + fins, open grin with white teeth, angled brow. Facing +x.
+  // v5: o.skin = colors (Aaron = AARON_SKIN), o.princess = tiara + eyelashes + rosy cheek + friendly round eye
+  const tail = o.tail || 0, fin = o.fin || 0, blink = o.blink || 0, chomp = clamp(o.chomp || 0, 0, 1);
+  const sk = o.skin || AARON_SKIN, princess = !!o.princess;
+  c.save();
+  c.lineJoin = 'round'; c.lineCap = 'round';
+  const outline = sk.out, lw = Math.max(1.5, L * 0.017);
+  const finCol = sk.fin;
+  // tail (sharper crescent)
+  c.save(); c.translate(-L * 0.37, 0); c.rotate(tail);
+  c.fillStyle = finCol; c.strokeStyle = outline; c.lineWidth = lw;
+  c.beginPath();
+  c.moveTo(L * 0.05, -L * 0.06);
+  c.quadraticCurveTo(-L * 0.08, -L * 0.11, -L * 0.22, -L * 0.25);
+  c.quadraticCurveTo(-L * 0.15, -L * 0.07, -L * 0.12, 0);
+  c.quadraticCurveTo(-L * 0.14, L * 0.07, -L * 0.2, L * 0.2);
+  c.quadraticCurveTo(-L * 0.07, L * 0.1, L * 0.05, L * 0.06);
+  c.closePath(); c.fill(); c.stroke();
+  c.restore();
+  // dorsal fin (tall, pointy, swept back)
+  c.fillStyle = finCol; c.strokeStyle = outline; c.lineWidth = lw;
+  c.beginPath(); c.moveTo(-L * 0.16, -L * 0.15);
+  c.quadraticCurveTo(-L * 0.1, -L * 0.3, -L * 0.04, -L * 0.4);
+  c.quadraticCurveTo(L * 0.02, -L * 0.28, L * 0.12, -L * 0.19);
+  c.closePath(); c.fill(); c.stroke();
+  // body with a pointier snout
+  const body = sharkBodyPath(L);
+  const bg = c.createLinearGradient(0, -L * 0.22, 0, L * 0.22);
+  bg.addColorStop(0, sk.top); bg.addColorStop(1, sk.bot);
+  c.fillStyle = bg; c.fill(body);
+  c.save(); c.clip(body);
+  c.fillStyle = sk.belly;
+  c.beginPath(); c.ellipse(L * 0.1, L * 0.19, L * 0.45, L * 0.12, -0.05, 0, Math.PI * 2); c.fill();
+  // gills
+  c.strokeStyle = 'rgba(20,40,80,0.4)'; c.lineWidth = lw * 1.1;
+  for (let i = 0; i < 3; i++) { const gx = L * (0.08 - i * 0.045); c.beginPath(); c.moveTo(gx + L * 0.012, -L * 0.075); c.quadraticCurveTo(gx - L * 0.016, 0, gx + L * 0.012, L * 0.06); c.stroke(); }
+  c.restore();
+  c.strokeStyle = outline; c.lineWidth = lw; c.stroke(body);
+  // pectoral fin (pointy; o.fin also makes the princesses wave bye-bye)
+  c.save(); c.translate(L * 0.02, L * 0.12); c.rotate(0.2 + fin);
+  c.fillStyle = finCol; c.strokeStyle = outline; c.lineWidth = lw;
+  c.beginPath(); c.moveTo(L * 0.06, -L * 0.02); c.quadraticCurveTo(L * 0.0, L * 0.14, -L * 0.16, L * 0.21);
+  c.quadraticCurveTo(-L * 0.06, L * 0.06, -L * 0.07, -L * 0.02); c.closePath(); c.fill(); c.stroke();
+  c.restore();
+  // open grin with pointy white teeth
+  const mA = { x: L * 0.22, y: L * 0.06 }, mB = { x: L * 0.515, y: L * 0.022 };
+  const up = { x: L * 0.37, y: L * 0.095 }, lo = { x: L * 0.36, y: L * (0.235 - 0.15 * chomp) };   // chomp closes the jaw
+  const mouth = new Path2D();
+  mouth.moveTo(mA.x, mA.y); mouth.quadraticCurveTo(up.x, up.y, mB.x, mB.y); mouth.quadraticCurveTo(lo.x, lo.y, mA.x, mA.y); mouth.closePath();
+  c.fillStyle = '#1d1f3d'; c.fill(mouth);
+  c.save(); c.clip(mouth);
+  c.fillStyle = '#e05a7a'; // tongue (soft pink, not scary)
+  c.beginPath(); c.ellipse(L * 0.35, L * 0.185, L * 0.08, L * 0.035, -0.1, 0, Math.PI * 2); c.fill();
+  const q = (a, ctl, b, t) => ({ x: (1 - t) * (1 - t) * a.x + 2 * (1 - t) * t * ctl.x + t * t * b.x, y: (1 - t) * (1 - t) * a.y + 2 * (1 - t) * t * ctl.y + t * t * b.y });
+  c.fillStyle = '#ffffff'; c.strokeStyle = 'rgba(30,40,80,0.45)'; c.lineWidth = Math.max(0.8, lw * 0.5);
+  const tw = L * 0.04, th = L * 0.056;
+  for (let i = 0; i < 6; i++) {           // top teeth point down
+    const p = q(mA, up, mB, 0.1 + i * 0.16);
+    c.beginPath(); c.moveTo(p.x - tw / 2, p.y - 2); c.lineTo(p.x + tw / 2, p.y - 2); c.lineTo(p.x, p.y + th); c.closePath(); c.fill(); c.stroke();
+  }
+  for (let i = 0; i < 5; i++) {           // bottom teeth point up
+    const p = q(mA, lo, mB, 0.17 + i * 0.16);
+    c.beginPath(); c.moveTo(p.x - tw * 0.42, p.y + 2); c.lineTo(p.x + tw * 0.42, p.y + 2); c.lineTo(p.x, p.y - th * 0.75); c.closePath(); c.fill(); c.stroke();
+  }
+  c.restore();
+  c.strokeStyle = outline; c.lineWidth = lw; c.stroke(mouth);
+  if (o.dead) {   // cartoon X eyes (game over)
+    const er = L * 0.075;
+    c.save(); c.translate(L * 0.255, -L * 0.075);
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(0, 0, er, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = outline; c.lineWidth = lw; c.stroke();
+    c.strokeStyle = '#13213f'; c.lineWidth = Math.max(2, L * 0.03);
+    c.beginPath(); c.moveTo(-er * 0.55, -er * 0.55); c.lineTo(er * 0.55, er * 0.55); c.moveTo(er * 0.55, -er * 0.55); c.lineTo(-er * 0.55, er * 0.55); c.stroke();
+    c.restore(); c.restore();
+    return;
+  }
+  const er = L * 0.075;
+  if (princess) {   // friendly round eye with lashes + a rosy cheek
+    c.fillStyle = 'rgba(255,120,160,0.55)'; c.beginPath(); c.ellipse(L * 0.2, L * 0.02, L * 0.05, L * 0.028, 0, 0, Math.PI * 2); c.fill();
+    c.save(); c.translate(L * 0.255, -L * 0.08); c.scale(1, 1 - blink * 0.9);
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(0, 0, er, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#1b2440'; c.beginPath(); c.arc(er * 0.22, er * 0.1, er * 0.6, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(er * 0.45, -er * 0.15, er * 0.22, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = outline; c.lineWidth = lw; c.beginPath(); c.arc(0, 0, er, 0, Math.PI * 2); c.stroke();
+    c.strokeStyle = '#1b2440'; c.lineWidth = Math.max(1.5, L * 0.016);
+    for (let i = 0; i < 3; i++) { const a = -Math.PI * (0.62 - i * 0.16); c.beginPath(); c.moveTo(Math.cos(a) * er, Math.sin(a) * er); c.lineTo(Math.cos(a) * er * 1.45, Math.sin(a) * er * 1.45); c.stroke(); }
+    c.restore();
+    // tiara on top of the head: gold band + 3 points + gems
+    c.save(); c.translate(L * 0.235, -L * 0.2); c.rotate(0.2);
+    const tw2 = L * 0.12, gold = '#ffd23f', goldOut = '#b07d0b';
+    c.fillStyle = gold; c.strokeStyle = goldOut; c.lineWidth = Math.max(1.2, lw * 0.8);
+    c.beginPath();
+    c.moveTo(-tw2, 0); c.lineTo(-tw2, -L * 0.03); c.lineTo(-tw2 * 0.75, -L * 0.085); c.lineTo(-tw2 * 0.4, -L * 0.035);
+    c.lineTo(0, -L * 0.12); c.lineTo(tw2 * 0.4, -L * 0.035); c.lineTo(tw2 * 0.75, -L * 0.085); c.lineTo(tw2, -L * 0.03); c.lineTo(tw2, 0);
+    c.closePath(); c.fill(); c.stroke();
+    c.fillStyle = o.gem || '#ff6f91';
+    [[-tw2 * 0.75, -L * 0.085, 0.016], [0, -L * 0.12, 0.02], [tw2 * 0.75, -L * 0.085, 0.016], [0, -L * 0.016, 0.017]].forEach(([x, y, r]) => { c.beginPath(); c.arc(x, y, L * r, 0, Math.PI * 2); c.fill(); c.stroke(); });
+    c.fillStyle = 'rgba(255,255,255,0.8)'; c.beginPath(); c.arc(-L * 0.005, -L * 0.125, L * 0.006, 0, Math.PI * 2); c.fill();
+    c.restore();
+    c.restore();
+    return;
+  }
+  // eye: narrowed with a lid, angled brow for a tough look (keeps a sparkle so it stays friendly)
+  c.save(); c.translate(L * 0.255, -L * 0.075); c.scale(1, 1 - blink * 0.9);
+  c.fillStyle = '#fff'; c.beginPath(); c.arc(0, 0, er, 0, Math.PI * 2); c.fill();
+  c.save(); c.beginPath(); c.arc(0, 0, er, 0, Math.PI * 2); c.clip();
+  c.fillStyle = '#1b2440'; c.beginPath(); c.arc(er * 0.3, er * 0.22, er * 0.55, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#fff'; c.beginPath(); c.arc(er * 0.5, er * 0.02, er * 0.2, 0, Math.PI * 2); c.fill();
+  c.fillStyle = sk.top;                    // eyelid: slants down toward the snout
+  c.beginPath(); c.moveTo(-er * 1.2, -er * 1.2); c.lineTo(er * 1.2, -er * 1.2); c.lineTo(er * 1.2, er * 0.05); c.lineTo(-er * 1.2, -er * 0.55); c.closePath(); c.fill();
+  c.restore();
+  c.strokeStyle = outline; c.lineWidth = lw; c.beginPath(); c.arc(0, 0, er, 0, Math.PI * 2); c.stroke();
+  c.restore();
+  c.strokeStyle = '#13213f'; c.lineWidth = Math.max(2, L * 0.032);   // brow
+  c.beginPath(); c.moveTo(L * 0.175, -L * 0.19); c.lineTo(L * 0.35, -L * 0.105); c.stroke();
+  c.restore();
+}
+
+/* ================================================================
+   Crocodile drawing (local coords, facing +x, length L, centered). Goofy cartoon: bug eyes, blush, tiny teeth.
+   o.jaw 0..1 opens the mouth, o.eyes = normal | surprised | happy, o.bulge 0..1 = full tummy
+   ================================================================ */
+function drawCroc(c, L, o) {
+  o = o || {};
+  const jaw = clamp(o.jaw || 0, 0, 1), ph = o.phase || 0, bulge = o.bulge || 0, eyes = o.eyes || 'normal';
+  const lw = Math.max(1.5, L * 0.014);
+  const pal = o.pal || {}, angry = !!o.angry, tk = angry ? 1.7 : 1;   // v5 boss: angry brows + bigger teeth
+  const OUT = pal.out || '#1d6b35', BODY = pal.body || '#4fbf5f', DARK = pal.dark || '#379a4a', BELLY = pal.belly || '#dff3a0';
+  c.save(); c.lineJoin = 'round'; c.lineCap = 'round'; c.lineWidth = lw; c.strokeStyle = OUT;
+  const wig = Math.sin(ph) * L * 0.05;
+  const ry = L * 0.1 * (1 + bulge * 0.4);
+  const leg = (x, a) => { c.save(); c.translate(x, ry * 0.55); c.rotate(a); c.fillStyle = DARK; c.beginPath(); c.ellipse(0, L * 0.045, L * 0.032, L * 0.06, 0, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore(); };
+  leg(-L * 0.17, 0.35 + Math.sin(ph * 1.4) * 0.5);
+  leg(L * 0.04, 0.35 + Math.sin(ph * 1.4 + Math.PI) * 0.5);
+  // tail
+  c.fillStyle = BODY;
+  c.beginPath();
+  c.moveTo(-L * 0.18, -L * 0.07);
+  c.quadraticCurveTo(-L * 0.4, -L * 0.055 + wig * 0.4, -L * 0.6, wig);
+  c.quadraticCurveTo(-L * 0.4, L * 0.055 + wig * 0.4, -L * 0.18, L * 0.08);
+  c.closePath(); c.fill(); c.stroke();
+  // back ridges
+  c.fillStyle = DARK;
+  for (let i = 0; i < 8; i++) {
+    const x = -L * 0.52 + i * L * 0.075;
+    let y;
+    if (x < -L * 0.18) { const f = (x + L * 0.6) / (L * 0.42); y = lerp(wig, -L * 0.07, f) - L * 0.008 * Math.sin(f * Math.PI); }
+    else { const u = (x + L * 0.05) / (L * 0.21); y = -ry * Math.sqrt(Math.max(0, 1 - u * u)) + L * 0.012; }
+    const r = L * (0.016 + 0.012 * Math.min(1, i / 4));
+    c.beginPath(); c.moveTo(x - r, y + r * 0.7); c.lineTo(x, y - r * 1.25); c.lineTo(x + r, y + r * 0.7); c.closePath(); c.fill(); c.stroke();
+  }
+  // body + belly
+  const bodyP = new Path2D(); bodyP.ellipse(-L * 0.05, L * 0.01, L * 0.21, ry, 0, 0, Math.PI * 2);
+  c.fillStyle = BODY; c.fill(bodyP);
+  c.save(); c.clip(bodyP);
+  c.fillStyle = BELLY; c.beginPath(); c.ellipse(-L * 0.05, L * 0.01 + ry * 0.85, L * 0.23, ry * 0.58, 0, 0, Math.PI * 2); c.fill();
+  c.strokeStyle = 'rgba(120,150,60,0.45)'; c.lineWidth = lw * 0.8;
+  for (let i = 0; i < 4; i++) { const x = -L * 0.17 + i * L * 0.07; c.beginPath(); c.moveTo(x, L * 0.01 + ry * 0.5); c.lineTo(x + L * 0.008, L * 0.01 + ry); c.stroke(); }
+  c.fillStyle = 'rgba(30,120,55,0.4)';
+  [[-0.12, -0.035, 0.024], [0.0, -0.055, 0.018], [-0.2, -0.005, 0.017]].forEach(([x, y, r]) => { c.beginPath(); c.arc(x * L, y * L, r * L, 0, Math.PI * 2); c.fill(); });
+  c.restore();
+  c.strokeStyle = OUT; c.lineWidth = lw; c.stroke(bodyP);
+  // head: jaws hinge at H
+  const H = { x: L * 0.11, y: L * 0.025 }, aU = -jaw * 0.6, aD = jaw * 0.32;
+  const rot = (p, a) => ({ x: H.x + (p.x - H.x) * Math.cos(a) - (p.y - H.y) * Math.sin(a), y: H.y + (p.x - H.x) * Math.sin(a) + (p.y - H.y) * Math.cos(a) });
+  if (jaw > 0.03) {   // inside of the mouth + tongue
+    const u1 = rot({ x: L * 0.53, y: L * 0.03 }, aU), d1 = rot({ x: L * 0.49, y: L * 0.04 }, aD);
+    const m = new Path2D(); m.moveTo(H.x - L * 0.03, H.y); m.lineTo(u1.x, u1.y); m.lineTo(d1.x, d1.y); m.closePath();
+    c.fillStyle = '#5c2148'; c.fill(m);   // dark plum (not blood-red)
+    c.save(); c.clip(m);
+    const tg = rot({ x: L * 0.3, y: L * 0.04 }, aD);
+    c.fillStyle = '#ff7f9a'; c.beginPath(); c.ellipse(tg.x, tg.y, L * 0.12, L * 0.03, aD, 0, Math.PI * 2); c.fill();
+    c.restore();
+  }
+  const toothStroke = 'rgba(30,80,40,0.55)';
+  // lower jaw + teeth (pointing up)
+  c.save(); c.translate(H.x, H.y); c.rotate(aD); c.translate(-H.x, -H.y);
+  c.fillStyle = '#fff'; c.strokeStyle = toothStroke; c.lineWidth = lw * 0.5;
+  for (let x = 0.2; x <= 0.45; x += 0.08) { c.beginPath(); c.moveTo(L * (x - 0.016 * tk), L * 0.04); c.lineTo(L * x, L * (0.04 - 0.032 * tk)); c.lineTo(L * (x + 0.016 * tk), L * 0.04); c.closePath(); c.fill(); c.stroke(); }
+  c.fillStyle = BODY; c.strokeStyle = OUT; c.lineWidth = lw;
+  c.beginPath(); c.moveTo(L * 0.05, L * 0.03); c.lineTo(L * 0.46, L * 0.035); c.quadraticCurveTo(L * 0.53, L * 0.045, L * 0.47, L * 0.078); c.quadraticCurveTo(L * 0.3, L * 0.1, L * 0.06, L * 0.095); c.closePath(); c.fill(); c.stroke();
+  c.restore();
+  // upper jaw (snout) + teeth (pointing down) + eyes
+  c.save(); c.translate(H.x, H.y); c.rotate(aU); c.translate(-H.x, -H.y);
+  c.fillStyle = '#fff'; c.strokeStyle = toothStroke; c.lineWidth = lw * 0.5;
+  for (let x = 0.17; x <= 0.48; x += 0.075) { c.beginPath(); c.moveTo(L * (x - 0.018 * tk), L * 0.026); c.lineTo(L * x, L * (0.026 + 0.036 * tk)); c.lineTo(L * (x + 0.018 * tk), L * 0.026); c.closePath(); c.fill(); c.stroke(); }
+  c.fillStyle = BODY; c.strokeStyle = OUT; c.lineWidth = lw;
+  c.beginPath();
+  c.moveTo(L * 0.02, -L * 0.07);
+  c.quadraticCurveTo(L * 0.12, -L * 0.115, L * 0.24, -L * 0.07);
+  c.lineTo(L * 0.46, -L * 0.045);
+  c.quadraticCurveTo(L * 0.57, -L * 0.05, L * 0.56, 0);
+  c.quadraticCurveTo(L * 0.55, L * 0.035, L * 0.5, L * 0.032);
+  c.lineTo(L * 0.06, L * 0.03);
+  c.closePath(); c.fill(); c.stroke();
+  c.fillStyle = DARK; c.beginPath(); c.arc(L * 0.5, -L * 0.048, L * 0.022, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#1d3b25'; c.beginPath(); c.arc(L * 0.507, -L * 0.054, L * 0.007, 0, Math.PI * 2); c.fill();
+  c.fillStyle = 'rgba(255,140,160,0.6)'; c.beginPath(); c.ellipse(L * 0.2, -L * 0.008, L * 0.036, L * 0.02, 0, 0, Math.PI * 2); c.fill();
+  const eye = (x, y, r) => {
+    c.fillStyle = BODY; c.strokeStyle = OUT; c.lineWidth = lw;
+    c.beginPath(); c.arc(x, y + r * 0.3, r * 1.2, Math.PI, 0); c.closePath(); c.fill(); c.stroke();
+    if (eyes === 'happy') { c.strokeStyle = '#1b2440'; c.lineWidth = Math.max(2, L * 0.012); c.beginPath(); c.arc(x, y + r * 0.4, r * 0.62, Math.PI * 1.12, Math.PI * 1.88); c.stroke(); return; }
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); c.stroke();
+    if (eyes === 'dizzy') {   // cartoon X eyes (the boss is beaten)
+      c.strokeStyle = '#1b2440'; c.lineWidth = Math.max(2, L * 0.011);
+      c.beginPath(); c.moveTo(x - r * 0.5, y - r * 0.5); c.lineTo(x + r * 0.5, y + r * 0.5); c.moveTo(x + r * 0.5, y - r * 0.5); c.lineTo(x - r * 0.5, y + r * 0.5); c.stroke();
+      return;
+    }
+    const sur = eyes === 'surprised', pr = sur ? r * 0.32 : r * 0.55, px = sur ? 0 : r * 0.3, py = sur ? 0 : r * 0.1;
+    c.fillStyle = '#1b2440'; c.beginPath(); c.arc(x + px, y + py, pr, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(x + px + pr * 0.35, y + py - pr * 0.4, pr * 0.36, 0, Math.PI * 2); c.fill();
+    if (angry && !sur) {   // grumpy lid + big slanted eyebrow (down toward the snout)
+      c.save(); c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.clip();
+      c.fillStyle = BODY; c.beginPath(); c.moveTo(x - r * 1.3, y - r * 1.3); c.lineTo(x + r * 1.3, y - r * 1.3); c.lineTo(x + r * 1.3, y - r * 0.05); c.lineTo(x - r * 1.3, y - r * 0.75); c.closePath(); c.fill();
+      c.restore();
+      c.strokeStyle = OUT; c.lineWidth = lw; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.stroke();
+      c.strokeStyle = '#1b2a1f'; c.lineWidth = Math.max(3, r * 0.42);
+      c.beginPath(); c.moveTo(x - r * 1.25, y - r * 1.55); c.lineTo(x + r * 1.15, y - r * 0.85); c.stroke();
+    }
+  };
+  eye(L * 0.085, -L * 0.115, L * 0.045);
+  eye(L * 0.165, -L * 0.11, L * 0.048);
+  c.restore();
+  c.restore();
+}
+
+/* ================================================================
+   Game state
+   ================================================================ */
+const game = { state: 'start', index: 0, letters: [], dragging: false, pointerId: null, dragOff: { x: 0, y: 0 }, target: null,
+  idle: 0, wrongs: 0, hasDragged: false, finalT: 0, lives: MAX_LIVES, seq: 0, crocsEaten: 0, near: false,
+  spawnT: 0, yum: 0, grace: 0,
+  breakEvery: 3, sinceBreak: 0, breaks: 0, breakLog: [], breakAt: [], snackGoals: [], snackEaten: 0,   // v4 snack breaks
+  crocWins: 0, covered: false, confAcc: 0, partyDone: {}, growLog: [], snackScaleTo: 0 };
+const snack = { goal: 0, eaten: 0, spawned: 0, t: 0 };            // the current snack break
+const feast = { s0: 1, cover: 10 };                                // after Z: start scale -> scale that covers the screen
+const race = { p: 0, dur: 9, wait: 0, started: false, hint: false, slot: 1, croc: null };   // Level 2 race
+let RACE = null;                                                    // Level 2 layout
+const shark = { x: 0, y: 0, px: 0, py: 0, heading: 0, speed: 0, tailPhase: 0, spin: 1, attn: 0, blinkT: 2, blink: 0, faceFwd: false, anim: null,
+  scale: L1_START_SCALE, chomp: 0, dead: 0, hidden: false, scripted: false, faceAng: null };
+const particles = []; // confetti + bubble bursts + stars + v5 gas puffs / poof clouds
+const crocs = [];     // cartoon crocodiles. role: 'snack' (L1 break), 'free' (20-croc ending), 'eater' (game over), 'racer' (Level 2), 'boss' (v5)
+const popTexts = [];  // cartoon "CHOMP!" words
+const tweens = [];
+const friends = [];   // v5: Aaron's shark friends (parties) / cousins (boss battle)
+const party = { n: 0, phase: '', count: 0, farts: 0, puffs: 0, log: [], atIndex: 0 };
+const boss = { croc: null, hp: 0, max: BOSS_HP, shown: 0, aaron: 0, cousins: 0, cd: 0, idle: 0, nextCousin: 0, half: false, t: 0,
+  defeated: false, poofed: false, flash: 0, eyesT: 0, cousinsIn: false };
+let flyer = null;     // letter flying up to the progress strip
+let T = 0;
+let SA = { t: 0, r: 0, b: 0, l: 0 }, stripBottom = 60;
+let aaronLbl = null;  // where Aaron's name label was drawn this frame (tests)
+
+const sharkLen = () => (isRace() && RACE ? RACE.Ls : G.L) * shark.scale;
+const curR = () => (isRace() && RACE ? RACE.R : G.bubbleR);   // letter bubble radius
+// v5: the shark always swims freely to the finger (letters, snack breaks, the ending, parties, the boss battle)
+const freeMove = () => /^(play|free|snack|party|boss)$/.test(game.state);
+function seqLater(fn, sec) { const tok = game.seq; return setTimeout(() => { if (tok === game.seq) fn(); }, sec * 1000 * TS); }
+const easeLinear = t => t, easeInCubic = t => t * t * t;
+const easeOutBack = t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+function tween(obj, to, dur, ease, onDone) {
+  for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].obj === obj && Object.keys(to).some(k => k in tweens[i].to)) tweens.splice(i, 1);
+  const from = {}; for (const k in to) from[k] = obj[k];
+  const w = { obj, from, to, dur: Math.max(0.01, dur * TS), t: 0, ease: ease || easeInOut, onDone };
+  tweens.push(w); return w;
+}
+function dropTweens(obj) { for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].obj === obj) tweens.splice(i, 1); }
+function updateTweens(dt) {
+  for (const w of tweens.slice()) {
+    if (tweens.indexOf(w) < 0) continue;
+    w.t = Math.min(1, w.t + dt / w.dur);
+    const e = w.ease(w.t);
+    for (const k in w.to) w.obj[k] = w.from[k] + (w.to[k] - w.from[k]) * e;
+    if (w.t >= 1) { tweens.splice(tweens.indexOf(w), 1); if (w.onDone) w.onDone(); }
+  }
+}
+
+/* ---- HUD: hearts, mute, crocodile counter ---- */
+const livesEl = $('lives'), muteBtn = $('mute');
+const HEART_SVG = '<svg viewBox="0 0 32 30" aria-hidden="true"><path d="M16 28.5C16 28.5 2 19.5 2 10.5 2 6 5.5 2.5 9.5 2.5c3 0 5.5 2 6.5 4.5 1-2.5 3.5-4.5 6.5-4.5 4 0 7.5 3.5 7.5 8 0 9-14 18-14 18z" fill="#ff4f6d" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/><ellipse cx="9.5" cy="9" rx="3" ry="2" fill="#fff" opacity=".75"/></svg>';
+for (let i = 0; i < MAX_LIVES; i++) { const sp = document.createElement('span'); sp.className = 'h'; sp.innerHTML = HEART_SVG; livesEl.appendChild(sp); }
+const hearts = Array.from(livesEl.children);
+function renderLives() { hearts.forEach((h, i) => { h.classList.remove('pop', 'gain'); h.classList.toggle('lost', i >= game.lives); }); livesEl.dataset.lives = game.lives; }
+function restartAnim(el, cls) { el.classList.remove('pop', 'gain', 'bump'); void el.offsetWidth; el.classList.add(cls); }
+function loseLife() { if (game.lives <= 0) return; game.lives--; const h = hearts[game.lives]; h.classList.add('lost'); restartAnim(h, 'pop'); livesEl.dataset.lives = game.lives; }
+function gainLife() { if (game.lives >= MAX_LIVES) return false; const h = hearts[game.lives]; game.lives++; h.classList.remove('lost'); restartAnim(h, 'gain'); livesEl.dataset.lives = game.lives; Sfx.sparkle(0.2); return true; }
+function setHud(mode) {   // 'start' | 'play' | 'snack' | 'race' | 'party' | 'free' | 'boss' | 'none'
+  livesEl.classList.toggle('hidden', !(mode === 'play' || mode === 'snack' || mode === 'race' || mode === 'party'));
+  $('counter').classList.toggle('hidden', !(mode === 'free' || mode === 'snack'));
+  $('replay').classList.toggle('hidden', mode !== 'free');
+  muteBtn.classList.toggle('hidden', mode === 'start');
+  $('lvl').classList.toggle('hidden', mode === 'start' || mode === 'none');
+  $('lvlNum').textContent = level().id;
+}
+function layoutHud() {
+  stripBottom = strip.getBoundingClientRect().bottom;
+  document.documentElement.style.setProperty('--stripB', Math.round(stripBottom) + 'px');
+  livesEl.classList.toggle('portrait', portrait);
+  muteBtn.classList.toggle('port', portrait); muteBtn.classList.toggle('land', !portrait);
+  $('lvl').classList.toggle('port', portrait); $('lvl').classList.toggle('land', !portrait);
+}
+function renderMute() { muteBtn.classList.toggle('off', Music.muted); muteBtn.setAttribute('aria-pressed', Music.muted ? 'true' : 'false'); }
+function renderCounter(bump) {   // "1 / 3" in a snack break, "12 / 20" in the ending
+  const inSnack = game.state === 'snack' || game.state === 'snackEnd';
+  $('counterNum').textContent = inSnack ? `${snack.eaten} / ${snack.goal}` : `${game.crocsEaten} / ${FEAST_GOAL}`;
+  if (bump) restartAnim($('counter'), 'bump');
+}
+function paintCrocCanvas(cv2, cssW, cssH, o) {
+  const d = Math.min(window.devicePixelRatio || 1, 2);
+  cv2.width = Math.round(cssW * d); cv2.height = Math.round(cssH * d);
+  const c = cv2.getContext('2d'); c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, cssW, cssH);
+  c.translate(cssW * 0.5, cssH * 0.56);
+  drawCroc(c, Math.min(cssW * 0.86, cssH * 3.2), o);
+}
+
+/* ---- where the shark waits between rounds (Level 1: left side in landscape, bottom in portrait; Level 2: his home) ---- */
+function startPos() {
+  const Ls = sharkLen();
+  if (portrait) return { x: W / 2, y: Math.min(H - SA.b - 14 - Ls * 0.62, H * 0.84) };
+  return { x: Math.max(SA.l + 16 + Ls * 0.62, W * 0.15), y: (stripBottom + H - SA.b) / 2 };
+}
+function homePos() { return isRace() && RACE ? RACE.sharkHome : startPos(); }
+function resetSharkToStart() {
+  const p = homePos();
+  shark.x = shark.px = p.x; shark.y = shark.py = p.y; shark.heading = 0; shark.flip = false; shark.anim = null;
+}
+function swimHome(onDone, dur = 1.0) {   // scripted swim back to the start spot (between rounds)
+  const p = homePos();
+  shark.scripted = true; shark.faceAng = null;
+  tween(shark, { x: p.x, y: p.y }, dur, easeInOut, () => { shark.scripted = false; if (onDone) onDone(); });
+}
+
+function newRound(opts) {
+  const n = level().choices;
+  const target = ALPHABET[game.index];
+  const pool = shuffle(ALPHABET.filter(ch => ch !== target)).slice(0, n - 1);
+  const chars = shuffle([target, ...pool]);
+  game.letters = chars.map((ch, i) => ({ ch, branch: i, correct: ch === target, x: 0, y: 0, scale: 0, scaleTarget: 1, delay: i * 0.12, phase: rand(0, 6), wobble: 0, glow: 0, gone: false, armed: true }));
+  game.letters.forEach((l, i) => Sfx.pop(0.05 + i * 0.12));
+  game.idle = 0; game.wrongs = 0; game.hinted = false; game.grace = 0;   // wrongs = misses in THIS round (glow hint after 2)
+  game.state = 'play'; game.target = null;
+  if (isRace()) startRaceRound(opts); else layoutLetters();
+  updateStrip();
+  if (opts && opts.prompt) {
+    const idx = game.index;
+    later(() => { if (game.state === 'play' && game.index === idx) Voice.play('f_' + target.toLowerCase()); }, 450);
+  }
+}
+
+function letterPos(l) {   // Level 1: bubbles float in open water (gentle bob + sway); Level 2: the middle column
+  const R = curR(), bob = Math.sin(T * 2 + l.phase) * R * 0.07;
+  if (isRace() && RACE) { const e = RACE.slots[l.branch]; return { x: e.x + bob * 0.4, y: e.y + bob }; }
+  return { x: l.x + Math.sin(T * 0.9 + l.phase) * R * 0.08, y: l.y + bob };
+}
+
+function startDrag(e) {   // touch anywhere: the shark swims to the finger (near him = drag him directly)
+  const p = { x: e.clientX, y: e.clientY };
+  if (!freeMove() || shark.scripted || shark.anim) return false;
+  game.dragging = true; game.pointerId = e.pointerId; game.hasDragged = true;
+  game.near = dist(p, shark) < sharkLen() * 0.6 + 40;
+  game.dragOff = game.near ? { x: (shark.x - p.x) * 0.5, y: (shark.y - p.y) * 0.5 } : { x: 0, y: 0 };
+  game.target = { x: p.x + game.dragOff.x, y: p.y + game.dragOff.y };
+  return true;
+}
+
+function sharkNose() { const L = sharkLen(); return { x: shark.x + Math.cos(shark.heading) * L * 0.45, y: shark.y + Math.sin(shark.heading) * L * 0.45 }; }
+function checkReach(isDrop) {
+  // forgiving for the RIGHT letter (nose touching counts; letting go near it counts); stricter for wrong letters, and a wrong letter
+  // never counts on a drop, during the grace time after a miss, or again before the shark has swum away from it
+  const nose = sharkNose(), R = curR();
+  let hit = null, hitD = Infinity;
+  for (const l of game.letters) {
+    if (l.gone) continue;
+    const lp = letterPos(l);
+    let d = Math.min(dist(shark, lp), dist(nose, lp) + R * 0.25);
+    if (isDrop && l.correct) d = Math.min(d, dist(shark, lp) - sharkLen() * 0.45 + R * 0.25);   // letting go: any way he faces, his front half near it counts
+    if (!l.correct && !isDrop && d < R * 0.72 && (game.grace > 0 || l.armed === false)) l.armed = false;   // touched while protected: stays safe until he swims away
+    const lim = l.correct ? R * (isDrop ? 1.5 : 0.9) : (isDrop || game.grace > 0 || l.armed === false ? -1 : R * 0.72);
+    if (d < lim && d < hitD) { hit = l; hitD = d; }
+  }
+  if (hit) { resolve(hit); return true; }
+  return false;
+}
+
+function resolve(l) {
+  game.dragging = false; game.pointerId = null; game.target = null;
+  if (l.correct) onCorrect(l); else onWrong(l);
+}
+
+function onWrong(l) {
+  Sfx.boop();
+  l.wobble = 1; l.armed = false;
+  game.grace = WRONG_GRACE * TS;
+  game.wrongs++;
+  game.bounces = (game.bounces || 0) + 1;
+  game.idle = 0;
+  loseLife();
+  if (game.lives <= 0) { gameOver(); return; }
+  const line = 'wrong' + (((game.bounces - 1) % 3) + 1);   // rotate the gentle "try again" lines
+  later(() => { if (game.state === 'play') Voice.play(line); }, 180);
+  if (isRace()) {   // Level 2: bounce back toward home (the crocodile waits while the shark bounces)
+    const home = RACE.sharkHome;
+    shark.scripted = true; shark.faceAng = 0;
+    tween(shark, { x: lerp(shark.x, home.x, 0.75), y: lerp(shark.y, home.y, 0.75) }, 0.8, easeOutCubic, () => { shark.scripted = false; shark.faceAng = null; });
+    return;
+  }
+  // Level 1: boing! he bounces off the bubble, away from it
+  const lp = letterPos(l), Ls = sharkLen(), b = freeBounds();
+  let dx = shark.x - lp.x, dy = shark.y - lp.y, d = Math.hypot(dx, dy);
+  if (d < 1) { const h = homePos(); dx = h.x - lp.x; dy = h.y - lp.y; d = Math.hypot(dx, dy) || 1; }
+  const push = curR() + Ls * 0.55 + 24;
+  let to = { x: clamp(lp.x + dx / d * push, b.x0, b.x1), y: clamp(lp.y + dy / d * push, b.y0, b.y1) };
+  if (dist(to, lp) < push * 0.85) {   // squeezed against the screen edge: bounce back toward the start spot instead
+    const h = homePos(); let hx = h.x - lp.x, hy = h.y - lp.y; const hd = Math.hypot(hx, hy) || 1;
+    to = { x: clamp(lp.x + hx / hd * push, b.x0, b.x1), y: clamp(lp.y + hy / hd * push, b.y0, b.y1) };
+  }
+  shark.scripted = true; shark.faceAng = null;
+  tween(shark, to, 0.55, easeOutCubic, () => { shark.scripted = false; });
+}
+
+function onCorrect(l) {
+  game.state = 'celebrate';
+  celebrationEnded = false;
+  const pos = letterPos(l);
+  const ch = l.ch, word = WORDS[ch];
+  Sfx.chime();
+  burst(pos.x, pos.y, 70, true);
+  bubbleBurst(pos.x, pos.y, 16);
+  shark.spin = 0;
+  l.gone = true; l.scaleTarget = 0;
+  game.letters.forEach(o => { if (!o.correct) { o.scaleTarget = 0; } });
+  // the letter flies up into its slot in the alphabet strip
+  const idx = game.index;
+  const cell = cells[idx]; cell.dataset.pending = '1';
+  const cr = cell.getBoundingClientRect();
+  flyer = { ch: show(ch), x0: pos.x, y0: pos.y, x1: cr.left + cr.width / 2, y1: cr.top + cr.height / 2, r0: curR(), r1: cr.width / 2, t: 0, dur: 0.9 * Math.max(SPEED, .3), idx };
+  sharkChomp();
+  if (isRace()) {   // Level 2: the shark got there first -> CHOMP the letter, happy sounds, the crocodile swims back surprised
+    Sfx.chomp(); Sfx.sparkle(0.25);
+    popText('YUM!', pos.x, pos.y - curR() * 1.1, Math.max(34, Math.min(W, H) * 0.08));
+    game.sharkWins = (game.sharkWins || 0) + 1;
+    const c = race.croc;
+    if (c) { c.eyes = 'surprised'; tween(race, { p: 0 }, 1.6, easeInOut, () => { if (race.croc) race.croc.eyes = 'normal'; }); }
+  }
+  game.index++;
+  updateStrip();
+  let spoke = false, minDone = false;
+  const finish = () => { if (spoke && minDone) endCelebration(l); };
+  Voice.play('c_' + ch.toLowerCase(), () => { spoke = true; later(finish, 250); });
+  later(() => { minDone = true; finish(); }, 2600);
+  later(() => showCard(ch, word), 450);
+}
+
+let celebrationEnded = true;
+function endCelebration(l) {
+  if (game.state !== 'celebrate' || celebrationEnded) return;
+  celebrationEnded = true;
+  hideCard();
+  if (game.index >= ALPHABET.length) { later(isRace() ? startBoss : finalCelebration, 400); return; }
+  if (!isRace()) game.sinceBreak++;
+  if (partyDue()) { later(startParty, 250); return; }   // v5: shark party after G and P (a snack break due now waits one more letter)
+  if (isRace()) {   // Level 2: back to the start, next letter
+    later(() => swimHome(() => { if (game.state === 'celebrate') newRound({ prompt: true }); }, 0.9), 150);
+    return;
+  }
+  const snackNow = game.sinceBreak >= game.breakEvery;   // random break after 2, 3 or 4 correct letters
+  later(() => {
+    if (game.state !== 'celebrate') return;
+    if (snackNow) startSnack();
+    else swimHome(() => { if (game.state === 'celebrate') newRound({ prompt: true }); }, 1.0);
+  }, 250);
+}
+
+function showCard(ch, word) {
+  if (game.state !== 'celebrate') return;
+  $('cardLetter').textContent = show(ch);
+  $('cardPic').textContent = word[1];
+  $('cardWord').textContent = word[0].charAt(0).toUpperCase() + word[0].slice(1);
+  const card = $('card'); card.classList.remove('hidden', 'out');
+}
+function hideCard() {
+  const card = $('card');
+  if (card.classList.contains('hidden')) return;
+  card.classList.add('out');
+  setTimeout(() => card.classList.add('hidden'), 340);
+}
+
+/* ---- v5: a clear "power-up" grow: he pulses between the old and the new size, stars, "BIGGER!" and a rising sound ---- */
+function growShark(to) {
+  const from = shark.scale; to = Math.max(from, to);
+  game.growLog.push({ level: level().id, index: game.index, from: +from.toFixed(4), to: +to.toFixed(4) });
+  Sfx.grow();
+  starBurst(shark.x, shark.y, 18);
+  const Lto = sharkLen() / Math.max(0.01, shark.scale) * to;
+  popText('BIGGER!', shark.x, shark.y - Lto * 0.5, Math.max(30, Math.min(W, H) * 0.075));
+  const d = Math.max(to - from, from * 0.08);   // at the size cap it is still a happy "flex" pulse
+  const steps = [from + d * 0.55, from + d * 0.15, from + d * 0.9, from + d * 0.45, to + d * 0.3, to];
+  let i = 0;
+  const next = () => { if (i >= steps.length) { shark.scale = to; return; } const v = steps[i++]; const last = i === steps.length; tween(shark, { scale: v }, last ? 0.32 : 0.12, last ? easeOutBack : easeInOut, next); };
+  next();
+}
+
+/* ---- crocodiles ---- */
+function makeCroc(o) { return Object.assign({ x: 0, y: 0, L: 100, dir: -1, jaw: 0, jawAuto: true, phase: rand(0, 6), eyes: 'normal', bulge: 0, vx: 0, role: 'free', enterK: 1, flip: 0 }, o); }
+function removeCroc(c) { const i = crocs.indexOf(c); if (i >= 0) crocs.splice(i, 1); }
+function sharkChomp() { shark.chomp = 0; tween(shark, { chomp: 1 }, 0.07, easeLinear, () => tween(shark, { chomp: 0 }, 0.35, easeOutCubic)); }
+function eatCrocFx(c, k) {
+  removeCroc(c);
+  Sfx.chomp();
+  bubbleBurst(c.x, c.y, 18); starBurst(c.x, c.y, 12);
+  popText('CHOMP!', c.x, c.y - c.L * 0.22, Math.max(34, Math.min(W, H) * 0.09) * (k || 1));
+}
+
+/* ---- crocodiles that swim in and wander around on screen (snack breaks + the ending) ---- */
+function crocBounds(Lc) {
+  const top = stripBottom + Lc * 0.25, bot = (scene.sandTop || H) - Lc * 0.08;
+  return { x0: SA.l + Lc * 0.55, x1: Math.max(SA.l + Lc * 0.55 + 1, W - SA.r - Lc * 0.55), y0: top, y1: Math.max(top + 1, bot) };
+}
+function zoneVal(p, pad) {   // < 1 = inside the shark's (generous) eating zone: his whole body + a margin
+  const Ls = sharkLen(), ch = Math.cos(shark.heading), sh = Math.sin(shark.heading);
+  const cx = shark.x + ch * Ls * 0.08, cy = shark.y + sh * Ls * 0.08;
+  const dx = p.x - cx, dy = p.y - cy, u = dx * ch + dy * sh, v = -dx * sh + dy * ch;
+  const a = Ls * 0.52 + pad, b = Ls * 0.24 + pad;
+  return (u / a) * (u / a) + (v / b) * (v / b);
+}
+const inEatZone = c => zoneVal(c, c.L * 0.3) <= 1;
+const onScreen = c => c.x > 0 && c.x < W && c.y > 0 && c.y < H;
+function spawnWanderCroc(role) {
+  const sc = Math.max(0.6, Math.min(W, H) / 700);
+  // snack crocodiles are a bit smaller than the (v5: smaller) shark; the ending keeps the v4 sizes
+  const Lc = role === 'snack' ? Math.max(G.L * 0.36, sharkLen() * rand(0.62, 0.8)) : G.L * rand(0.62, 0.82);
+  const b = crocBounds(Lc);
+  // pick a spot within reach on screen, outside the shark's mouth zone (so the child gets to chase it)
+  const good = []; let far = null, farV = -1;
+  for (let i = 0; i < 40; i++) {
+    const p = { x: rand(b.x0, b.x1), y: rand(b.y0, b.y1) }, v = zoneVal(p, Lc * 0.6);
+    if (v > 1.5) good.push(p);
+    if (v > farV) { far = p; farV = v; }
+  }
+  const t = good.length ? good[Math.floor(Math.random() * good.length)] : far;
+  const fromLeft = t.x < W / 2;   // swims in from the nearer side
+  const c = makeCroc({ role, L: Lc, dir: fromLeft ? 1 : -1, x: fromLeft ? -Lc * 0.6 : W + Lc * 0.6, y: t.y, jawAuto: true,
+    wander: { tx: t.x, ty: t.y, spd: rand(46, 66) * sc, age: 0, entering: true, still: false } });
+  crocs.push(c);
+  return c;
+}
+function updateWander(c, dt) {
+  const w = c.wander;
+  w.age += dt;
+  const b = crocBounds(c.L);
+  if (w.age > (c.role === 'snack' ? 7 : 9) && !w.still) { w.tx = shark.x; w.ty = shark.y; w.entering = false; }   // curious crocs come closer, so a break always ends
+  else if (!w.entering) { w.tx = clamp(w.tx, b.x0, b.x1); w.ty = clamp(w.ty, b.y0, b.y1); }
+  const dx = w.tx - c.x, dy = w.ty - c.y, d = Math.hypot(dx, dy);
+  if (d < 6) {
+    w.entering = false;
+    if (!w.still) { w.tx = clamp(c.x + rand(-0.3, 0.3) * W, b.x0, b.x1); w.ty = clamp(c.y + rand(-0.25, 0.25) * H, b.y0, b.y1); }
+  } else if (!w.still || w.entering) {
+    const st = Math.min(d, w.spd * (w.entering ? 1.7 : 1) * dt);
+    c.x += dx / d * st; c.y += dy / d * st;
+    if (Math.abs(dx) > 4) c.dir = dx > 0 ? 1 : -1;
+  }
+}
+function swimAway(c) {
+  c.leaving = true; c.wander = null;
+  const dir = c.x < W / 2 ? -1 : 1; c.dir = dir;
+  tween(c, { x: dir < 0 ? -c.L : W + c.L }, 1.2, easeInCubic, () => removeCroc(c));
+}
+
+/* ---- Level 1 snack break: after a random 2-4 letters, eat 2-3 crocodiles that swim in; at the end he GROWS ---- */
+function pickBreak() { return BREAK_FIXED ? clamp(BREAK_FIXED, 1, 26) : BREAK_MIN + Math.floor(Math.random() * (BREAK_MAX - BREAK_MIN + 1)); }
+const l1ScaleAfter = breaks => Math.min(L1_MAX_SCALE, L1_START_SCALE + L1_GROW_BREAK * breaks);
+function startSnack() {
+  if (game.state !== 'celebrate') return;
+  game.state = 'snack'; game.seq++; game.breaks++;
+  game.breakLog.push(game.sinceBreak); game.breakAt.push(game.index);
+  game.sinceBreak = 0; game.breakEvery = pickBreak();
+  snack.goal = SNACK_MIN + Math.floor(Math.random() * (SNACK_MAX - SNACK_MIN + 1));
+  snack.eaten = 0; snack.spawned = 0; snack.t = 0;
+  game.snackGoals.push(snack.goal);
+  game.letters = [];
+  shark.anim = null; shark.scripted = false; shark.faceAng = null;
+  game.dragging = false; game.pointerId = null; game.target = null; game.spawnT = 0.5;
+  setHud('snack'); renderCounter(true);
+  updateStrip();
+  Sfx.swish();
+  popText('SNACK TIME!', W / 2, H * 0.42, Math.max(34, Math.min(W, H) * 0.085));
+  Voice.play('snack');
+}
+function updateSnack(dt) {
+  snack.t += dt;
+  game.spawnT -= dt;
+  const alive = crocs.filter(c => c.role === 'snack').length;
+  if (game.spawnT <= 0 && snack.spawned < snack.goal && alive < 2) { spawnWanderCroc('snack'); snack.spawned++; game.spawnT = rand(0.9, 1.5); }
+  for (const c of crocs.slice()) if (game.state === 'snack' && c.role === 'snack' && !c.leaving && onScreen(c) && inEatZone(c)) eatSnack(c);
+  if (game.state === 'snack' && snack.t > SNACK_MAX_SEC) endSnack();
+}
+function eatSnack(c) {
+  eatCrocFx(c, 0.9); sharkChomp(); shark.attn = 1;
+  snack.eaten++; game.snackEaten++; renderCounter(true);
+  if (snack.eaten >= snack.goal) { endSnack(); return; }
+  if (game.snackEaten === 1) Voice.play('chomp');   // first ever: "Chomp! You ate a crocodile! Eat them all to grow bigger!" (v5: he grows after the break)
+  else if (!Voice.src) Voice.play('yum' + ((game.yum++ % 3) + 1));
+}
+function endSnack() {
+  if (game.state !== 'snack') return;
+  game.state = 'snackEnd'; game.seq++;
+  game.dragging = false; game.pointerId = null; game.target = null;
+  for (const c of crocs.slice()) if (c.role === 'snack') swimAway(c);
+  gainLife();   // each break gives back one heart (max 5)
+  Sfx.sting();
+  game.snackScaleTo = Math.min(L1_MAX_SCALE, shark.scale + L1_GROW_BREAK);
+  let voiced = false, moved = false;
+  const finish = () => { if (voiced && moved && game.state === 'snackEnd') { setHud('play'); newRound({ prompt: true }); } };
+  seqLater(() => {   // v5: the big moment of every break: he grows (animation + sound), "Yum! Look, you got bigger!"
+    growShark(game.snackScaleTo);
+    Voice.play('snackgrow', () => { voiced = true; finish(); });
+    seqLater(() => { voiced = true; finish(); }, 7);
+  }, 0.45);
+  seqLater(() => swimHome(() => { moved = true; finish(); }, 1.1), 1.9);
+}
+function finishSnackNow() {   // e.g. the iPad was rotated while the shark swam back
+  game.seq++; tweens.length = 0;
+  for (const c of crocs.slice()) if (c.role === 'snack') removeCroc(c);
+  shark.scripted = false; shark.faceAng = null; shark.chomp = 0; shark.scale = game.snackScaleTo || shark.scale;
+  resetSharkToStart(); setHud('play'); newRound({ prompt: true });
+}
+
+/* ---- out of hearts: sad tune, belly-up shark floats up, a crocodile gobbles him, Try Again ---- */
+function gameOver() {
+  game.state = 'gameover'; game.seq++;
+  game.dragging = false; game.pointerId = null; game.target = null;
+  if (race.croc) { const c = race.croc; race.croc = null; c.jawAuto = true; c.eyes = 'happy'; c.dir = 1; tween(c, { x: W + c.L }, 1.4, easeInCubic, () => removeCroc(c)); }
+  updateStrip();
+  Voice.stop();
+  Music.stop(0.6);
+  game.letters.forEach(o => { o.scaleTarget = 0; });
+  shark.anim = null; shark.scripted = true; shark.spin = 1;
+  shark.faceAng = Math.cos(shark.heading) < 0 ? Math.PI : 0;
+  seqLater(() => { Sfx.sad(); tween(shark, { dead: 1 }, 0.9, easeInOut); }, 0.45);
+  seqLater(() => {
+    const Ls = sharkLen();
+    const tx = clamp(shark.x, SA.l + Ls * 0.7, W - SA.r - Ls * 0.7);
+    tween(shark, { x: tx, y: stripBottom + Ls * 0.34 }, 3.2, easeInOut, crocGobbles);
+  }, 1.0);
+}
+function crocGobbles() {
+  if (game.state !== 'gameover') return;
+  const Ls = sharkLen(), Lc = Math.min(Ls * 1.8, W * 0.62);
+  const dir = shark.x > W / 2 ? 1 : -1;   // swims in from the side with more room
+  const c = makeCroc({ role: 'eater', x: dir > 0 ? -Lc * 0.75 : W + Lc * 0.75, y: shark.y - Lc * 0.02, L: Lc, dir, jawAuto: false, jaw: 0.1 });
+  crocs.push(c);
+  Sfx.swish();
+  tween(c, { jaw: 1 }, 1.1, easeInOut);   // jaws wide open for the last part of the approach
+  tween(c, { x: shark.x - dir * Lc * 0.3 }, 1.8, easeOutCubic, () => {
+    tween(c, { jaw: 0 }, 0.1, easeInCubic, () => {
+      Sfx.chomp(); shark.hidden = true; c.bulge = 1; c.eyes = 'happy';
+      bubbleBurst(shark.x, shark.y, 20); starBurst(shark.x, shark.y, 10);
+      popText('CHOMP!', shark.x, shark.y + Lc * 0.3, Math.max(40, Math.min(W, H) * 0.11));
+      seqLater(() => { Sfx.burp(); burpBubbles(c); }, 1.0);
+      seqLater(() => tween(c, { x: dir > 0 ? W + Lc : -Lc }, 1.8, easeInCubic, () => removeCroc(c)), 1.6);
+      seqLater(showTryAgain, 2.5);
+    });
+  });
+}
+function burpBubbles(c) {
+  const mx = c.x + c.dir * c.L * 0.45, my = c.y - c.L * 0.02;
+  particles.push({ kind: 'b', x: mx, y: my, vx: c.dir * 30, vy: -40, r: c.L * 0.05, life: 1.8, age: 0 });
+  for (let i = 0; i < 4; i++) particles.push({ kind: 'b', x: mx, y: my, vx: c.dir * rand(20, 70), vy: rand(-80, -20), r: c.L * rand(0.012, 0.025), life: rand(1, 1.6), age: 0 });
+}
+function showTryAgain() {
+  if (game.state !== 'gameover') return;
+  game.state = 'over';
+  const oc = $('overCroc'), r = oc.getBoundingClientRect();
+  $('over').classList.remove('hidden');
+  const r2 = oc.getBoundingClientRect();
+  paintCrocCanvas(oc, r2.width || r.width || 300, r2.height || r.height || 150, { bulge: 1, eyes: 'happy', phase: 0.6 });
+  Voice.play('gameover');
+}
+function skipToOver() { game.seq++; tweens.length = 0; crocs.length = 0; race.croc = null; shark.hidden = true; shark.scripted = true; showTryAgain(); }
+
+/* ---- A to Z done: celebration, then the free-swim crocodile feast ---- */
+function finalCelebration() {
+  game.state = 'final'; game.finalT = 0; game.seq++;
+  game.letters = [];
+  Music.stop(0.4);
+  setHud('none');
+  Sfx.fanfare();
+  for (let i = 0; i < 4; i++) setTimeout(() => burst(rand(0.2, 0.8) * W, rand(0.25, 0.6) * H, 80, true), i * 350);
+  shark.spin = 0;
+  updateStrip();
+  let spoke = false, minDone = false;
+  const go = () => { if (spoke && minDone && game.state === 'final') startFree(); };
+  Voice.play('final', () => { spoke = true; seqLater(go, 0.6); });
+  seqLater(() => { minDone = true; go(); }, 4);
+  setTimeout(() => { if (game.state === 'final') $('final').classList.remove('hidden'); }, 700);
+}
+/* ---- the 20-crocodile ending: each crocodile makes him bigger; #20 covers the whole screen = WIN ---- */
+const hitCv = document.createElement('canvas'), hctx = hitCv.getContext('2d');
+function coverAng() { return portrait ? -Math.PI / 2 : 0; }   // portrait screens: he faces up (covers a tall screen sooner)
+function coverPos(scale, ang) {   // centre of his body on the centre of the screen
+  const L = G.L * scale, ox = 0.075 * L, oy = 0.005 * L, c = Math.cos(ang), s = Math.sin(ang);
+  return { x: W / 2 - (ox * c - oy * s), y: H / 2 - (ox * s + oy * c) };
+}
+function coverageOf(x, y, L, ang, sx, sy, nx, ny) {   // share of a grid of screen points (edges + corners) inside his body
+  const path = sharkBodyPath(L);
+  hctx.setTransform(1, 0, 0, 1, 0, 0); hctx.translate(x, y); hctx.rotate(ang); hctx.scale(sx, sy);
+  let inside = 0, total = 0;
+  for (let i = 0; i <= nx; i++) for (let j = 0; j <= ny; j++) {
+    total++;
+    if (hctx.isPointInPath(path, clamp(i / nx * W, 0.5, W - 0.5), clamp(j / ny * H, 0.5, H - 0.5))) inside++;
+  }
+  hctx.setTransform(1, 0, 0, 1, 0, 0);
+  return inside / total;
+}
+function coverScale() {   // smallest size whose body covers the whole viewport (+6% margin)
+  const ang = coverAng();
+  const ok = m => { const p = coverPos(m, ang), L = G.L * m; return coverageOf(p.x, p.y, L, ang, 1, 1, 16, 12) >= 1 && coverageOf(p.x, p.y, L, ang, 1, -1, 16, 12) >= 1; };
+  let lo = 1, hi = 150;
+  for (let k = 0; k < 24; k++) { const m = (lo + hi) / 2; if (ok(m)) hi = m; else lo = m; }
+  return hi * 1.06;
+}
+function sharkCoverage(nx, ny) { const t = sharkXform(); return coverageOf(t.x, t.y, t.Ls, t.ang, t.sx, t.sy, nx, ny); }
+function feastScale(n) { return feast.s0 * Math.pow(feast.cover / feast.s0, clamp(n, 0, FEAST_GOAL) / FEAST_GOAL); }   // even steps: ~12-16% bigger per croc
+function startFree() {
+  game.state = 'free'; game.seq++;
+  $('final').classList.add('hidden');
+  game.crocsEaten = 0;
+  feast.s0 = Math.max(0.3, shark.scale); feast.cover = Math.max(feast.s0 * 1.5, coverScale());
+  renderCounter(false);
+  shark.scripted = false; shark.anim = null; shark.faceAng = null;
+  game.spawnT = 0.8; game.dragging = false;
+  setHud('free');
+  Music.start('main');
+  Voice.play('free');   // "Bonus time! Eat twenty crocodiles and grow super big!"
+}
+function skipToEnding() {   // ?skip=end and the tests: straight to the 20-crocodile ending (as if A-Z was done)
+  game.index = ALPHABET.length; game.letters = [];
+  cells.forEach(c => { delete c.dataset.pending; });
+  shark.scale = L1_MAX_SCALE; resetSharkToStart();
+  game.state = 'final'; updateStrip();
+  startFree();
+}
+function freeBounds() {
+  const Ls = sharkLen(), mx = Math.min(Ls * 0.35, W * 0.3), my = Math.min(Ls * 0.18, H * 0.3);
+  return { x0: SA.l + mx, x1: W - SA.r - mx, y0: stripBottom + my, y1: H - SA.b - my };
+}
+function updateFree(dt) {
+  game.spawnT -= dt;
+  const alive = crocs.filter(c => c.role === 'free').length, maxAlive = game.crocsEaten < 12 ? 3 : 2;
+  if (game.spawnT <= 0 && alive < maxAlive && alive + game.crocsEaten < FEAST_GOAL) { spawnWanderCroc('free'); game.spawnT = rand(0.7, 1.4); }
+  for (const c of crocs.slice()) if (game.state === 'free' && c.role === 'free' && onScreen(c) && inEatZone(c)) eatFree(c);
+}
+function eatFree(c) {
+  eatCrocFx(c, 0.85);
+  sharkChomp();
+  game.crocsEaten++; renderCounter(true);
+  if (game.crocsEaten >= FEAST_GOAL) { winGame(); return; }
+  tween(shark, { scale: feastScale(game.crocsEaten) }, 0.5, easeOutBack);
+  if (!Voice.src) Voice.play('yum' + ((game.yum++ % 3) + 1));
+}
+function winGame() {   // croc #20: he grows to cover the whole screen, confetti never stops, jingle + "You did it! You won!"
+  game.state = 'won'; game.seq++;
+  game.dragging = false; game.pointerId = null; game.covered = false; game.confAcc = 0;
+  for (const c of crocs.slice()) if (c.role === 'free') { bubbleBurst(c.x, c.y, 8); removeCroc(c); }
+  feast.cover = Math.max(feast.cover, coverScale());
+  const ang = coverAng(), pos = coverPos(feast.cover, ang);
+  shark.scripted = true; shark.anim = null; shark.faceAng = ang; shark.attn = 0; shark.spin = 1;
+  tween(shark, { x: pos.x, y: pos.y, scale: feast.cover }, 1.3, easeOutCubic, () => { game.covered = true; });
+  Music.stop(0.3);
+  Sfx.victory();
+  strip.classList.add('gone'); setHud('none');
+  for (let i = 0; i < 5; i++) setTimeout(() => { if (game.state === 'won') burst(rand(0.15, 0.85) * W, rand(0.2, 0.6) * H, 70, true); }, 200 + i * 260);
+  let panel = false;
+  const showPanel = () => { if (panel || game.state !== 'won') return; panel = true; $('won').classList.remove('hidden'); Voice.play('l2tap'); };
+  seqLater(() => Voice.play('win', () => seqLater(showPanel, 0.9)), 1.4);
+  seqLater(showPanel, 6.5);
+}
+function confettiShower(dt) {   // continuous confetti rain from the top (never stops by itself)
+  const sc = Math.max(0.7, Math.min(W, H) / 700), grav = 520 * sc;
+  game.confAcc += dt * 55;
+  while (game.confAcc >= 1) {
+    game.confAcc -= 1;
+    if (particles.length > 500) continue;
+    const vt = 0.2 * grav;   // flutter speed
+    particles.push({ kind: 'c', fl: true, x: rand(0, W), y: rand(-40, -8), vx: rand(-40, 40) * sc, vy: rand(0.4, 1) * vt, rot: rand(0, 6), vr: rand(-8, 8),
+      w: rand(7, 13) * sc, h: rand(5, 9) * sc, color: CONFETTI[Math.floor(Math.random() * CONFETTI.length)], life: (H + 60) / vt * 1.25, age: 0, round: Math.random() < 0.3, ph: rand(0, 6) });
+  }
+  if (Math.random() < dt * 0.7) burst(rand(0.15, 0.85) * W, rand(0.2, 0.55) * H, 40, true);
+}
+
+/* ---- Level 2: race the crocodile to the letter ---- */
+function buildRace() {
+  if (!G) return;
+  const barH = clamp(Math.min(W, H) * 0.04, 18, 30), barW = clamp(W * 0.36, 160, 440);
+  const barY = stripBottom + 10, barX = W / 2 - barW / 2;
+  const y0 = barY + barH + 12, y1 = H - SA.b - 10, ph = Math.max(60, y1 - y0);
+  const R = Math.max(24, Math.min(G.bubbleR, ph / 6 * 0.88, W * 0.11));
+  const slots = [0, 1, 2].map(k => ({ x: W / 2, y: y0 + ph * (k + 0.5) / 3 }));
+  const Ls = Math.max(50, Math.min(G.L, W * 0.2, ph * 0.5)), Lc = Ls * 1.12, midY = y0 + ph / 2;
+  RACE = { R, slots, Ls, Lc, y0, y1, barX, barY, barW, barH,
+    sharkHome: { x: SA.l + 14 + Ls * 0.62, y: midY }, crocHome: { x: W - SA.r - 14 - Lc * 0.62, y: midY } };
+}
+function crocSec(i) { return CROC_SEC_FIXED || lerp(L2_CROC_SEC_A, L2_CROC_SEC_Z, clamp(i / 25, 0, 1)); }
+function startRaceRound(opts) {
+  const retry = !!(opts && opts.retry);
+  race.p = 0; race.started = false; race.hint = retry;
+  race.dur = crocSec(game.index) * (retry ? L2_RETRY_SLOWER : 1);
+  race.wait = opts && opts.intro ? 4.8 : 1.9;   // the croc waits for the "Find the letter" prompt (and the Level 2 intro line)
+  race.slot = game.letters.find(l => l.correct).branch;
+  if (!race.croc || crocs.indexOf(race.croc) < 0) {   // a (new) crocodile swims in from the right
+    race.croc = makeCroc({ role: 'racer', L: RACE.Lc, dir: -1, enterK: 0 }); crocs.push(race.croc);
+    tween(race.croc, { enterK: 1 }, 1.1, easeOutCubic);
+  }
+  const c = race.croc; c.L = RACE.Lc; c.eyes = 'normal'; c.bulge = 0; c.jawAuto = true; c.dir = -1;
+  placeRacer();
+}
+function racerPos(p) {   // straight across the middle, then (last ~45%) it turns toward the right letter
+  const s = RACE.slots[race.slot] || RACE.slots[1], home = RACE.crocHome;
+  const endX = s.x + RACE.R * 0.55 + RACE.Lc * 0.5;   // its mouth touches the bubble
+  const k = p <= 0.55 ? 0 : easeInOut((p - 0.55) / 0.45);
+  return { x: lerp(home.x, endX, p), y: lerp(home.y, s.y, k) };
+}
+function placeRacer() { const c = race.croc; if (!c || !RACE) return; const q = racerPos(race.p); c.x = q.x + (1 - c.enterK) * (W - q.x + c.L * 0.7); c.y = q.y; }
+function updateRace(dt) {
+  if (game.state === 'play') {
+    if (race.wait > 0) { race.wait -= dt / TS; if (race.wait <= 0 && !race.started) { race.started = true; Sfx.swish(); } }
+    else if (!shark.scripted) {   // no progress while the shark bounces back from a wrong letter
+      race.p = Math.min(1, race.p + dt / race.dur);
+      if (race.p >= 1) crocWins();
+    }
+  }
+  if (race.croc && (game.state === 'play' || game.state === 'celebrate' || game.state === 'crocwin')) placeRacer();
+}
+function crocWins() {   // the crocodile got there first: it eats the letter, one heart, then the same letter again (slower)
+  if (game.state !== 'play') return;
+  game.state = 'crocwin'; game.seq++;
+  game.dragging = false; game.pointerId = null; game.target = null;
+  game.crocWins++;
+  const c = race.croc, l = game.letters.find(o => o.correct);
+  c.jawAuto = false;
+  tween(c, { jaw: 1 }, 0.16, easeOutCubic, () => tween(c, { jaw: 0 }, 0.09, easeInCubic, () => {
+    Sfx.chomp();
+    if (l) { const lp = letterPos(l); l.gone = true; bubbleBurst(lp.x, lp.y, 14); popText('CHOMP!', lp.x, lp.y - RACE.R, Math.max(34, Math.min(W, H) * 0.08)); }
+    game.letters.forEach(o => { o.scaleTarget = 0; });
+    c.eyes = 'happy'; c.bulge = 0.6;
+    loseLife();
+    if (game.lives <= 0) { seqLater(gameOver, 0.7); return; }
+    later(() => Voice.play('crocgot'), 250);   // "Oh no! The crocodile got it! Let's try again!"
+    seqLater(() => {
+      c.jawAuto = true; c.eyes = 'normal'; tween(c, { bulge: 0 }, 0.8);
+      const home = RACE.sharkHome;
+      shark.scripted = true; shark.faceAng = 0;
+      tween(shark, { x: home.x, y: home.y }, 0.9, easeInOut, () => { shark.scripted = false; shark.faceAng = null; });
+      tween(race, { p: 0 }, 1.3, easeInOut, () => { if (game.state === 'crocwin') newRound({ prompt: true, retry: true }); });
+    }, 2.3);
+  }));
+}
+function startRaceIntro() {
+  newRound({ intro: true });
+  Voice.play('level2', () => later(() => { if (game.state === 'play' && game.index === 0) Voice.play('f_a'); }, 150));
+}
+
+/* ================================================================
+   v5: Aaron's shark friends (party dancers + boss-battle cousins)
+   ================================================================ */
+const BEAT = 60 / 124;   // the party loop's beat: friends bob on the beat
+function makeFriend(d, i) {
+  return { name: d.name, key: d.key, boy: !!d.boy, princess: !d.boy, skin: d.skin, gem: d.gem, i,
+    x: -9999, y: 0, hx: 0, hy: 0, L: 100, face: 1, faceS: 1, tilt: 0, phase: rand(0, 6), spin: 1, tailPhase: rand(0, 6),
+    state: 'off', la: 0, chomp: 0, lbl: null };
+}
+function friendBase() { return G.L * 0.56; }
+// 8 spots: 'dance' (party: 2 rows of 4 / portrait 4 rows of 2, Aaron swims in the middle), 'cheer' (after the boss: around Aaron),
+// 'hover' (boss battle: 4 above and 4 below the crocodile)
+function partyLayout(kind) {
+  const top = stripBottom + 8, bot = H - SA.b - 8, left = SA.l + 8, right = W - SA.r - 8, w = right - left, h = bot - top;
+  let rows, aaron = null;
+  if (kind === 'hover') {
+    const b = bossLayout(), bTop = b.y - b.L * 0.17 * BOSS_YS, bBot = b.y + b.L * 0.14 * BOSS_YS, t2 = bossBar().y + bossBar().h + 8;
+    const yA = portrait ? t2 + (bTop - t2) * 0.22 : (t2 + bTop) / 2, yB = (bBot + bot) / 2;
+    const bandA = portrait ? (bTop - t2) * 0.4 : bTop - t2, bandB = bot - bBot;
+    const L = Math.max(36, Math.min(friendBase(), w / 4 * 0.8, bandA * 0.95, bandB * 0.95));
+    const xs = portrait ? [0.14, 0.38, 0.62, 0.86] : [0.08, 0.28, 0.48, 0.68];
+    const pts = xs.map(f => ({ x: left + w * f, y: yA })).concat(xs.map(f => ({ x: left + w * (f + (portrait ? 0 : 0.05)), y: yB })));
+    return { pts, L };
+  }
+  if (kind === 'cheer') {
+    rows = portrait ? [[0.13, [1 / 6, 3 / 6, 5 / 6]], [0.36, [0.2, 0.8]], [0.59, [1 / 6, 3 / 6, 5 / 6]]]
+                    : [[0.2, [0.125, 0.375, 0.625, 0.875]], [0.52, [0.1, 0.27, 0.73, 0.9]]];
+    aaron = { x: left + w / 2, y: top + h * (portrait ? 0.36 : 0.52) };
+  } else rows = portrait ? [[0.1, [0.25, 0.75]], [0.3, [0.25, 0.75]], [0.7, [0.25, 0.75]], [0.9, [0.25, 0.75]]]
+                          : [[0.24, [0.125, 0.375, 0.625, 0.875]], [0.8, [0.125, 0.375, 0.625, 0.875]]];
+  const maxCols = Math.max(...rows.map(r => r[1].length));
+  const L = Math.max(36, Math.min(friendBase(), w / maxCols * 0.8, h / rows.length * 0.9));
+  const pts = [];
+  rows.forEach(([fy, xs]) => xs.forEach(fx => pts.push({ x: left + w * fx, y: top + h * fy })));
+  return { pts, L, aaron };
+}
+function friendEnter(f, slot, L, dur, after) {
+  f.L = L; f.hx = slot.x; f.hy = slot.y;
+  const fromLeft = slot.x < W / 2;
+  f.x = fromLeft ? -L * 0.8 : W + L * 0.8; f.y = slot.y; f.face = f.faceS = fromLeft ? 1 : -1; f.tilt = 0;
+  f.state = 'enter';
+  Sfx.blub();
+  tween(f, { x: slot.x }, dur, easeOutCubic, () => { if (f.state === 'enter') { f.state = after || 'dance'; f.spin = 0; Sfx.pop(); } });
+}
+function updateFriends(dt) {
+  for (const f of friends) {
+    const moving = f.state === 'enter' || f.state === 'leave' || f.state === 'dart' || f.state === 'back';
+    f.tailPhase += dt * (moving ? 15 : 7);
+    f.spin = Math.min(1, f.spin + dt / 0.8);
+    if (f.state !== 'off') f.la = Math.min(1, f.la + dt * 3);
+    f.chomp = Math.max(0, f.chomp - dt * 3);
+    if (f.state === 'dance') {   // face the middle, every couple of bars turn around for a moment, and the odd spin
+      const mid = game.state === 'bosswon' ? shark.x : W / 2;
+      const turn = Math.sin((T + f.phase) * Math.PI / (BEAT * 4)) > 0.7 ? -1 : 1;
+      f.face = (f.x < mid ? 1 : -1) * turn;
+      if (f.spin >= 1 && Math.random() < dt * 0.2) f.spin = 0;
+    } else if (f.state === 'hover' && boss.croc) f.face = f.x < boss.croc.x ? 1 : -1;
+    f.faceS += (f.face - f.faceS) * Math.min(1, dt * 7);
+  }
+}
+function drawFriend(f) {
+  f.lbl = null;
+  if (f.state === 'off' || f.state === 'gone') return;
+  const dancing = f.state === 'dance' || f.state === 'hover';
+  const bw = Math.PI * 2 / BEAT;
+  const bob = dancing ? Math.sin(T * bw + f.phase) * f.L * 0.07 : Math.sin(T * 3 + f.phase) * f.L * 0.03;
+  const wig = dancing ? Math.sin(T * bw * 0.5 + f.phase) * 0.17 : 0;
+  const spinE = f.spin < 1 ? easeInOut(f.spin) : 0;
+  const sxv = Math.abs(f.faceS) < 0.08 ? (f.faceS < 0 ? -0.08 : 0.08) : f.faceS;
+  const sc = 1 + Math.sin(spinE * Math.PI) * 0.2;
+  ctx.save();
+  ctx.translate(f.x, f.y + bob);
+  ctx.rotate(wig + f.tilt + spinE * Math.PI * 2 * (f.face < 0 ? -1 : 1));
+  ctx.scale(sxv * sc, sc);
+  const waving = f.state === 'leave' && f.princess;
+  drawShark(ctx, f.L, { skin: f.skin, princess: f.princess, gem: f.gem, tail: Math.sin(f.tailPhase) * 0.3,
+    fin: waving ? Math.sin(T * 16) * 0.8 - 0.7 : Math.sin(f.tailPhase * 0.5) * 0.2, chomp: f.chomp });
+  ctx.restore();
+  if (f.la > 0.02) labelQ.push({ text: f.name, x: f.x, y: f.y + bob + f.L * 0.33, size: Math.max(13, f.L * 0.13), color: f.skin.out, a: f.la, set: r => { f.lbl = r; } });
+}
+// v5: name tags are queued while the sharks are drawn, then nudged apart so they never overlap, then drawn on top
+const labelQ = [];
+function flushLabels() {
+  if (!labelQ.length) return;
+  ctx.save();
+  for (const q of labelQ) {
+    ctx.font = `900 ${Math.round(q.size)}px ${FONT}`;
+    q.w = ctx.measureText(q.text).width + q.size * 1.0; q.h = q.size * 1.4;
+  }
+  ctx.restore();
+  const clampQ = q => { q.x = clamp(q.x, q.w / 2 + 4, W - q.w / 2 - 4); q.y = clamp(q.y, stripBottom + q.h / 2 + 2, H - q.h / 2 - 2); };
+  labelQ.forEach(clampQ);
+  for (let it = 0; it < 12; it++) {
+    let moved = false;
+    for (let i = 0; i < labelQ.length; i++) for (let j = i + 1; j < labelQ.length; j++) {
+      const a = labelQ[i], b = labelQ[j];
+      const ox = (a.w + b.w) / 2 + 4 - Math.abs(a.x - b.x), oy = (a.h + b.h) / 2 + 3 - Math.abs(a.y - b.y);
+      if (ox <= 0 || oy <= 0) continue;
+      moved = true;
+      const wa = a.fixed ? 0 : b.fixed ? 1 : 0.5, wb = 1 - wa;   // Aaron's tag stays put, the friends' tags make room
+      if (oy <= ox) { const d = (a.y < b.y || (a.y === b.y && i < j)) ? -1 : 1; a.y += d * oy * wa; b.y -= d * oy * wb; }
+      else { const d = a.x < b.x ? -1 : 1; a.x += d * ox * wa; b.x -= d * ox * wb; }
+      clampQ(a); clampQ(b);
+    }
+    if (!moved) break;
+  }
+  for (const q of labelQ) { const r = drawNameLabel(q.text, q.x, q.y, q.size, q.color, q.a); if (q.set) q.set(r); }
+  labelQ.length = 0;
+}
+function roundRectPath(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arc(x + w - r, y + r, r, -Math.PI / 2, 0); ctx.lineTo(x + w, y + h - r);
+  ctx.arc(x + w - r, y + h - r, r, 0, Math.PI / 2); ctx.lineTo(x + r, y + h); ctx.arc(x + r, y + h - r, r, Math.PI / 2, Math.PI); ctx.lineTo(x, y + r); ctx.arc(x + r, y + r, r, Math.PI, Math.PI * 1.5); ctx.closePath();
+}
+function drawNameLabel(text, x, y, size, color, a) {   // a name tag under a shark (pill with the shark's outline color)
+  ctx.save();
+  ctx.globalAlpha = clamp(a == null ? 1 : a, 0, 1);
+  ctx.font = `900 ${Math.round(size)}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const w = ctx.measureText(text).width + size * 1.0, h = size * 1.4;
+  x = clamp(x, w / 2 + 4, W - w / 2 - 4); y = clamp(y, stripBottom + h / 2 + 2, H - h / 2 - 2);
+  roundRectPath(x - w / 2, y - h / 2, w, h, h / 2);
+  ctx.fillStyle = color; ctx.fill();
+  ctx.lineWidth = Math.max(2, size * 0.14); ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.fillText(text, x, y + size * 0.04);
+  ctx.restore();
+  return { x, y, w, h };
+}
+
+/* ---- v5: the shark party (after G and after P, in both levels) ---- */
+const partyDue = () => PARTY_AT.includes(game.index) && !game.partyDone[game.index];
+function startParty() {
+  if (game.state !== 'celebrate') return;
+  const n = game.index >= PARTY_AT[1] ? 2 : 1;
+  game.partyDone[game.index] = true;
+  game.state = 'party'; game.seq++;
+  party.n = n; party.count++; party.phase = 'intro'; party.farts = 0; party.puffs = 0; party.log = []; party.atIndex = game.index;
+  game.letters = []; game.dragging = false; game.pointerId = null; game.target = null;
+  shark.scripted = false; shark.faceAng = null; shark.anim = null;
+  if (race.croc) { const c = race.croc; race.croc = null; c.eyes = 'surprised'; c.jawAuto = true; c.dir = 1; tween(c, { x: W + c.L }, 1.2, easeInCubic, () => removeCroc(c)); }
+  setHud('party'); updateStrip();
+  Music.start('party');
+  Sfx.toot(); Sfx.sparkle(0.3);
+  burst(W / 2, H * 0.4, 50, true);
+  popText('PARTY TIME!', W / 2, H * 0.42, Math.max(36, Math.min(W, H) * 0.09));
+  friends.length = 0; FRIENDS.forEach((d, i) => friends.push(makeFriend(d, i)));
+  const lay = partyLayout('dance');
+  const enter = (i, dur) => { friendEnter(friends[i], lay.pts[i], lay.L, dur, 'dance'); party.log.push(friends[i].name); };
+  const steps = n === 1
+    ? [['party1'], ['n_elio', 0], ['n_oliver', 1], ['n_andrew', 2], ['princesses'], ['n_audrey', 3], ['n_emma', 4], ['n_penny', 5], ['n_mackenzie', 6], ['n_alli', 7]]
+    : [['party2', 'all']];   // they're back: everybody swims in together
+  let k = 0;
+  const next = () => {
+    if (game.state !== 'party') return;
+    if (k >= steps.length) { party.phase = 'dance'; seqLater(partyExit, PARTY_DANCE_SEC[n - 1]); return; }
+    const [key, who] = steps[k++];
+    if (who === 'all') friends.forEach((f, i) => seqLater(() => enter(i, 1.1), 0.3 + i * 0.14));
+    else if (who != null) enter(who, 0.9);
+    let done = false;
+    const go = () => { if (done) return; done = true; seqLater(next, 0.12); };
+    Voice.play(key, go);
+    const line = VOICE_DATA.lines[key];
+    const tok = game.seq;
+    setTimeout(() => { if (tok === game.seq) go(); }, ((line ? line.dur : 1) + 1.5) * 1000);   // safety net
+  };
+  seqLater(next, 0.4);
+}
+function partyExit() {   // the boys toot off (fart + stinky cloud), "Pee-yew! So stinky!", the princesses swim off waving
+  if (game.state !== 'party') return;
+  party.phase = 'exit';
+  const boys = friends.filter(f => f.boy), girls = friends.filter(f => !f.boy);
+  boys.forEach((f, i) => seqLater(() => friendLeave(f, i), 0.1 + i * 0.7));
+  seqLater(() => Voice.play('stinky'), 1.9);
+  girls.forEach((f, i) => seqLater(() => friendLeave(f, -1), 2.3 + i * 0.12));
+  seqLater(partyEnd, 4.4);
+}
+function friendLeave(f, fartIdx) {
+  if (f.state === 'gone' || f.state === 'leave') return;
+  const dir = f.x < W / 2 ? -1 : 1;   // out the nearer side, tail toward the middle
+  f.state = 'leave'; f.face = dir; f.spin = 1; f.tilt = 0;
+  tween(f, { x: dir < 0 ? -f.L * 0.9 : W + f.L * 0.9 }, fartIdx >= 0 ? 1.6 : 1.4, easeInCubic, () => { f.state = 'gone'; });
+  if (fartIdx >= 0) {
+    Sfx.fart(fartIdx); party.farts++;
+    gasPuffs(f, 6); seqLater(() => gasPuffs(f, 4), 0.22); seqLater(() => gasPuffs(f, 3), 0.45);
+    popText('TOOT!', f.x - dir * f.L * 0.45, f.y - f.L * 0.3, Math.max(26, Math.min(W, H) * 0.06));
+  } else starBurst(f.x, f.y - f.L * 0.15, 5);
+}
+function gasPuffs(f, n) {   // little green-yellow cartoon clouds puffing out behind his tail
+  if (f.state !== 'leave') return;
+  const back = f.face < 0 ? 1 : -1, tx = f.x + back * f.L * 0.55, ty = f.y;
+  for (let i = 0; i < n; i++) particles.push({ kind: 'g', x: tx + rand(-0.06, 0.06) * f.L, y: ty + rand(-0.1, 0.1) * f.L, vx: back * rand(25, 100), vy: rand(-45, 10),
+    r: f.L * rand(0.07, 0.12), life: rand(1.5, 2.3), age: 0, ph: rand(0, 6) });
+  party.puffs += n;
+}
+function partyEnd() {
+  if (game.state !== 'party') return;
+  game.state = 'partyEnd'; game.seq++;
+  party.phase = 'done';
+  friends.length = 0;
+  game.dragging = false; game.pointerId = null; game.target = null;
+  Music.start('main');
+  const next = () => { if (game.state === 'partyEnd') { setHud(isRace() ? 'race' : 'play'); newRound({ prompt: true }); } };
+  if (!isRace()) { swimHome(next, 1.0); return; }
+  // Level 2 has no snack breaks: he grows a bit at each party
+  let voiced = false, moved = false;
+  const fin = () => { if (voiced && moved) next(); };
+  growShark(Math.min(L2_MAX_SCALE, shark.scale + L2_GROW_PARTY));
+  Voice.play('partygrow', () => { voiced = true; fin(); });
+  seqLater(() => { voiced = true; fin(); }, 4);
+  seqLater(() => swimHome(() => { moved = true; fin(); }, 0.9), 1.3);
+}
+
+/* ---- v5: Level 2 finale: the BIG crocodile. Aaron + his 8 cousins bite it until its health bar is empty (no hearts lost) ---- */
+const BOSS_PAL = { out: '#14512a', body: '#3a9e4c', dark: '#2a7a3a', belly: '#d4ea8c' };
+const BOSS_HURT = { out: '#14512a', body: '#9be8a5', dark: '#68c977', belly: '#f6ffd6' };
+const BOSS_YS = 1.3;   // chunkier than a normal crocodile
+const BOSS_ZONES = [[-0.05, 0.01, 0.2], [0.19, -0.03, 0.12], [0.36, -0.01, 0.1], [0.5, -0.01, 0.07], [-0.3, 0, 0.08], [-0.45, 0, 0.06]];
+function bossBar() { const w = clamp(W * 0.5, 220, 560), h = clamp(Math.min(W, H) * 0.045, 20, 34); return { x: W / 2 - w / 2, y: stripBottom + 12, w, h }; }
+function bossLayout() {
+  const bb = bossBar(), top = bb.y + bb.h + 16, bot = H - SA.b - 8;
+  if (portrait) { const L = Math.min(W * 0.84, (bot - top) * 0.9); return { L, x: W / 2 + L * 0.02, y: top + (bot - top) * 0.66 }; }
+  const L = Math.min(W * 0.64, (bot - top) * 1.9); return { L, x: W - SA.r - L * 0.52, y: (top + bot) / 2 };
+}
+function bossZones() {
+  const c = boss.croc; if (!c) return [];
+  return BOSS_ZONES.map(([lx, ly, lr]) => ({ x: c.x + c.dir * lx * c.L, y: c.y + ly * c.L * BOSS_YS, r: lr * c.L * (1 + BOSS_YS) / 2 }));
+}
+function bossHit(p, pad) { for (const z of bossZones()) if (dist(p, z) < z.r + pad) return z; return null; }
+function aaronBossHome() {
+  const b = bossLayout(), Ls = sharkLen();
+  if (portrait) return { x: W * 0.3, y: Math.max(stripBottom + Ls * 0.4, b.y - b.L * 0.5) };
+  return { x: SA.l + 16 + Ls * 0.62, y: b.y };
+}
+function startBoss() {
+  game.state = 'bossIntro'; game.seq++;
+  game.letters = []; game.dragging = false; game.pointerId = null; game.target = null;
+  if (race.croc) { const c = race.croc; race.croc = null; c.eyes = 'surprised'; c.dir = 1; tween(c, { x: W + c.L }, 1.2, easeInCubic, () => removeCroc(c)); }
+  setHud('boss'); updateStrip();
+  Music.start('main');
+  Object.assign(boss, { hp: BOSS_HP, max: BOSS_HP, shown: BOSS_HP, aaron: 0, cousins: 0, cd: 0, idle: 0, nextCousin: 1.0, half: false, t: 0, defeated: false, poofed: false, flash: 0, eyesT: 0, cousinsIn: false });
+  const lay = bossLayout();
+  const c = makeCroc({ role: 'boss', L: lay.L, dir: -1, x: W + lay.L * 0.8, y: lay.y, hx: lay.x, hy: lay.y, jawAuto: false, jaw: 0.3 });
+  boss.croc = c; crocs.push(c);
+  Sfx.roar();
+  tween(c, { x: lay.x }, 2.4, easeOutCubic);
+  shark.spin = 1; shark.scripted = true; shark.faceAng = 0;
+  tween(shark, aaronBossHome(), 1.0, easeInOut, () => { shark.scripted = false; shark.faceAng = null; });
+  friends.length = 0; FRIENDS.forEach((d, i) => friends.push(makeFriend(d, i)));
+  popText('UH OH!', W / 2, H * 0.4, Math.max(36, Math.min(W, H) * 0.09));
+  Voice.play('boss', () => seqLater(bossCousins, 0.2));   // "Uh oh! Here comes the biggest crocodile!"
+  seqLater(bossCousins, 5.5);
+}
+function bossCousins() {   // "Aaron's shark cousins are here to help! Chomp chomp!" - they swim in, then the fight starts
+  if (game.state !== 'bossIntro' || boss.cousinsIn) return;
+  boss.cousinsIn = true;
+  const lay = partyLayout('hover');
+  friends.forEach((f, i) => seqLater(() => friendEnter(f, lay.pts[i], lay.L, 1.0, 'hover'), i * 0.12));
+  Voice.play('cousins');
+  seqLater(() => { if (game.state === 'bossIntro') { game.state = 'boss'; shark.scripted = false; shark.faceAng = null; popText('BITE HIM!', W / 2, H * 0.4, Math.max(36, Math.min(W, H) * 0.09)); } }, 1.8);
+}
+function updateBoss(dt) {
+  const c = boss.croc;
+  boss.shown += (boss.hp - boss.shown) * Math.min(1, dt * 6);
+  boss.flash = Math.max(0, boss.flash - dt * 4);
+  if (!c) return;
+  if (game.state === 'boss' || game.state === 'bossIntro') {
+    c.y = c.hy + Math.sin(T * 1.1) * c.L * 0.03;
+    c.jaw = 0.2 + 0.55 * Math.pow(Math.max(0, Math.sin(T * 2.4)), 3);   // snaps at the water (harmless)
+    if (game.state === 'boss') c.x = c.hx + Math.sin(T * 55) * c.L * 0.012 * boss.flash;   // shakes when bitten
+    boss.eyesT -= dt; if (boss.eyesT <= 0 && c.eyes === 'surprised') c.eyes = 'normal';
+  }
+  if (game.state !== 'boss') return;
+  boss.t += dt; boss.cd -= dt; boss.idle += dt;
+  if (boss.cd <= 0) {   // Aaron bites: his nose (or body) touching the crocodile
+    const z = bossHit(sharkNose(), sharkLen() * 0.06) || bossHit(shark, 0);
+    if (z) { boss.cd = BOSS_AARON_CD * TS; boss.idle = 0; sharkChomp(); const n = sharkNose(); bossBite('aaron', lerp(n.x, z.x, 0.3), lerp(n.y, z.y, 0.3)); }
+  }
+  boss.nextCousin -= dt;
+  if (boss.nextCousin <= 0 && game.state === 'boss') {   // the cousins dart in and bite on their own
+    const free = friends.filter(f => f.state === 'hover'), busy = friends.filter(f => f.state === 'dart' || f.state === 'back').length;
+    if (free.length && busy < 2) cousinDart(free[Math.floor(Math.random() * free.length)]);
+    boss.nextCousin = (boss.idle > 4 ? BOSS_COUSIN_FAST : BOSS_COUSIN_EVERY) * rand(0.8, 1.2) * TS;
+  }
+}
+function cousinDart(f) {
+  const zs = bossZones(); if (!zs.length) return;
+  const z = zs[Math.floor(Math.random() * 4)];
+  const above = f.hy < z.y;
+  const tx = z.x + rand(-0.4, 0.4) * z.r, ty = z.y + (above ? -1 : 1) * z.r * 0.7;
+  const dx = tx - f.x, dy = ty - f.y, d = Math.hypot(dx, dy) || 1;
+  const cx = tx - dx / d * f.L * 0.42, cy = ty - dy / d * f.L * 0.42;
+  f.state = 'dart'; f.face = f.faceS = dx >= 0 ? 1 : -1;
+  const a = Math.atan2(dy, dx);
+  f.tilt = clamp(angDiff(0, f.face > 0 ? a : a - Math.PI), -0.9, 0.9);
+  tween(f, { x: cx, y: cy }, 0.5, easeInCubic, () => {
+    if (game.state !== 'boss') return;
+    f.chomp = 1; bossBite('cousin', tx, ty);
+    if (game.state !== 'boss') return;   // that was the winning bite: bossDefeated() already sent everyone dancing
+    seqLater(() => { f.state = 'back'; tween(f, { x: f.hx, y: f.hy, tilt: 0 }, 0.8, easeInOut, () => { if (f.state === 'back') f.state = 'hover'; }); }, 0.22);
+  });
+}
+function bossBite(who, x, y) {
+  if (game.state !== 'boss' || boss.hp <= 0) return;
+  boss.hp--; if (who === 'aaron') boss.aaron++; else boss.cousins++;
+  boss.flash = 1; boss.croc.eyes = 'surprised'; boss.eyesT = 0.35;
+  Sfx.chomp();
+  popText('CHOMP!', x, y - boss.croc.L * 0.05, Math.max(30, Math.min(W, H) * 0.07));
+  starBurst(x, y, 7); bubbleBurst(x, y, 6);
+  if (!boss.half && boss.hp <= boss.max / 2) { boss.half = true; Voice.play('bosshalf'); }   // "Keep biting! He's getting tired!"
+  if (boss.hp <= 0) bossDefeated();
+}
+function poofCloud(x, y, size) {
+  for (let i = 0; i < 16; i++) { const a = rand(0, Math.PI * 2), v = rand(60, 220); particles.push({ kind: 'p', x: x + Math.cos(a) * size * 0.1, y: y + Math.sin(a) * size * 0.06, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.6, r: size * rand(0.06, 0.11), life: rand(0.9, 1.5), age: 0, ph: rand(0, 6) }); }
+}
+function bossDefeated() {   // he flips belly-up, floats up and POOF!; everybody cheers + dances, confetti, jingle, voice, buttons
+  game.state = 'bosswon'; game.seq++; game.confAcc = 0;
+  game.dragging = false; game.pointerId = null; game.target = null;
+  boss.defeated = true;
+  const c = boss.croc;
+  c.eyes = 'dizzy'; c.jaw = 0.5; boss.flash = 0; c.x = c.hx;
+  Music.stop(0.3);
+  Sfx.victory();
+  tween(c, { flip: 1 }, 0.8, easeInOut, () => {
+    tween(c, { y: stripBottom + c.L * 0.12 }, 1.5, easeInOut, () => {
+      Sfx.poof(); poofCloud(c.x, c.y, c.L); starBurst(c.x, c.y, 20); removeCroc(c); boss.croc = null; boss.poofed = true;
+    });
+  });
+  const lay = partyLayout('cheer');
+  friends.forEach((f, i) => { f.state = 'dance'; f.spin = 0; f.L = lay.L; tween(f, { x: lay.pts[i].x, y: lay.pts[i].y, tilt: 0 }, 1.2, easeInOut); f.hx = lay.pts[i].x; f.hy = lay.pts[i].y; });
+  shark.scripted = true; shark.faceAng = null; shark.spin = 0;
+  tween(shark, { x: lay.aaron.x, y: lay.aaron.y }, 1.2, easeInOut);
+  for (let i = 0; i < 5; i++) setTimeout(() => { if (game.state === 'bosswon') burst(rand(0.15, 0.85) * W, rand(0.2, 0.6) * H, 70, true); }, 150 + i * 260);
+  popText('YOU WIN!', W / 2, H * 0.3, Math.max(40, Math.min(W, H) * 0.1));
+  seqLater(() => { if (game.state === 'bosswon') Music.start('party'); }, 3.4);
+  let panel = false;
+  const showPanel = () => { if (panel || game.state !== 'bosswon') return; panel = true; $('won2').classList.remove('hidden'); };
+  seqLater(() => Voice.play('bosswin', () => seqLater(showPanel, 0.8)), 1.3);   // "You beat the big crocodile! Aaron and his cousins win!"
+  seqLater(showPanel, 8);
+}
+function relayoutFriends() {   // after a rotation / resize
+  const kind = game.state === 'party' ? 'dance' : game.state === 'bosswon' ? 'cheer' : 'hover';
+  const lay = partyLayout(kind);
+  friends.forEach((f, i) => {
+    if (f.state === 'leave' || f.state === 'gone' || f.state === 'off') return;
+    dropTweens(f); f.L = lay.L; f.x = f.hx = lay.pts[i].x; f.y = f.hy = lay.pts[i].y; f.tilt = 0;
+    f.state = kind === 'hover' ? 'hover' : 'dance';
+  });
+  if (kind === 'cheer' && lay.aaron) { dropTweens(shark); shark.x = lay.aaron.x; shark.y = lay.aaron.y; }
+}
+function relayoutBoss() {
+  const c = boss.croc; if (!c) return;
+  const lay = bossLayout(); c.L = lay.L; c.hx = lay.x; c.hy = lay.y;
+  if (!boss.defeated) { dropTweens(c); c.x = lay.x; c.y = lay.y; }
+}
+
+/* ---- start / restart a level ---- */
+function setupLevel(lv) {
+  levelIndex = clamp((lv | 0) || 1, 1, 2) - 1;
+  game.seq++; tweens.length = 0; crocs.length = 0; popTexts.length = 0; particles.length = 0; friends.length = 0;
+  race.croc = null; race.p = 0; boss.croc = null; boss.defeated = false;
+  ['over', 'final', 'card', 'won', 'won2'].forEach(id => $(id).classList.add('hidden'));
+  strip.classList.remove('gone');
+  game.index = 0; game.lives = MAX_LIVES; game.bounces = 0; game.crocsEaten = 0; game.grace = 0;
+  game.sinceBreak = 0; game.breakEvery = pickBreak(); game.breaks = 0; game.breakLog = []; game.breakAt = []; game.snackGoals = []; game.snackEaten = 0;
+  game.crocWins = 0; game.sharkWins = 0; game.covered = false; game.letters = []; game.partyDone = {}; game.growLog = [];
+  game.dragging = false; game.pointerId = null; game.target = null;
+  party.phase = ''; party.count = 0;
+  renderLives();
+  shark.scale = isRace() ? L2_START_SCALE : L1_START_SCALE;
+  shark.dead = 0; shark.hidden = false; shark.scripted = false; shark.faceAng = null; shark.chomp = 0; shark.spin = 1; shark.attn = 0;
+  cells.forEach(c => { delete c.dataset.pending; });
+  flyer = null;
+  layoutStrip();
+  resetSharkToStart();
+  setHud(isRace() ? 'race' : 'play');
+  celebrationEnded = true;
+}
+// Dad / test hook: continue at letter i as if the letters before it were done (strip filled, shark grown to match)
+function jumpTo(i, beforeParty) {
+  game.index = clamp(i | 0, 0, 26); game.sinceBreak = 0;
+  cells.forEach(c => { delete c.dataset.pending; });
+  PARTY_AT.forEach(p => { if (p < game.index || (p === game.index && !beforeParty)) game.partyDone[p] = true; else delete game.partyDone[p]; });
+  if (isRace()) shark.scale = Math.min(L2_MAX_SCALE, L2_START_SCALE + L2_GROW_PARTY * PARTY_AT.filter(p => p < game.index || (p === game.index && !beforeParty)).length);
+  else shark.scale = l1ScaleAfter(Math.floor(game.index / 3));
+  game.letters = [];
+  resetSharkToStart(); updateStrip();
+}
+function restartGame(lv) {   // Try Again, Play Again, Level 1 / Level 2 buttons
+  Sfx.unlock();
+  setupLevel(lv || level().id);
+  Music.start('main');
+  Sfx.chime();
+  if (isRace()) { startRaceIntro(); return; }
+  Voice.play('again');
+  newRound();
+}
+
+/* ---- particles ---- */
+const CONFETTI = ['#ffd84d', '#ff6f91', '#7fe0a0', '#7fd3ff', '#b49cff', '#ffffff', '#ff9f43'];
+function burst(x, y, n, confetti) {
+  const sc = Math.max(0.7, Math.min(W, H) / 700);
+  for (let i = 0; i < n; i++) {
+    const a = rand(0, Math.PI * 2), v = rand(180, 520) * sc;
+    particles.push({ kind: 'c', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 200 * sc, rot: rand(0, 6), vr: rand(-10, 10),
+      w: rand(6, 12) * sc, h: rand(4, 8) * sc, color: CONFETTI[i % CONFETTI.length], life: rand(1.4, 2.4), age: 0, round: Math.random() < 0.3 });
+  }
+}
+function bubbleBurst(x, y, n) {
+  const sc = Math.max(0.7, Math.min(W, H) / 700);
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2, v = rand(80, 200) * sc;
+    particles.push({ kind: 'b', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rand(4, 11) * sc, life: rand(0.8, 1.4), age: 0 });
+  }
+}
+function starBurst(x, y, n) {
+  const sc = Math.max(0.7, Math.min(W, H) / 700), cols = ['#ffd84d', '#fff3a0', '#ffffff', '#ffb347'];
+  for (let i = 0; i < n; i++) {
+    const a = rand(0, Math.PI * 2), v = rand(140, 340) * sc;
+    particles.push({ kind: 's', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rand(7, 14) * sc, rot: rand(0, 6), vr: rand(-6, 6), color: cols[i % cols.length], life: rand(0.8, 1.3), age: 0 });
+  }
+}
+function popText(text, x, y, size) {
+  x = clamp(x, size * 1.9, W - size * 1.9); y = clamp(y, stripBottom + size * 0.7, H - size * 0.7);
+  popTexts.push({ text, x, y, size, age: 0, life: 1.3 });
+  popLog.push(text); if (popLog.length > 60) popLog.shift();
+}
+const popLog = [];   // (tests) the last pop texts shown, even after they faded
+
+/* ================================================================
+   Input
+   ================================================================ */
+cv.addEventListener('pointerdown', e => {
+  if (Sfx.ctx && Sfx.ctx.state !== 'running') Sfx.ctx.resume();
+  if (game.dragging) return;
+  if (startDrag(e)) { try { cv.setPointerCapture(e.pointerId); } catch (_) {} }
+  e.preventDefault();
+});
+cv.addEventListener('pointermove', e => {
+  if (!game.dragging || e.pointerId !== game.pointerId) return;
+  game.target = { x: e.clientX + game.dragOff.x, y: e.clientY + game.dragOff.y };
+  game.idle = 0;
+  e.preventDefault();
+});
+function endPointer(e) {
+  if (!game.dragging || e.pointerId !== game.pointerId) return;
+  game.dragging = false; game.pointerId = null;
+  if (game.state !== 'play') return;
+  checkReach(true);   // letting go near the right letter counts; otherwise he keeps swimming to the finger's last spot
+}
+cv.addEventListener('pointerup', endPointer);
+cv.addEventListener('pointercancel', endPointer);
+cv.addEventListener('lostpointercapture', endPointer);
+
+// stop iOS scrolling, rubber-banding, pinch zoom and double-tap zoom
+document.addEventListener('touchmove', e => { e.preventDefault(); }, { passive: false });
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('gesturechange', e => e.preventDefault());
+document.addEventListener('dblclick', e => e.preventDefault());
+document.addEventListener('contextmenu', e => e.preventDefault());
+let lastTouchEnd = 0;
+document.addEventListener('touchend', e => { const now = Date.now(); if (now - lastTouchEnd < 300 && e.target === cv) e.preventDefault(); lastTouchEnd = now; }, { passive: false });
+
+function startGame(lv) {
+  if (game.state !== 'start') return;
+  Sfx.unlock();                 // must happen inside the tap for iOS
+  Speech.prime();
+  setupLevel(lv);
+  const jump = isRace() && BOSS_JUMP ? 'boss' : PARTY_JUMP ? 'party' : START_AT ? 'start' : '';
+  Voice.decodeAll(jump === 'boss' ? 'boss' : jump === 'party' ? 'party' + PARTY_JUMP : isRace() ? 'level2' : 'intro');
+  $('start').classList.add('hidden');
+  Sfx.chime();
+  Music.start('main');          // energetic loop starts right after the Tap to Play unlock
+  if (jump === 'boss') { jumpTo(26); startBoss(); return; }                                                 // ?boss=1
+  if (jump === 'party') { jumpTo(PARTY_AT[PARTY_JUMP - 1], true); game.state = 'celebrate'; startParty(); return; }   // ?party=G / P
+  if (jump === 'start') { jumpTo(START_AT); newRound({ prompt: true }); return; }                           // ?start=G
+  if (isRace()) { startRaceIntro(); return; }
+  if (SKIP === 'end') { skipToEnding(); return; }
+  Voice.play('intro');
+  newRound();
+}
+$('start').addEventListener('click', () => startGame(startLevel));   // tap anywhere = Level 1 (or ?level=2)
+$('play').addEventListener('click', e => { e.stopPropagation(); startGame(1); });
+$('play2').addEventListener('click', e => { e.stopPropagation(); startGame(2); });
+$('tryagain').addEventListener('click', e => { e.stopPropagation(); restartGame(level().id); });
+$('replay').addEventListener('click', e => { e.stopPropagation(); restartGame(1); });
+$('toL2').addEventListener('click', e => { e.stopPropagation(); restartGame(2); });
+$('againL1').addEventListener('click', e => { e.stopPropagation(); restartGame(1); });
+$('againL2').addEventListener('click', e => { e.stopPropagation(); restartGame(2); });
+$('toL1').addEventListener('click', e => { e.stopPropagation(); restartGame(1); });
+muteBtn.addEventListener('click', e => { e.stopPropagation(); Sfx.unlock(); Music.setMuted(!Music.muted); renderMute(); });
+renderMute();
+if (navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches)) $('a2hs').classList.add('hidden');
+
+/* ================================================================
+   Update
+   ================================================================ */
+function update(dt) {
+  T += dt;
+
+  for (const b of scene.bubbles) {
+    b.y -= b.v * dt; b.x += Math.sin(T * 2 + b.phase) * 10 * dt;
+    if (b.y < -20) Object.assign(b, newBubble(false));
+  }
+  for (const f of scene.fish) {
+    f.x += f.v * dt; f.y += Math.sin(T + f.phase) * 6 * dt;
+    if (f.x > W + 60) f.x = -60; if (f.x < -60) f.x = W + 60;
+  }
+
+  // letters
+  for (const l of game.letters) {
+    if (l.delay > 0) { l.delay -= dt; continue; }
+    const k = l.scaleTarget > l.scale ? 7 : 10;
+    l.scale += (l.scaleTarget - l.scale) * Math.min(1, dt * k);
+    l.wobble = Math.max(0, l.wobble - dt * 1.4);
+    const wantGlow = game.state === 'play' && l.correct && (game.idle > 9 || game.wrongs >= 2 || (isRace() && race.hint)) ? 1 : 0;   // glow hint after 2 misses (or a croc win) this round
+    l.glow += (wantGlow - l.glow) * Math.min(1, dt * 3);
+  }
+  if (game.state === 'play') {   // v5: wrong-letter grace time; a bubble that was bumped only counts again once he swam away from it
+    if (!shark.scripted) game.grace = Math.max(0, game.grace - dt);   // the grace time starts once the bounce is over
+    for (const l of game.letters) if (l.armed === false && dist(shark, letterPos(l)) > curR() * 1.25 + sharkLen() * 0.3) l.armed = true;
+  }
+  if (game.state === 'play' && !game.dragging && !shark.anim) game.idle += dt;
+  if (game.state === 'play' && game.idle > 9 && !game.hinted) { game.hinted = true; Voice.play('f_' + ALPHABET[game.index].toLowerCase()); }
+
+  // shark
+  shark.px = shark.x; shark.py = shark.y;
+  updateTweens(dt);
+  if (shark.scripted) {
+    // position driven by tweens (swim home, bounce, game-over float, finales)
+  } else if (freeMove()) {
+    const playing = game.state === 'play';
+    if ((game.dragging || playing) && game.target) {   // letter rounds: after letting go he keeps swimming to the finger's last spot
+      const k = 1 - Math.exp(-dt * (game.near && game.dragging ? 18 : 6));
+      shark.x = lerp(shark.x, game.target.x, k); shark.y = lerp(shark.y, game.target.y, k);
+      if (!game.dragging && dist(shark, game.target) < 3) game.target = null;
+    }
+    const b = freeBounds();
+    shark.x = clamp(shark.x, b.x0, b.x1); shark.y = clamp(shark.y, b.y0, b.y1);
+    if (playing && game.target) checkReach(false);
+  }
+  const vx = (shark.x - shark.px) / Math.max(dt, 1e-3), vy = (shark.y - shark.py) / Math.max(dt, 1e-3);
+  const sp = Math.hypot(vx, vy);
+  shark.speed += (sp - shark.speed) * Math.min(1, dt * 10);
+  let want = game.state === 'won' ? G.fwd : (Math.cos(shark.heading) < 0 ? Math.PI : 0);   // v5: he rests level (open water); faces up only for the portrait ending
+  if (shark.faceAng !== null) want = shark.faceAng;
+  else if (sp > 25 && !(shark.anim && shark.anim.faceFwd)) want = Math.atan2(vy, vx);
+  else if (freeMove()) want = Math.cos(shark.heading) < 0 ? Math.PI : 0;   // level out when resting
+  const turn = shark.faceAng !== null || sp > 25 ? 10 : 4;
+  shark.heading += angDiff(shark.heading, want) * Math.min(1, dt * turn);
+  shark.tailPhase += dt * (5 + Math.min(shark.speed, 700) * 0.025);
+  shark.attn = Math.max(0, shark.attn - dt * 1.5);
+  shark.spin = Math.min(1, shark.spin + dt / (0.9 * Math.max(SPEED, .5)));
+  shark.blinkT -= dt;
+  if (shark.blinkT < 0) { shark.blink = 1; shark.blinkT = rand(2.5, 5); }
+  shark.blink = Math.max(0, shark.blink - dt * 7);
+
+  if (game.state === 'final') {
+    game.finalT += dt;
+    if (shark.spin >= 1 && Math.random() < dt * 0.6) shark.spin = 0;
+    if (Math.random() < dt * 1.5) burst(rand(0.1, 0.9) * W, rand(0.15, 0.5) * H, 40, true);
+  }
+  if ((game.state === 'bosswon' || (game.state === 'party' && !game.dragging)) && shark.spin >= 1 && Math.random() < dt * 0.25) shark.spin = 0;   // Aaron dances too
+  if (game.state === 'free') updateFree(dt);
+  if (game.state === 'snack') updateSnack(dt);
+  if (isRace() && RACE) updateRace(dt);
+  if (friends.length) updateFriends(dt);
+  if (boss.croc || game.state === 'boss' || game.state === 'bosswon') updateBoss(dt);
+  if (game.state === 'won' || game.state === 'bosswon') confettiShower(dt);
+
+  // crocodiles
+  for (let i = crocs.length - 1; i >= 0; i--) {
+    const c = crocs[i];
+    c.phase += dt * 6;
+    if (c.vx) c.x += c.vx * dt;
+    if (c.wander && !c.leaving) updateWander(c, dt);
+    if (c.jawAuto) c.jaw = 0.12 + 0.3 * (0.5 + 0.5 * Math.sin(T * 3.4 + c.phase * 0.2));
+    if (c.role === 'free' && ((c.vx < 0 && c.x < -c.L) || (c.vx > 0 && c.x > W + c.L))) crocs.splice(i, 1);
+  }
+  for (let i = popTexts.length - 1; i >= 0; i--) { popTexts[i].age += dt; if (popTexts[i].age > popTexts[i].life) popTexts.splice(i, 1); }
+
+  // particles
+  const grav = 520 * Math.max(0.7, Math.min(W, H) / 700);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i]; p.age += dt;
+    if (p.age > p.life) { particles.splice(i, 1); continue; }
+    if (p.kind === 'c' && p.fl) { p.vy += grav * 0.3 * dt; p.vy *= (1 - dt * 1.5); p.vx = p.vx * (1 - dt * 1.5) + Math.sin(p.age * 3 + p.ph) * 60 * dt; p.rot += p.vr * dt; }
+    else if (p.kind === 'c') { p.vy += grav * dt; p.vx *= (1 - dt * 1.5); p.vy *= (1 - dt * 1.2); p.rot += p.vr * dt; }
+    else if (p.kind === 's') { p.vx *= (1 - dt * 2.2); p.vy = p.vy * (1 - dt * 2.2) + 50 * dt; p.rot += p.vr * dt; }
+    else if (p.kind === 'g' || p.kind === 'p') { p.vx *= (1 - dt * 1.8); p.vy = p.vy * (1 - dt * 1.8) - 12 * dt; }
+    else { p.vx *= (1 - dt * 2.5); p.vy = p.vy * (1 - dt * 2.5) - 60 * dt; }
+    p.x += p.vx * dt; p.y += p.vy * dt;
+  }
+  if (flyer) {
+    flyer.t += dt / flyer.dur;
+    if (flyer.t >= 1) { const c = cells[flyer.idx]; delete c.dataset.pending; flyer = null; Sfx.pop(); updateStrip(); }
+  }
+}
+
+/* ================================================================
+   Render
+   ================================================================ */
+function render() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (bgCache) ctx.drawImage(bgCache, 0, 0, W, H);
+  // light rays
+  for (const r of scene.rays) {
+    const sway = Math.sin(T * 0.4 + r.phase) * W * 0.03;
+    const g = ctx.createLinearGradient(0, 0, 0, H * 0.85);
+    g.addColorStop(0, `rgba(255,255,255,${r.a})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.beginPath();
+    ctx.moveTo(r.x - r.w * 0.3, 0); ctx.lineTo(r.x + r.w * 0.3, 0);
+    ctx.lineTo(r.x + sway + r.w, H * 0.85); ctx.lineTo(r.x + sway - r.w, H * 0.85); ctx.closePath(); ctx.fill();
+  }
+  // back bubbles
+  for (const b of scene.bubbles) if (!b.front) drawBubble(b.x, b.y, b.r, 0.5);
+  // fish
+  for (const f of scene.fish) drawFish(f);
+  // seaweed
+  for (const w of scene.weeds) drawWeed(w);
+  if (!G) return;
+  // letters
+  for (const l of game.letters) if (l.scale > 0.02) drawLetter(l);
+  // hand hint on the very first round
+  if (game.state === 'play' && !game.hasDragged && game.index === 0 && !shark.scripted && !isRace()) drawHandHint();
+  for (const c of crocs) if (c.role !== 'eater') drawCrocEntity(c);
+  for (const f of friends) drawFriend(f);   // v5: party friends / cousins (Aaron is drawn on top)
+  // shark
+  if (!shark.hidden) {
+    const ch = Math.cos(shark.heading);
+    if (ch < -0.25) shark.flip = true; else if (ch > 0.25) shark.flip = false;  // hysteresis: no flicker near vertical
+    const t = sharkXform(), Ls = t.Ls;
+    ctx.save();
+    ctx.translate(t.x, t.y);
+    ctx.rotate(t.ang);
+    ctx.scale(t.sx, t.sy);
+    const amp = shark.dead > 0 ? 0.05 : 0.16 + Math.min(shark.speed / 400, 1) * 0.32;
+    drawShark(ctx, Ls, { tail: Math.sin(shark.tailPhase) * amp, fin: Math.sin(shark.tailPhase * 0.5) * 0.18, blink: shark.dead > 0 ? 0 : shark.blink, chomp: shark.chomp, dead: shark.dead > 0.5 });
+    ctx.restore();
+  }
+  aaronLbl = null;
+  if (!shark.hidden && /^(party|partyEnd|bossIntro|boss|bosswon)$/.test(game.state)) {   // v5: "Aaron" name tag during parties + the boss battle
+    const t = sharkXform();
+    labelQ.push({ text: 'Aaron', x: t.x, y: t.y + t.Ls * 0.33, size: Math.max(14, Math.min(t.Ls * 0.13, 30)), color: AARON_SKIN.out, a: 1, fixed: true, set: r => { aaronLbl = r; } });
+  }
+  flushLabels();
+  if (boss.croc && /^(bossIntro|boss|bosswon)$/.test(game.state)) drawBossBar();
+  for (const c of crocs) if (c.role === 'eater') drawCrocEntity(c);
+  if (isRace() && RACE && /^(play|celebrate|crocwin)$/.test(game.state)) drawRaceBar();
+  // particles
+  for (const p of particles) {
+    const a = 1 - Math.max(0, (p.age - p.life * 0.6) / (p.life * 0.4));
+    if (p.kind === 'c') {
+      ctx.save(); ctx.globalAlpha = a; ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.color;
+      if (p.round) { ctx.beginPath(); ctx.arc(0, 0, p.h * 0.6, 0, 7); ctx.fill(); } else ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    } else if (p.kind === 's') {
+      ctx.save(); ctx.globalAlpha = a; ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.color;
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) { const an = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? p.r * 0.45 : p.r; ctx.lineTo(Math.cos(an) * rr, Math.sin(an) * rr); }
+      ctx.closePath(); ctx.fill(); ctx.restore();
+    } else if (p.kind === 'g') drawCloud(p.x, p.y, p.r * (1 + p.age * 0.7), a * 0.9, 'rgba(176,214,92,0.92)', 'rgba(104,140,40,0.9)', p.ph);
+    else if (p.kind === 'p') drawCloud(p.x, p.y, p.r * (1 + p.age * 0.9), a, 'rgba(255,255,255,0.95)', 'rgba(150,180,210,0.9)', p.ph);
+    else drawBubble(p.x, p.y, p.r * (1 + p.age * 0.3), a * 0.9);
+  }
+  ctx.globalAlpha = 1;
+  // cartoon "CHOMP!" words
+  for (const p of popTexts) {
+    const k = p.age / p.life, s = k < 0.2 ? easeOutBack(k / 0.2) : 1, a = k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1;
+    ctx.save(); ctx.globalAlpha = Math.max(0, a); ctx.translate(p.x, p.y - k * p.size * 0.4); ctx.rotate(-0.08); ctx.scale(s, s);
+    ctx.font = `900 ${Math.round(p.size)}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round'; ctx.lineWidth = p.size * 0.16; ctx.strokeStyle = '#0d2b52'; ctx.strokeText(p.text, 0, 0);
+    ctx.fillStyle = '#ffd84d'; ctx.fillText(p.text, 0, 0);
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+  // front bubbles
+  for (const b of scene.bubbles) if (b.front) drawBubble(b.x, b.y, b.r * 1.3, 0.35);
+  // letter flying to the strip
+  if (flyer) {
+    const t = easeInOut(Math.min(1, flyer.t));
+    const x = lerp(flyer.x0, flyer.x1, t), y = lerp(flyer.y0, flyer.y1, t) - Math.sin(t * Math.PI) * H * 0.12;
+    const r = lerp(flyer.r0, flyer.r1, t);
+    ctx.save(); ctx.translate(x, y); ctx.rotate(t * Math.PI * 2);
+    ctx.fillStyle = '#ffd84d'; ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fill();
+    drawGlyph(flyer.ch, r * 1.3, '#0d2b52');
+    ctx.restore();
+  }
+}
+
+function sharkXform() {   // where/how the shark is drawn (shared by render + the screen-coverage check)
+  const Ls = sharkLen();
+  const bobY = (!game.dragging && !shark.anim && !shark.scripted) ? Math.sin(T * 2.2) * Ls * 0.03 : 0;
+  const spinE = shark.spin < 1 ? easeInOut(shark.spin) : 0;
+  const ang = shark.heading + spinE * Math.PI * 2 + Math.sin(T * 25) * 0.08 * shark.attn + Math.sin(T * 1.6) * 0.07 * shark.dead;
+  const sc = 1 + Math.sin(spinE * Math.PI) * 0.25 + shark.attn * 0.08;
+  let belly = Math.cos(shark.dead * Math.PI);                 // 1 = upright, -1 = belly-up
+  if (Math.abs(belly) < 0.03) belly = belly < 0 ? -0.03 : 0.03;
+  return { Ls, x: shark.x, y: shark.y + bobY, ang, sx: sc, sy: (shark.flip ? -sc : sc) * belly };
+}
+function drawRaceBar() {   // Level 2: how far the crocodile is (fills from the right as it swims toward the letter)
+  const { barX: x, barY: y, barW: w, barH: h } = RACE, r = h / 2, p = race.p;
+  const pill = () => { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arc(x + w - r, y + r, r, -Math.PI / 2, Math.PI / 2); ctx.lineTo(x + r, y + h); ctx.arc(x + r, y + r, r, Math.PI / 2, Math.PI * 1.5); ctx.closePath(); };
+  ctx.save();
+  pill(); ctx.fillStyle = 'rgba(4,40,80,0.45)'; ctx.fill();
+  const fw = h + (w - h) * p;
+  ctx.save(); pill(); ctx.clip();
+  const g = ctx.createLinearGradient(x, 0, x + w, 0); g.addColorStop(0, '#ff5a6e'); g.addColorStop(1, '#ffc24d');
+  ctx.fillStyle = g; ctx.fillRect(x + w - fw, y, fw, h);
+  ctx.restore();
+  pill(); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.75)'; ctx.stroke();
+  // the goal: a letter bubble at the left end
+  ctx.save(); ctx.translate(x + r, y + r);
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, 0, r * 1.25, 0, 7); ctx.fill();
+  ctx.strokeStyle = '#ffd84d'; ctx.lineWidth = Math.max(2, r * 0.32); ctx.stroke();
+  ctx.fillStyle = '#ffd84d'; ctx.beginPath();
+  for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * 0.3 : r * 0.68; ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+  // a little crocodile at the front of the fill
+  ctx.save(); ctx.translate(x + w - fw + h * 0.9, y + r); ctx.scale(-1, 1);
+  drawCroc(ctx, h * 2.4, { jaw: 0.25 + 0.2 * Math.sin(T * 7), phase: T * 6 });
+  ctx.restore();
+  ctx.restore();
+}
+function drawCloud(x, y, r, a, fill, edge, ph) {   // a cartoon puff (fart gas / boss poof): 4 overlapping circles
+  ctx.save(); ctx.globalAlpha = clamp(a, 0, 1);
+  const pts = [[0, 0, 1], [-0.75, 0.2, 0.7], [0.75, 0.15, 0.75], [0.1, -0.55, 0.7]];
+  ctx.beginPath();
+  for (const [dx, dy, k] of pts) { const rx = x + Math.cos(ph) * dx * r - Math.sin(ph) * dy * r * 0.3, ry = y + dy * r; ctx.moveTo(rx + r * k, ry); ctx.arc(rx, ry, r * k, 0, Math.PI * 2); }
+  ctx.fillStyle = fill; ctx.fill();
+  ctx.lineWidth = Math.max(1.5, r * 0.12); ctx.strokeStyle = edge; ctx.stroke();
+  ctx.fill();
+  ctx.restore();
+}
+function drawBossBar() {   // the big crocodile's health bar (goes down with every bite)
+  const b = bossBar(), r = b.h / 2, p = clamp(boss.shown / boss.max, 0, 1);
+  ctx.save();
+  roundRectPath(b.x, b.y, b.w, b.h, r); ctx.fillStyle = 'rgba(4,40,80,0.55)'; ctx.fill();
+  if (p > 0.002) {
+    ctx.save(); roundRectPath(b.x, b.y, b.w, b.h, r); ctx.clip();
+    const g = ctx.createLinearGradient(b.x, 0, b.x + b.w, 0); g.addColorStop(0, '#ff4f6d'); g.addColorStop(1, '#ffb347');
+    ctx.fillStyle = g; ctx.fillRect(b.x, b.y, b.w * p, b.h);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(b.x, b.y + b.h * 0.12, b.w * p, b.h * 0.22);
+    ctx.restore();
+  }
+  roundRectPath(b.x, b.y, b.w, b.h, r); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.stroke();
+  ctx.save(); ctx.translate(b.x - b.h * 0.9, b.y + r); ctx.scale(-1, 1);   // an angry little croc head at the left end
+  drawCroc(ctx, b.h * 3, { jaw: 0.3 + 0.2 * Math.sin(T * 6), phase: T * 6, angry: true, pal: BOSS_PAL });
+  ctx.restore();
+  ctx.restore();
+}
+function drawCrocEntity(c) {
+  if (c.role === 'boss') {   // v5 boss: big, chunky, angry brows + big teeth; flips belly-up when beaten
+    const fy = Math.cos((c.flip || 0) * Math.PI), sy = BOSS_YS * (Math.abs(fy) < 0.05 ? (fy < 0 ? -0.05 : 0.05) : fy);
+    ctx.save(); ctx.translate(c.x, c.y); ctx.scale(c.dir, sy);
+    drawCroc(ctx, c.L, { jaw: c.jaw, phase: c.phase, eyes: c.eyes, angry: c.eyes !== 'dizzy', pal: boss.flash > 0.45 ? BOSS_HURT : BOSS_PAL });
+    ctx.restore();
+    if (c.eyes === 'dizzy') {   // cartoon stars circling his head
+      for (let i = 0; i < 4; i++) {
+        const a = T * 4 + i * Math.PI / 2, hx = c.x + c.dir * c.L * 0.12, hy = c.y + (c.flip > 0.5 ? 1 : -1) * c.L * 0.2;
+        const x = hx + Math.cos(a) * c.L * 0.12, y = hy + Math.sin(a) * c.L * 0.035, r = c.L * 0.025;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.fillStyle = '#ffd84d'; ctx.beginPath();
+        for (let k = 0; k < 10; k++) { const an = k * Math.PI / 5 - Math.PI / 2, rr = k % 2 ? r * 0.45 : r; ctx.lineTo(Math.cos(an) * rr, Math.sin(an) * rr); }
+        ctx.closePath(); ctx.fill(); ctx.restore();
+      }
+    }
+    return;
+  }
+  ctx.save();
+  ctx.translate(c.x, c.y + Math.sin(T * 2 + c.phase * 0.1) * c.L * 0.015);
+  ctx.scale(c.dir, 1);
+  drawCroc(ctx, c.L, { jaw: c.jaw, phase: c.phase, eyes: c.eyes, bulge: c.bulge });
+  ctx.restore();
+}
+function drawBubble(x, y, r, a) {
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = Math.max(1, r * 0.18);
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.beginPath(); ctx.arc(x - r * 0.35, y - r * 0.35, r * 0.25, 0, 7); ctx.fill();
+  ctx.restore();
+}
+function drawFish(f) {
+  ctx.save(); ctx.globalAlpha = 0.55; ctx.translate(f.x, f.y); if (f.v < 0) ctx.scale(-1, 1);
+  const s = f.s, wag = Math.sin(T * 8 + f.phase) * 0.3;
+  ctx.fillStyle = f.color;
+  ctx.beginPath(); ctx.ellipse(0, 0, s, s * 0.55, 0, 0, 7); ctx.fill();
+  ctx.save(); ctx.translate(-s * 0.9, 0); ctx.rotate(wag);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-s * 0.7, -s * 0.5); ctx.lineTo(-s * 0.7, s * 0.5); ctx.closePath(); ctx.fill(); ctx.restore();
+  ctx.fillStyle = '#1b2440'; ctx.beginPath(); ctx.arc(s * 0.5, -s * 0.1, s * 0.12, 0, 7); ctx.fill();
+  ctx.restore();
+}
+function drawWeed(w) {
+  ctx.save(); ctx.strokeStyle = w.color; ctx.lineCap = 'round';
+  let px = w.x, py = w.y;
+  for (let k = 1; k <= w.segs; k++) {
+    const f = k / w.segs;
+    const x = w.x + Math.sin(T * w.speed + w.phase + k * 0.45) * f * w.h * 0.12;
+    const y = w.y - f * w.h;
+    ctx.lineWidth = w.w * (1 - f * 0.7);
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x, y); ctx.stroke();
+    px = x; py = y;
+  }
+  ctx.restore();
+}
+
+function drawGlyph(ch, size, color) {
+  ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  ctx.font = `900 ${Math.round(size)}px ${FONT}`;
+  const m = ctx.measureText(ch);
+  const asc = m.actualBoundingBoxAscent, desc = m.actualBoundingBoxDescent;
+  const y = (asc !== undefined && desc !== undefined) ? (asc - desc) / 2 : size * 0.35;
+  ctx.fillText(ch, 0, y);
+}
+
+function drawLetter(l) {
+  const pos = letterPos(l), R = curR() * l.scale;
+  const color = BUBBLE_COLORS[l.branch % BUBBLE_COLORS.length];
+  ctx.save(); ctx.translate(pos.x, pos.y);
+  if (l.glow > 0.02) {
+    const pulse = 0.75 + Math.sin(T * 5) * 0.25;
+    const g = ctx.createRadialGradient(0, 0, R * 0.8, 0, 0, R * 1.9);
+    g.addColorStop(0, `rgba(255,236,120,${0.85 * l.glow * pulse})`); g.addColorStop(1, 'rgba(255,236,120,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R * 1.9, 0, 7); ctx.fill();
+  }
+  const wob = l.wobble;
+  ctx.rotate(Math.sin(T * 18) * 0.18 * wob + (l.glow > 0.5 ? Math.sin(T * 6) * 0.06 : 0));
+  ctx.scale(1 + Math.sin(T * 20) * 0.06 * wob, 1 - Math.sin(T * 20) * 0.06 * wob);
+  // bubble
+  const g = ctx.createRadialGradient(-R * 0.3, -R * 0.35, R * 0.1, 0, 0, R);
+  g.addColorStop(0, '#ffffff'); g.addColorStop(0.75, '#f4fbff'); g.addColorStop(1, '#d9f1ff');
+  ctx.shadowColor = 'rgba(0,40,90,0.35)'; ctx.shadowBlur = R * 0.25; ctx.shadowOffsetY = R * 0.08;
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.strokeStyle = color; ctx.lineWidth = R * 0.13; ctx.beginPath(); ctx.arc(0, 0, R * 0.93, 0, 7); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.beginPath(); ctx.ellipse(-R * 0.45, -R * 0.5, R * 0.2, R * 0.11, -0.7, 0, 7); ctx.fill();
+  drawGlyph(show(l.ch), R * 1.2, '#0d2b52');
+  ctx.restore();
+}
+
+function drawHandHint() {   // first round: a finger shows "drag me" from the shark out into the water
+  const z = letterZone(), cyc = (T % 2.6) / 2.6, k = easeInOut(Math.min(1, cyc / 0.75));
+  const home = startPos(), aim = { x: (z.x0 + z.x1) / 2, y: (z.y0 + z.y1) / 2 };
+  const p = { x: lerp(home.x, lerp(home.x, aim.x, 0.55), k), y: lerp(home.y, lerp(home.y, aim.y, 0.55), k) };
+  const a = cyc < 0.1 ? cyc / 0.1 : cyc > 0.8 ? Math.max(0, 1 - (cyc - 0.8) / 0.2) : 1;
+  const L = G.L;
+  ctx.save(); ctx.globalAlpha = a * 0.9;
+  ctx.font = `${Math.round(L * 0.45)}px system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.beginPath(); ctx.arc(p.x, p.y, L * 0.13, 0, 7); ctx.fill();
+  ctx.fillText('👆', p.x + L * 0.05, p.y + L * 0.02);
+  ctx.restore();
+}
+
+/* ================================================================
+   Resize + main loop
+   ================================================================ */
+function resize() {
+  const nw = window.innerWidth, nh = window.innerHeight;
+  if (nw === W && nh === H && G) return;
+  W = nw; H = nh; portrait = H > W;
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  SA = safeArea();
+  layoutStrip();
+  buildGeometry();
+  buildScene();
+  layoutHud();
+  buildRace();
+  hitCv.width = Math.max(1, Math.round(W)); hitCv.height = Math.max(1, Math.round(H));
+  game.dragging = false; game.pointerId = null; game.target = null;
+  if (game.state === 'snackEnd') finishSnackNow();
+  else if (game.state === 'gameover') skipToOver();
+  const st = game.state;
+  if (st === 'won') {   // keep him covering the (new) screen
+    for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].obj === shark) tweens.splice(i, 1);
+    feast.cover = coverScale(); const ang = coverAng(), p = coverPos(feast.cover, ang);
+    shark.scale = feast.cover; shark.x = p.x; shark.y = p.y; shark.faceAng = shark.heading = ang; game.covered = true;
+  } else if (/^(free|final|over|snack|party|bossIntro|boss|bosswon)$/.test(st)) {
+    if (st === 'free') { feast.cover = Math.max(feast.s0 * 1.5, coverScale()); for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].obj === shark) tweens.splice(i, 1); shark.scale = feastScale(game.crocsEaten); }
+    if (boss.croc) relayoutBoss();
+    if (friends.length) relayoutFriends();
+    if (st === 'bossIntro' || st === 'boss') { dropTweens(shark); const p = aaronBossHome(); shark.x = p.x; shark.y = p.y; shark.scripted = false; shark.faceAng = null; if (st === 'bossIntro') bossCousins(); }
+    if (st !== 'bosswon') { const b = freeBounds(); shark.x = clamp(shark.x, b.x0, b.x1); shark.y = clamp(shark.y, b.y0, b.y1); }
+  } else if (st === 'partyEnd') {
+    dropTweens(shark); shark.scripted = false; resetSharkToStart(); setHud(isRace() ? 'race' : 'play'); newRound({ prompt: true });
+    if (isRace()) placeRacer();
+  } else if (isRace()) {
+    for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].obj === shark) { const w = tweens.splice(i, 1)[0]; for (const k in w.to) shark[k] = w.to[k]; if (w.onDone) w.onDone(); }
+    shark.scripted = false; shark.faceAng = null;
+    resetSharkToStart(); placeRacer();
+  } else {
+    for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].obj === shark && ('x' in tweens[i].to)) { const w = tweens.splice(i, 1)[0]; if (w.onDone) w.onDone(); }
+    shark.scripted = false; resetSharkToStart();
+    if (st === 'play') layoutLetters();
+  }
+  if (flyer) { const c = cells[flyer.idx]; delete c.dataset.pending; flyer = null; updateStrip(); }
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => { setTimeout(resize, 120); setTimeout(resize, 500); });
+document.addEventListener('visibilitychange', () => {   // no music while Safari is in the background
+  if (!Sfx.ctx) return;
+  const quiet = p => { if (p && p.catch) p.catch(() => {}); };   // iOS may refuse without a tap; the next touch resumes
+  if (document.hidden) { Voice.stop(); try { quiet(Sfx.ctx.suspend()); } catch (_) {} }
+  else if (game.state !== 'start') { try { quiet(Sfx.ctx.resume()); } catch (_) {} }
+});
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+  update(dt); render();
+  requestAnimationFrame(frame);
+}
+resize();
+paintCrocCanvas($('counterCroc'), 90, 45, { jaw: 0.35, eyes: 'normal', phase: 1 });
+document.querySelectorAll('canvas.crocIcon').forEach(c => paintCrocCanvas(c, 130, 50, { jaw: 0.45, eyes: 'normal', phase: 1 }));
+requestAnimationFrame(frame);
+
+/* Icon renderer (used to generate apple-touch-icon / manifest icons) */
+function drawIcon(canvas, size, maskable) {
+  const c = canvas.getContext('2d'); canvas.width = canvas.height = size;
+  const g = c.createLinearGradient(0, 0, 0, size);
+  g.addColorStop(0, '#6fd6f5'); g.addColorStop(1, '#0b5aa0');
+  c.fillStyle = g; c.fillRect(0, 0, size, size);
+  c.fillStyle = 'rgba(255,255,255,0.35)';
+  [[0.18, 0.2, 0.05], [0.12, 0.34, 0.03], [0.85, 0.75, 0.04]].forEach(([x, y, r]) => { c.beginPath(); c.arc(x * size, y * size, r * size, 0, 7); c.fill(); });
+  const k = maskable ? 0.78 : 1;
+  c.save(); c.translate(size / 2, size / 2); c.scale(k, k); c.translate(-size / 2, -size / 2);
+  // letter bubble
+  c.save(); c.translate(size * 0.8, size * 0.2);
+  c.fillStyle = '#fff'; c.beginPath(); c.arc(0, 0, size * 0.15, 0, 7); c.fill();
+  c.strokeStyle = '#ffd84d'; c.lineWidth = size * 0.022; c.beginPath(); c.arc(0, 0, size * 0.137, 0, 7); c.stroke();
+  c.fillStyle = '#0d2b52'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `900 ${Math.round(size * 0.19)}px ${FONT}`;
+  c.fillText('A', 0, size * 0.012);
+  c.restore();
+  c.save(); c.translate(size * 0.5, size * 0.6); c.rotate(-0.22);
+  drawShark(c, size * 0.8, { tail: 0.25, fin: 0 });
+  c.restore();
+  c.restore();
+}
+window.SharkABC = {
+  drawIcon, LEVELS, ALPHABET,
+  get state() { return game.state; }, get index() { return game.index; }, get bounces() { return game.bounces || 0; },
+  get shark() { return { x: shark.x, y: shark.y, animating: !!shark.anim || shark.scripted, scale: shark.scale, L: sharkLen(), dead: shark.dead, hidden: shark.hidden, heading: shark.heading }; },
+  get lives() { return game.lives; },
+  get sharkScale() { return shark.scale; },
+  get crocs() { return crocs.map(c => ({ role: c.role, x: c.x, y: c.y, L: c.L, jaw: c.jaw, dir: c.dir, bulge: c.bulge, eyes: c.eyes })); },
+  get crocsEaten() { return game.crocsEaten; },
+  get level() { return level().id; },
+  get breaks() { return { count: game.breaks, log: game.breakLog.slice(), at: game.breakAt.slice(), every: game.breakEvery, since: game.sinceBreak, goals: game.snackGoals.slice(), eaten: game.snackEaten }; },
+  get snack() { return { goal: snack.goal, eaten: snack.eaten, spawned: snack.spawned, t: snack.t }; },
+  get feast() { return { goal: FEAST_GOAL, eaten: game.crocsEaten, s0: feast.s0, cover: feast.cover, covered: !!game.covered, next: feastScale(Math.min(FEAST_GOAL, game.crocsEaten + 1)) }; },
+  coverage(nx, ny) { return sharkCoverage(nx || 40, ny || 30); },
+  get confetti() { return particles.filter(p => p.kind === 'c').length; },
+  get sfx() { return Sfx.log.slice(); },
+  get sfxCounts() { return Object.assign({}, Sfx.counts); },
+  get race() { if (!RACE) return null; const c = race.croc; return { p: race.p, dur: race.dur, started: race.started, wait: race.wait, hint: race.hint, slot: race.slot, crocWins: game.crocWins, sharkWins: game.sharkWins || 0,
+    croc: c ? { x: c.x, y: c.y, L: c.L, eyes: c.eyes } : null, R: RACE.R, slots: RACE.slots, sharkHome: RACE.sharkHome, crocHome: RACE.crocHome, bar: { x: RACE.barX, y: RACE.barY, w: RACE.barW, h: RACE.barH } }; },
+  get tunnel() { return false; },   // v5: the current/tunnel is gone (Level 1 is open water)
+  get music() { return { ready: !!Music.buf, playing: !!Music.src, kind: Music.srcKind, partyReady: !!Music.bufs.party, muted: Music.muted, ducked: Music.ducked, starts: Music.starts, ctx: Sfx.ctx ? Sfx.ctx.state : 'none', loopSec: Music.buf ? Music.buf._loopEnd : 0, partyLoopSec: Music.bufs.party ? Music.bufs.party._loopEnd : 0, muteGain: Music.muteG ? Music.muteG.gain.value : null }; },
+  musicLevel() { return Music.level(); },
+  bounds() { return freeBounds(); },
+  test: {   // automated-test helpers only
+    jump(i, scale) {   // skip ahead to letter i (grown as if the snack breaks / parties before it happened; optional exact scale)
+      if (game.state !== 'play') return false;
+      jumpTo(clamp(i | 0, 0, 25), true);
+      if (scale) { shark.scale = scale; resetSharkToStart(); }
+      newRound(); return true;
+    },
+    startParty(n) {   // straight into the party after G (n = 1) or after P (n = 2)
+      if (!/^(play|celebrate)$/.test(game.state)) return false;
+      jumpTo(PARTY_AT[(n || 1) - 1], true); game.state = 'celebrate'; startParty(); return true;
+    },
+    startBoss() { if (!isRace() || !/^(play|celebrate)$/.test(game.state)) return false; jumpTo(26); startBoss(); return true; },
+    bossHome() { return aaronBossHome(); },
+    spawnCroc(o) {   // a snack/ending crocodile, optionally parked at {x, y} (still: true = it stays there)
+      if (game.state !== 'free' && game.state !== 'snack') return false;
+      const c = spawnWanderCroc(game.state);
+      if (game.state === 'snack') snack.spawned++;
+      if (o && o.x != null) { c.x = o.x; c.y = o.y; Object.assign(c.wander, { entering: false, tx: o.x, ty: o.y, still: !!o.still }); }
+      return { x: c.x, y: c.y, L: c.L };
+    },
+    sampleBreaks(n) { const out = []; for (let i = 0; i < n; i++) out.push(pickBreak()); return out; },
+    startEnding() { if (game.state !== 'play' || isRace()) return false; skipToEnding(); return true; },
+  },
+  get letters() { return game.letters.filter(l => !l.gone).map(l => { const p = letterPos(l); return { ch: l.ch, correct: l.correct, branch: l.branch, x: p.x, y: p.y, glow: l.glow, armed: l.armed !== false }; }); },
+  get geometry() { return { L: G.L, bubbleR: G.bubbleR, R: curR(), pw: G.pw, ph: G.ph, portrait, stripBottom, start: startPos(), zone: letterZone(), grace: game.grace }; },
+  get sizes() { return { base: G.L, l1Start: L1_START_SCALE, l1Grow: L1_GROW_BREAK, l1Max: L1_MAX_SCALE, l2Base: RACE ? RACE.Ls : 0, l2Start: L2_START_SCALE, l2Grow: L2_GROW_PARTY, l2Max: L2_MAX_SCALE }; },
+  get growLog() { return game.growLog.slice(); },
+  get party() {
+    return { n: party.n, count: party.count, phase: party.phase, farts: party.farts, puffs: party.puffs, gas: particles.filter(p => p.kind === 'g').length, log: party.log.slice(), atIndex: party.atIndex,
+      done: Object.keys(game.partyDone).map(Number), aaronLabel: aaronLbl ? Object.assign({ text: 'Aaron' }, aaronLbl) : null,
+      friends: friends.map(f => ({ name: f.name, princess: f.princess, boy: f.boy, state: f.state, x: f.x, y: f.y, L: f.L, label: f.lbl ? Object.assign({ text: f.name }, f.lbl) : null })) };
+  },
+  get boss() {
+    const c = boss.croc;
+    return { active: /^(bossIntro|boss|bosswon)$/.test(game.state), hp: boss.hp, max: boss.max, shown: boss.shown, aaron: boss.aaron, cousins: boss.cousins, defeated: boss.defeated, poofed: boss.poofed,
+      t: boss.t, bar: bossBar(), croc: c ? { x: c.x, y: c.y, L: c.L, flip: c.flip, eyes: c.eyes } : null, zones: bossZones() };
+  },
+  get voice() { return { total: Object.keys(VOICE_DATA.lines).length, decoded: Object.keys(Voice.buf).length, failed: Voice.failed, lastKey: Voice.lastKey, lastMode: Voice.lastMode, played: Voice.played, playing: !!Voice.src, history: Voice.history.slice() }; },
+  get popTexts() { return popTexts.map(p => p.text); },
+  get popLog() { return popLog.slice(); },
+  voiceUrls() { return Object.keys(VOICE_DATA.lines).map(k => Voice.url(k)); },
+};
+})();
+</script>
+</body>
+</html>
