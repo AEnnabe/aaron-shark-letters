@@ -155,7 +155,9 @@ css.textContent = `
 #lvl{overflow:visible}#lvl::after{content:'Aaron';position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px;font-weight:900;font-size:16px;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.5);white-space:nowrap}
 #rlayer{position:fixed;inset:0;z-index:20;display:none;touch-action:none;user-select:none;-webkit-user-select:none;font-family:inherit}
 #rlayer canvas{position:absolute;inset:0;width:100%;height:100%}
-#rhud{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:12px;padding:10px 14px;pointer-events:none}
+#rhud{position:absolute;left:0;right:0;top:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 4px max(10px,env(safe-area-inset-left));pointer-events:none}
+#rsafe{position:absolute;visibility:hidden;pointer-events:none;top:0;left:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#rsay{pointer-events:auto;width:54px;height:54px;border-radius:50%;border:0;background:#ffd84d;font-size:28px;box-shadow:0 3px 8px rgba(0,0,0,.2);display:none}
 #rbadge{background:rgba(255,255,255,.85);border-radius:18px;padding:6px 14px;font-weight:900;font-size:22px;color:#4a2a7a;white-space:nowrap;box-shadow:0 3px 8px rgba(0,0,0,.2)}
 #rbadge b{display:inline-block;background:#ff5d8f;color:#fff;border-radius:12px;padding:0 10px;margin-left:8px}
 #rprog{flex:1;height:22px;background:rgba(255,255,255,.6);border-radius:12px;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.2)}
@@ -164,8 +166,16 @@ css.textContent = `
 #rcoins{font-weight:900;font-size:22px;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.5);white-space:nowrap}
 #rmute{pointer-events:auto;width:54px;height:54px;border-radius:50%;border:0;background:rgba(255,255,255,.85);font-size:28px;box-shadow:0 3px 8px rgba(0,0,0,.2)}
 #rmenu{pointer-events:auto;width:54px;height:54px;border-radius:50%;border:0;background:rgba(255,255,255,.85);font-size:28px;box-shadow:0 3px 8px rgba(0,0,0,.2)}
-#rprompt{position:absolute;left:50%;top:78px;transform:translateX(-50%);background:rgba(255,255,255,.92);border-radius:24px;padding:6px 26px;font-weight:900;font-size:min(9vmin,64px);color:#3a2370;display:none;box-shadow:0 6px 16px rgba(0,0,0,.2);text-align:center;pointer-events:none}
+#rprompt{position:absolute;left:50%;top:78px;max-width:92vw;white-space:nowrap;transform:translateX(-50%);background:rgba(255,255,255,.92);border-radius:24px;padding:6px 26px;font-weight:900;font-size:min(9vmin,64px);color:#3a2370;display:none;box-shadow:0 6px 16px rgba(0,0,0,.2);text-align:center;pointer-events:none}
 #rprompt .dots{font-size:min(4vmin,30px);letter-spacing:2px;line-height:1.1}
+@media (max-width:640px),(max-height:500px){
+  #rhud{gap:6px}#rbadge{font-size:15px;padding:4px 10px}#rbadge b{padding:0 6px;margin-left:4px}
+  #rhearts{font-size:18px;letter-spacing:0}#rcoins{font-size:16px}
+  #rmute,#rmenu,#rsay{width:44px;height:44px;font-size:22px}
+}
+@media (max-width:640px){#rprog{order:9;flex:0 0 100%;height:12px}#rhud .rsp{flex:1}}
+@media (min-width:641px){#rhud .rsp{display:none}}
+@media (max-height:500px){#rprog{height:14px}#rprompt{font-size:min(8vmin,40px);padding:2px 18px}#rprompt .dots{font-size:14px}}
 .rpanel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;background:rgba(40,10,70,.35)}
 .rpanel h2{margin:0;font-size:min(9vmin,64px);font-weight:900;color:#fff;text-shadow:0 4px 0 #6a2a9a,0 8px 20px rgba(0,0,0,.4);text-align:center}
 .rbtns{display:flex;gap:28px;flex-wrap:wrap;justify-content:center}
@@ -202,7 +212,7 @@ document.head.appendChild(css);
 const layer = document.createElement('div');
 layer.id = 'rlayer';
 layer.innerHTML = `<canvas id="rcv"></canvas>
-<div id="rhud"><div id="rbadge"><span id="rname">Audrey</span><b id="rlvl">3</b></div><div id="rprog"><i></i></div><div id="rcoins">⭐ 0</div><div id="rhearts"></div><button id="rmute" aria-label="Music on/off">🎵</button><button id="rmenu" aria-label="Menu">🏠</button></div>
+<div id="rsafe"></div><div id="rhud"><div id="rbadge"><span id="rname">Audrey</span><b id="rlvl">3</b></div><div id="rprog"><i></i></div><span class="rsp"></span><div id="rcoins">⭐ 0</div><div id="rhearts"></div><button id="rsay" aria-label="Say it again">🔊</button><button id="rmute" aria-label="Music on/off">🎵</button><button id="rmenu" aria-label="Menu">🏠</button></div>
 <div id="rprompt"></div>
 <div class="rpanel" id="rover"><h2>Oh no! Out of hearts.<br>Let's try again!</h2><div class="rbtns"><button class="rbtn g" id="rtry">↻ Try Again</button><button class="rbtn b" data-menu>🏠 Menu</button></div></div>
 <div class="rpanel" id="rend"><h2 id="rendT">You did it!</h2><div class="rbtns"><button class="rbtn g" id="rnext">Next Level ➜</button><button class="rbtn p" id="ragain">↻ Play Again</button><button class="rbtn b" data-menu>🏠 Menu</button></div></div>`;
@@ -212,6 +222,45 @@ const $r = id => layer.querySelector('#' + id);
 let W = 0, H = 0, DPR = 1;
 function resize() { DPR = Math.min(2, window.devicePixelRatio || 1); W = innerWidth; H = innerHeight; rcv.width = W * DPR; rcv.height = H * DPR; }
 addEventListener('resize', resize); resize();
+/* v10: safe-area insets + the top band (HUD + prompt) that answer labels must stay below */
+const SAFE = { t: 0, r: 0, b: 0, l: 0 };
+function readSafe() { const cs = getComputedStyle($r('rsafe')); SAFE.t = parseFloat(cs.paddingTop) || 0; SAFE.r = parseFloat(cs.paddingRight) || 0; SAFE.b = parseFloat(cs.paddingBottom) || 0; SAFE.l = parseFloat(cs.paddingLeft) || 0; }
+let bandAt = -1;
+function topBand() {
+  if (performance.now() - bandAt < 200 && R.band) return R.band;
+  bandAt = performance.now(); readSafe();
+  const hb = $r('rhud').getBoundingClientRect(); const pr = $r('rprompt');
+  if (pr.style.display !== 'none') pr.style.top = (hb.bottom + 4) + 'px';
+  const pb = pr.style.display !== 'none' ? pr.getBoundingClientRect().bottom : 0;
+  return (R.band = Math.max(hb.bottom, pb) + 10);
+}
+/* v10: one place that lays out the 3 answer labels so they never touch: equal columns across the safe width,
+   font auto-shrunk to fit its column, solid pill with padding, >= GAP px between pills. */
+const GAP = 20;
+function columns() {
+  const l = SAFE.l + 10, r = W - SAFE.r - 10, usable = r - l;
+  const colW = Math.min((usable - 2 * GAP) / 3, 340);
+  const step = colW + GAP;
+  return { colW, step, xs: [-1, 0, 1].map(i => W / 2 + i * step) };
+}
+function fitFont(label, maxW, want, min = 14) {
+  let fs = want;
+  g.font = `900 ${fs}px ui-rounded, "Arial Rounded MT Bold", "Comic Sans MS", system-ui, sans-serif`;
+  const tw = g.measureText(label).width; const pad = fs * 0.5;
+  if (tw + 2 * pad > maxW) fs = Math.max(min, want * (maxW / (tw + 2 * pad)));
+  return fs;
+}
+function pill(label, cx, cy, maxW, want, border, opt = {}) {
+  const fs = fitFont(label, maxW, want);
+  g.font = `900 ${fs}px ui-rounded, "Arial Rounded MT Bold", "Comic Sans MS", system-ui, sans-serif`;
+  const tw = g.measureText(label).width, padX = fs * 0.5;
+  const bw = Math.min(maxW, Math.max(tw + 2 * padX, opt.minW ? Math.min(maxW, opt.minW) : fs * 1.6)), bh = fs * 1.4;
+  g.save(); g.globalAlpha = 1; g.fillStyle = opt.bg || '#fff'; rr(cx - bw / 2, cy - bh / 2, bw, bh, bh * 0.35); g.fill();
+  g.lineWidth = Math.max(3, fs * 0.09); g.strokeStyle = border || '#3a2370'; g.stroke();
+  g.fillStyle = opt.fg || '#2a1840'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(label, cx, cy + fs * 0.04); g.restore();
+  const rect = { x: cx - bw / 2, y: cy - bh / 2, w: bw, h: bh, label };
+  (R.labels || (R.labels = [])).push(rect); return rect;
+}
 
 /* ===== level picker on the start screen ===== */
 (function buildPicker() {
@@ -285,7 +334,7 @@ function startLevel(n) {
   Voice.stop(); timers.length = 0;
   Object.assign(R, { active: true, level: n, state: 'intro', qi: Q_START - 1, hearts: HEARTS, lane: 0, laneX: 0, jumpT: -1, scale: 1,
     coins: 0, correct: 0, wrong: 0, gates: null, mode: 'run', stunT: 0, reward: null, rewards: 0, swim: null, items: [], fx: [], t: 0, bonus: null, speed: 26, decisionLog: [], log: [] });
-  R.qs = buildQuestions(n);
+  R.qs = buildQuestions(n); $r('rsay').style.display = 'none'; R.labels = [];
   R.deco = []; if (L.swim) return startSwim(n);
   for (let i = 0; i < 14; i++) R.deco.push({ z: i * 7, side: i % 2 ? 1 : -1, e: pick(WORLDS[L.world].deco), off: rnd(0, 0.6) });
   layer.style.display = 'block'; panels(null); $r('rprompt').style.display = 'none'; $r('rhud').style.display = 'flex';
@@ -311,8 +360,9 @@ function nextQuestion() {
     if (q.math) {
       const m = q.math, dots = (x, c) => x <= 10 ? `<span style="color:${c}">${'●'.repeat(x)}</span>` : '';
       pr.innerHTML = `${m.a} ${m.op === '+' ? '+' : '−'} ${m.b} = ?` + (m.a <= 10 && m.b <= 10 ? `<div class="dots">${dots(m.a, '#ff5d8f')}${m.op === '+' ? ' + ' : ' − '}${dots(m.b, '#3a8ee6')}</div>` : '');
-    } else pr.innerHTML = '🔊';
-    pr.style.display = 'block';
+      pr.style.display = 'block';
+    } else { pr.style.display = 'none'; $r('rsay').style.display = 'block'; }
+    bandAt = -1;
   };
   showPrompt();
   say(q.k + '_q');
@@ -340,7 +390,7 @@ function resolveGate() {
     R.wrong++; R.hearts--; bonk(); Sfx.tone(220, 90, 0.35, 'square', 0.12, 0.08); R.hurtT = R.t; R.stunT = R.t; hud();
     R.fx.push({ type: 'txt', text: 'BONK!', x: W / 2 + R.laneX * W * 0.27, y: H * 0.45, t: 0, life: 1.2, col: '#ff5d8f' });
   }
-  $r('rprompt').style.display = 'none';
+  $r('rprompt').style.display = 'none'; $r('rsay').style.display = 'none'; bandAt = -1;
   R.state = 'answer';
   const k = q.k + (ok ? '_y' : '_n');
   const after = () => {
@@ -384,6 +434,7 @@ addEventListener('keydown', e => {
   if (!R.active) return;
   if (e.key === 'ArrowLeft') setLane(R.lane - 1); else if (e.key === 'ArrowRight') setLane(R.lane + 1); else if (e.key === 'ArrowUp' || e.key === ' ') jump();
 });
+$r('rsay').addEventListener('click', e => { e.stopPropagation(); Sfx.unlock(); const q = R.mode === 'swim' ? R.swim && R.swim.q : (R.tapq || (R.gates && R.gates.q) || R.qs[R.qi]); if (q) say(q.k + '_q'); });
 $r('rmute').addEventListener('click', e => { e.stopPropagation(); Sfx.unlock(); Music.setMuted(!Music.muted); hud(); });
 layer.querySelectorAll('[data-menu], #rmenu').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); Voice.stop(); location.href = location.pathname; }));
 $r('rtry').addEventListener('click', e => { e.stopPropagation(); Sfx.unlock(); startLevel(R.level); });
@@ -591,24 +642,27 @@ function drawGateAndItems(dt) {
 function drawGates(gt) {
   const q = gt.q, L = RL[R.level];
   const cols = { rainbow: ['#ff5d8f', '#a66bff', '#4dc4ff'], volcano: ['#e8553d', '#f5a623', '#8a4a3a'], jungle: ['#3fae4f', '#c05be0', '#e8a33d'], garden: ['#ff8fc8', '#7cc96a', '#a66bff'], meadow: ['#5ee07a', '#ff8fc8', '#4dc4ff'], desert: ['#d98a2b', '#3fae4f', '#e8553d'], ocean: ['#2a9fd6', '#ff8fc8', '#2ec4a0'], castle: ['#e8553d', '#f5a623', '#8a4a3a'], forest: ['#5ee07a', '#ff8fc8', '#4dc4ff'] }[L.world] || ['#ff5d8f', '#a66bff', '#4dc4ff'];
+  const C3 = columns(), band = topBand(); R.labels = [];
   q.opts.forEach((opt, i) => {
     const lx = i - 1, p = proj(lx, gt.z), w = W * 0.27 * p.f * 0.92, h = H * 0.42 * p.f;
     g.save();
     g.lineWidth = Math.max(4, w * 0.09); g.strokeStyle = cols[i]; g.lineCap = 'round';
     g.beginPath(); g.moveTo(p.x - w / 2, p.y); g.lineTo(p.x - w / 2, p.y - h * 0.62); g.arc(p.x, p.y - h * 0.62, w / 2, Math.PI, 0); g.lineTo(p.x + w / 2, p.y); g.stroke();
-    const label = q.show ? q.show(opt) : String(opt);
-    const fs = Math.max(30, Math.min(w * (label.length > 4 ? 0.34 : 0.48), H * 0.16));
-    const bw = Math.max(fs * (label.length * 0.62 + 0.8), w * 0.8), bh = fs * 1.35;
-    g.fillStyle = '#fff'; g.globalAlpha = 0.95; rr(p.x - bw / 2, p.y - h * 0.62 - bh / 2, bw, bh, bh * 0.35); g.fill(); g.globalAlpha = 1;
-    g.lineWidth = 3; g.strokeStyle = cols[i]; g.stroke();
-    g.font = `900 ${fs}px ui-rounded, "Arial Rounded MT Bold", "Comic Sans MS", system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#2a1840';
-    g.fillText(label, p.x, p.y - h * 0.62 + fs * 0.04);
     g.restore();
+    const label = q.show ? q.show(opt) : String(opt);
+    // label column: never closer than one column step to its neighbour, whatever the perspective
+    const lxp = W / 2 + lx * Math.max(Math.abs(p.x - W / 2) || 0, C3.step);
+    const want = Math.min(H * 0.11, 64) * (0.8 + 0.2 * clamp(p.f, 0, 1));
+    const bh = Math.min(want, 64) * 1.4;
+    const cy = clamp(p.y - h * 0.62, band + bh / 2, H - SAFE.b - bh / 2 - 8);
+    if (lx) { /* tether line from the pill to its gate */ g.strokeStyle = cols[i]; g.lineWidth = 3; g.beginPath(); g.moveTo(lxp, cy); g.lineTo(p.x, p.y - h * 0.62); g.stroke(); }
+    pill(label, lxp, cy, C3.colW, want, cols[i], { minW: C3.colW * 0.7 });
   });
   // decision timer ring
   const left = clamp(gt.z / Z0, 0, 1);
-  g.lineWidth = 10; g.strokeStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.arc(W - 50, H - 50, 30, 0, 6.28); g.stroke();
-  g.strokeStyle = left > 0.35 ? '#5ee07a' : '#ff5d8f'; g.beginPath(); g.arc(W - 50, H - 50, 30, -Math.PI / 2, -Math.PI / 2 + 6.28 * left); g.stroke();
+  R.timerRect = { x: W - SAFE.r - 82, y: H - SAFE.b - 82, w: 72, h: 72 };
+  g.lineWidth = 10; g.strokeStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.arc(W - SAFE.r - 46, H - SAFE.b - 46, 30, 0, 6.28); g.stroke();
+  g.strokeStyle = left > 0.35 ? '#5ee07a' : '#ff5d8f'; g.beginPath(); g.arc(W - SAFE.r - 46, H - SAFE.b - 46, 30, -Math.PI / 2, -Math.PI / 2 + 6.28 * left); g.stroke();
 }
 function drawRunner(dt) {
   const L = RL[R.level], C = CH[L.ch];
