@@ -115,7 +115,7 @@
     background:radial-gradient(circle at 35% 30%, #d8ffd6, #5fd36a 45%, #2b9e3c);border:0;box-shadow:0 6px 0 #1f7a2d, 0 10px 24px rgba(0,0,0,.3);}
   #replay:active{transform:translateY(4px);box-shadow:0 2px 0 #1f7a2d;}
 
-  /* Crocodiles-eaten counter (free swim) */
+  /* Killer whales-eaten counter (free swim) */
   #counter{position:fixed;z-index:4;pointer-events:none;left:0;right:0;margin:0 auto;width:max-content;top:calc(var(--stripB,60px) + 10px);
     display:flex;align-items:center;gap:10px;padding:4px 20px 4px 10px;border-radius:999px;background:rgba(4,40,80,.42);
     border:3px solid rgba(255,255,255,.65);font-weight:900;font-size:min(8vmin,48px);line-height:1.1;color:#fff;text-shadow:0 2px 0 #0b4c86;}
@@ -181,8 +181,8 @@
       <div class="lvlname" id="play1Name">Level 1</div>
     </div>
     <div class="lvlpick">
-      <button id="play2" class="bigbtn l2" aria-label="Play level 2: race the crocodile"><canvas class="crocIcon" aria-hidden="true"></canvas><span class="num">2</span></button>
-      <div class="lvlname">Level 2<small>Race the croc!</small></div>
+      <button id="play2" class="bigbtn l2" aria-label="Play level 2: race the killer whale"><canvas class="crocIcon" aria-hidden="true"></canvas><span class="num">2</span></button>
+      <div class="lvlname">Level 2<small>Race the killer whale!</small></div>
     </div>
   </div>
   <div class="sub">Tap to Play!</div>
@@ -216,9 +216,9 @@
   </div>
 </div>
 
-<!-- v4: Level 2 won (A to Z before the crocodile): play Level 2 again or go back to Level 1 -->
+<!-- v4: Level 2 won (A to Z before the killer whale): play Level 2 again or go back to Level 1 -->
 <div id="won2" class="overlay endpanel hidden">
-  <h2>You beat the big crocodile!</h2>
+  <h2>You beat the big killer whale!</h2>
   <div class="levels">
     <div class="lvlpick">
       <button id="againL2" class="bigbtn green" aria-label="Play level 2 again"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M74 34 A30 30 0 1 0 80 56" fill="none" stroke="#0d3b1a" stroke-width="11" stroke-linecap="round"/><path d="M62 20 L84 30 L72 50 Z" fill="#0d3b1a" stroke="#0d3b1a" stroke-width="5" stroke-linejoin="round"/></svg></button>
@@ -239,7 +239,7 @@
 
 <noscript><p style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px">Please turn on JavaScript to play.</p></noscript>
 
-<script type="application/json" id="voice-lines">{"voice":"en-US-AvaNeural","rate":"-10%","lines":{"intro":{"text":"Let's swim! Drag the shark to the letter A!","dur":3.38},"again":{"text":"Here we go! Find the letter, A!","dur":2.57},"final":{"text":"Hooray! You did it! A to Z! Great job, Aaron!","dur":4.68},"wrong1":{"text":"Oops! Try again!","dur":1.85},"wrong2":{"text":"Almost! Try another one!","dur":2.18},"wrong3":{"text":"Hmm, not that one. Let's try again!","dur":3.53},"chomp":{"text":"Chomp! You ate a crocodile! Eat them all to grow bigger!","dur":4.63},"gameover":{"text":"Oh no! The crocodile got you! Let's try again!","dur":4.06},"yum1":{"text":"Yum yum!","dur":0.89},"yum2":{"text":"Chomp! Got one!","dur":1.78},"yum3":{"text":"Yummy! You're so big!","dur":2.14},"free":{"text":"Bonus time! Eat twenty crocodiles and grow super big!","dur":4.37},"snack":{"text":"Snack time! Eat the crocodiles!","dur":2.62},"snackdone":{"text":"Yum! Back to the letters!","dur":2.23},"win":{"text":"You did it! You won!","dur":1.87},"l2tap":{"text":"Tap the big button for level two!","dur":2.11},"level2":{"text":"Level two! Race the crocodile to the letter!","dur":3.07},"crocgot":{"text":"Oh no! The crocodile got it! Let's try again!","dur":3.96},"l2final":{"text":"Hooray! You beat the crocodile! A to Z! Great job, Aaron!","dur":5.52},"snackgrow":{"text":"Yum! Look, you got bigger! Back to the letters!","dur":4.08},"partygrow":{"text":"Wow! You got bigger!","dur":2.11},"party1":{"text":"Party time! Here come Aaron's shark friends!","dur":3.31},"party2":{"text":"They're back! Party time again!","dur":2.33},"n_elio":{"text":"Elio!","dur":0.72},"n_oliver":{"text":"Oliver!","dur":0.72},"n_andrew":{"text":"Andrew!","dur":0.77},"princesses":{"text":"And the shark princesses!","dur":1.66},"n_audrey":{"text":"Audrey!","dur":0.72},"n_emma":{"text":"Emma!","dur":0.55},"n_penny":{"text":"Penny!","dur":0.58},"n_mackenzie":{"text":"Mackenzie!","dur":0.89},"n_alli":{"text":"And Alli!","dur":0.84},"stinky":{"text":"Pee-yew! So stinky!","dur":2.18},"boss":{"text":"Uh oh! Here comes the biggest crocodile!","dur":3.41},"cousins":{"text":"Aaron's shark cousins are here to help! Chomp chomp!","dur":3.67},"bosshalf":{"text":"Keep biting! He's getting tired!","dur":2.47},"bosswin":{"text":"You beat the big crocodile! Aaron and his cousins win!","dur":4.13},"c_a":{"text":"A! A is for apple!","dur":2.21},"f_a":{"text":"Find the letter, A!","dur":1.37},"c_b":{"text":"B! B is for ball!","dur":1.85},"f_b":{"text":"Find the letter, B!","dur":1.27},"c_c":{"text":"C! C is for cat!","dur":2.16},"f_c":{"text":"Find the letter, C!","dur":1.34},"c_d":{"text":"D! D is for dog!","dur":2.16},"f_d":{"text":"Find the letter, D!","dur":1.37},"c_e":{"text":"E! E is for elephant!","dur":2.23},"f_e":{"text":"Find the letter E!","dur":1.25},"c_f":{"text":"F! F is for fish!","dur":2.42},"f_f":{"text":"Find the letter, F!","dur":1.34},"c_g":{"text":"G! G is for grapes!","dur":2.4},"f_g":{"text":"Find the letter, G!","dur":1.49},"c_h":{"text":"H! H is for hat!","dur":2.16},"f_h":{"text":"Find the letter, H!","dur":1.49},"c_i":{"text":"I! I is for ice cream!","dur":2.28},"f_i":{"text":"Find the letter, I!","dur":1.34},"c_j":{"text":"J! J is for juice!","dur":2.33},"f_j":{"text":"Find the letter, J!","dur":1.54},"c_k":{"text":"K! K is for kite!","dur":1.97},"f_k":{"text":"Find the letter, K!","dur":1.46},"c_l":{"text":"L! L is for lion!","dur":2.09},"f_l":{"text":"Find the letter L!","dur":1.27},"c_m":{"text":"M! M is for moon!","dur":1.92},"f_m":{"text":"Find the letter, M!","dur":1.32},"c_n":{"text":"N! N is for nest!","dur":1.99},"f_n":{"text":"Find the letter, N!","dur":1.34},"c_o":{"text":"O! O is for octopus!","dur":2.47},"f_o":{"text":"Find the letter, O!","dur":1.39},"c_p":{"text":"P! P is for pig!","dur":1.94},"f_p":{"text":"Find the letter, P!","dur":1.42},"c_q":{"text":"Q! Q is for queen!","dur":2.33},"f_q":{"text":"Find the letter, Q!","dur":1.37},"c_r":{"text":"R! R is for rainbow!","dur":2.11},"f_r":{"text":"Find the letter, R!","dur":1.44},"c_s":{"text":"S! S is for shark!","dur":2.35},"f_s":{"text":"Find the letter, S!","dur":1.34},"c_t":{"text":"T! T is for turtle!","dur":2.09},"f_t":{"text":"Find the letter, T!","dur":1.34},"c_u":{"text":"U! U is for umbrella!","dur":2.38},"f_u":{"text":"Find the letter, U!","dur":1.25},"c_v":{"text":"V! V is for volcano!","dur":2.52},"f_v":{"text":"Find the letter, V!","dur":1.39},"c_w":{"text":"W! W is for whale!","dur":2.59},"f_w":{"text":"Find the letter, W!","dur":1.75},"c_x":{"text":"X! X is for xylophone!","dur":2.52},"f_x":{"text":"Find the letter, X!","dur":1.37},"c_y":{"text":"Y! Y is for yo-yo!","dur":2.38},"f_y":{"text":"Find the letter, Y!","dur":1.56},"c_z":{"text":"Z! Z is for zebra!","dur":2.3},"f_z":{"text":"Find the letter, Z!","dur":1.34}}}</script>
+<script type="application/json" id="voice-lines">{"voice":"en-US-AvaNeural","rate":"-10%","lines":{"intro":{"text":"Let's swim! Drag the shark to the letter A!","dur":3.38},"again":{"text":"Here we go! Find the letter, A!","dur":2.57},"final":{"text":"Hooray! You did it! A to Z! Great job, Aaron!","dur":4.68},"wrong1":{"text":"Oops! Try again!","dur":1.85},"wrong2":{"text":"Almost! Try another one!","dur":2.18},"wrong3":{"text":"Hmm, not that one. Let's try again!","dur":3.53},"chomp":{"text":"Chomp! You ate a killer whale! Eat them all to grow bigger!","dur":4.58},"gameover":{"text":"Oh no! The killer whale got you! Let's try again!","dur":4.1},"yum1":{"text":"Yum yum!","dur":0.89},"yum2":{"text":"Chomp! Got one!","dur":1.78},"yum3":{"text":"Yummy! You're so big!","dur":2.14},"free":{"text":"Bonus time! Eat twenty killer whales and grow super big!","dur":4.32},"snack":{"text":"Snack time! Eat the killer whales!","dur":2.66},"snackdone":{"text":"Yum! Back to the letters!","dur":2.23},"win":{"text":"You did it! You won!","dur":1.87},"l2tap":{"text":"Tap the big button for level two!","dur":2.11},"level2":{"text":"Level two! Race the killer whale to the letter!","dur":3.14},"crocgot":{"text":"Oh no! The killer whale got it! Let's try again!","dur":4.06},"l2final":{"text":"Hooray! You beat the killer whale! A to Z! Great job, Aaron!","dur":5.33},"snackgrow":{"text":"Yum! Look, you got bigger! Back to the letters!","dur":4.08},"partygrow":{"text":"Wow! You got bigger!","dur":2.11},"party1":{"text":"Party time! Here come Aaron's shark friends!","dur":3.31},"party2":{"text":"They're back! Party time again!","dur":2.33},"n_elio":{"text":"Elio!","dur":0.72},"n_oliver":{"text":"Oliver!","dur":0.72},"n_andrew":{"text":"Andrew!","dur":0.77},"princesses":{"text":"And the shark princesses!","dur":1.66},"n_audrey":{"text":"Audrey!","dur":0.72},"n_emma":{"text":"Emma!","dur":0.55},"n_penny":{"text":"Penny!","dur":0.58},"n_mackenzie":{"text":"Mackenzie!","dur":0.89},"n_alli":{"text":"And Alli!","dur":0.84},"stinky":{"text":"Pee-yew! So stinky!","dur":2.18},"boss":{"text":"Uh oh! Here comes the biggest killer whale!","dur":3.41},"cousins":{"text":"Aaron's shark cousins are here to help! Chomp chomp!","dur":3.67},"bosshalf":{"text":"Keep biting! He's getting tired!","dur":2.47},"mike1":{"text":"Surprise! Uncle Mike is here!","dur":2.59},"mike2":{"text":"Spank Uncle Mike's butt!","dur":1.73},"mikeow1":{"text":"Ouch!","dur":0.98},"mikeow2":{"text":"Ow! Ooh!","dur":1.27},"mikeow3":{"text":"Oh, my booty!","dur":1.15},"mikedone":{"text":"Okay, okay! You got me!","dur":2.18},"bosswin":{"text":"You beat the big killer whale! Aaron and his cousins win!","dur":3.96},"c_a":{"text":"A! A is for apple!","dur":2.21},"f_a":{"text":"Find the letter, A!","dur":1.37},"c_b":{"text":"B! B is for ball!","dur":1.85},"f_b":{"text":"Find the letter, B!","dur":1.27},"c_c":{"text":"C! C is for cat!","dur":2.16},"f_c":{"text":"Find the letter, C!","dur":1.34},"c_d":{"text":"D! D is for dog!","dur":2.16},"f_d":{"text":"Find the letter, D!","dur":1.37},"c_e":{"text":"E! E is for elephant!","dur":2.23},"f_e":{"text":"Find the letter E!","dur":1.25},"c_f":{"text":"F! F is for fish!","dur":2.42},"f_f":{"text":"Find the letter, F!","dur":1.34},"c_g":{"text":"G! G is for grapes!","dur":2.4},"f_g":{"text":"Find the letter, G!","dur":1.49},"c_h":{"text":"H! H is for hat!","dur":2.16},"f_h":{"text":"Find the letter, H!","dur":1.49},"c_i":{"text":"I! I is for ice cream!","dur":2.28},"f_i":{"text":"Find the letter, I!","dur":1.34},"c_j":{"text":"J! J is for juice!","dur":2.33},"f_j":{"text":"Find the letter, J!","dur":1.54},"c_k":{"text":"K! K is for kite!","dur":1.97},"f_k":{"text":"Find the letter, K!","dur":1.46},"c_l":{"text":"L! L is for lion!","dur":2.09},"f_l":{"text":"Find the letter L!","dur":1.27},"c_m":{"text":"M! M is for moon!","dur":1.92},"f_m":{"text":"Find the letter, M!","dur":1.32},"c_n":{"text":"N! N is for nest!","dur":1.99},"f_n":{"text":"Find the letter, N!","dur":1.34},"c_o":{"text":"O! O is for octopus!","dur":2.47},"f_o":{"text":"Find the letter, O!","dur":1.39},"c_p":{"text":"P! P is for pig!","dur":1.94},"f_p":{"text":"Find the letter, P!","dur":1.42},"c_q":{"text":"Q! Q is for queen!","dur":2.33},"f_q":{"text":"Find the letter, Q!","dur":1.37},"c_r":{"text":"R! R is for rainbow!","dur":2.11},"f_r":{"text":"Find the letter, R!","dur":1.44},"c_s":{"text":"S! S is for shark!","dur":2.35},"f_s":{"text":"Find the letter, S!","dur":1.34},"c_t":{"text":"T! T is for turtle!","dur":2.09},"f_t":{"text":"Find the letter, T!","dur":1.34},"c_u":{"text":"U! U is for umbrella!","dur":2.38},"f_u":{"text":"Find the letter, U!","dur":1.25},"c_v":{"text":"V! V is for volcano!","dur":2.52},"f_v":{"text":"Find the letter, V!","dur":1.39},"c_w":{"text":"W! W is for whale!","dur":2.59},"f_w":{"text":"Find the letter, W!","dur":1.75},"c_x":{"text":"X! X is for xylophone!","dur":2.52},"f_x":{"text":"Find the letter, X!","dur":1.37},"c_y":{"text":"Y! Y is for yo-yo!","dur":2.38},"f_y":{"text":"Find the letter, Y!","dur":1.56},"c_z":{"text":"Z! Z is for zebra!","dur":2.3},"f_z":{"text":"Find the letter, Z!","dur":1.34}}}</script>
 <script>
 (() => {
 'use strict';
@@ -249,12 +249,12 @@
    ================================================================ */
 const params = new URLSearchParams(location.search);
 // Timing multiplier (used by automated tests: ?speed=0.2 makes celebrations faster)
-const BUILD = '5';   // bump to bust caches for audio/icons
+const BUILD = '6';   // bump to bust caches for audio/icons
 const SPEED = Math.min(1, Math.max(0.05, parseFloat(params.get('speed')) || 1));
-const TS = Math.max(SPEED, 0.25);   // time scale for scripted scenes (crocodile reward / game over); ?speed shortens them in tests
+const TS = Math.max(SPEED, 0.25);   // time scale for scripted scenes (killer whale reward / game over); ?speed shortens them in tests
 const MAX_LIVES = 5;
-const BREAK_MIN = 2, BREAK_MAX = 4;                 // Level 1: a crocodile snack break after a random 2, 3 or 4 correct letters
-const SNACK_MIN = 2, SNACK_MAX = 3;                 // crocodiles to eat in one snack break
+const BREAK_MIN = 2, BREAK_MAX = 4;                 // Level 1: a killer whale snack break after a random 2, 3 or 4 correct letters
+const SNACK_MIN = 2, SNACK_MAX = 3;                 // killer whales to eat in one snack break
 const SNACK_MAX_SEC = 40;                           // safety net: a snack break never lasts longer than this (crocs also swim closer after ~7 s)
 // v5 sizes are relative to the v4 starting shark (scale 1 = v4 start size)
 const L1_START_SCALE = 0.6;                         // Level 1 starts at 60% of the v4 size (still big + easy to drag)
@@ -263,21 +263,21 @@ const L2_START_SCALE = 0.6, L2_GROW_PARTY = 0.2, L2_MAX_SCALE = 1.0;   // Level 
 const PARTY_AT = [7, 16];                           // shark party after G (7 letters done) and after P (16 letters done), both levels
 const PARTY_DANCE_SEC = [2.2, 8.5];                 // dancing time after the intros (first party: long name intros, second party: short intro)
 const WRONG_GRACE = 2.0;                            // after a wrong letter, no other wrong letter counts for this long (starts after the bounce)
-const BOSS_HP = 24;                                 // Level 2 boss crocodile: bites to win (Aaron + 8 cousins)
+const BOSS_HP = 24;                                 // Level 2 boss killer whale: bites to win (Aaron + 8 cousins)
 const BOSS_AARON_CD = 1.1;                          // seconds between two of Aaron's bites
 const BOSS_COUSIN_EVERY = 2.3, BOSS_COUSIN_FAST = 1.4;   // a cousin darts in to bite every ~2.3 s (1.4 s when Aaron has not bitten for 4 s)
-const FEAST_GOAL = 20;                              // after Z: crocodile #20 makes the shark cover the whole screen (= you won!)
-const L2_CROC_SEC_A = 9, L2_CROC_SEC_Z = 7;         // Level 2: seconds the crocodile needs to reach the letter (at A ... at Z)
-const L2_RETRY_SLOWER = 1.25;                       // Level 2: after the crocodile wins, the repeat round is 25% slower and the right letter glows
+const FEAST_GOAL = 20;                              // after Z: killer whale #20 makes the shark cover the whole screen (= you won!)
+const L2_CROC_SEC_A = 9, L2_CROC_SEC_Z = 7;         // Level 2: seconds the killer whale needs to reach the letter (at A ... at Z)
+const L2_RETRY_SLOWER = 1.25;                       // Level 2: after the killer whale wins, the repeat round is 25% slower and the right letter glows
 const MUSIC_VOL = 0.35, MUSIC_DUCK = 0.35;          // music ~9 dB under the voice (voice = 1.0); ducked another ~9 dB while a voice line plays
 // Dad / test hooks: ?level=2 (tap-anywhere starts Level 2), ?break=N (fixed snack interval), ?crocsec=S (fixed Level 2 croc time),
-// ?skip=end (Level 1 starts straight at the 20-crocodile ending), v5: ?start=G (start at a letter, e.g. G = the party comes next),
-// ?party=G or ?party=P (straight into that shark party), ?boss=1 (Level 2 straight to the big crocodile; also ?level=2&start=boss)
+// ?skip=end (Level 1 starts straight at the 20-killer whale ending), v5: ?start=G (start at a letter, e.g. G = the party comes next),
+// ?party=G or ?party=P (straight into that shark party), v6: ?party=B (Uncle Mike's surprise party), ?mike=0 (no Uncle Mike party), ?boss=1 (Level 2 straight to the big killer whale; also ?level=2&start=boss)
 const BREAK_FIXED = parseInt(params.get('break'), 10) || 0;
 const CROC_SEC_FIXED = parseFloat(params.get('crocsec')) || 0;
 const SKIP = params.get('skip') || '';
 const START_AT = (() => { const v = (params.get('start') || '').toUpperCase(); const i = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(v); return v.length === 1 && i >= 0 ? i : 0; })();
-const PARTY_JUMP = (() => { const v = (params.get('party') || '').toUpperCase(); return v === 'G' || v === '1' ? 1 : v === 'P' || v === '2' ? 2 : 0; })();
+const PARTY_JUMP = (() => { const v = (params.get('party') || '').toUpperCase(); return v === 'G' || v === '1' ? 1 : v === 'P' || v === '2' ? 2 : v === 'B' || v === 'MIKE' ? 3 : 0; })();   // v6: ?party=B = Uncle Mike
 const BOSS_JUMP = /^(1|true|yes)$/i.test(params.get('boss') || '') || /^boss$/i.test(params.get('start') || '');
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -290,7 +290,7 @@ const WORDS = {
   Z:['zebra','🦓']
 };
 
-/* Levels. Level 1 = free swim to the letters (v5: no more current/tunnel), Level 2 = race the crocodile (race:true).
+/* Levels. Level 1 = free swim to the letters (v5: no more current/tunnel), Level 2 = race the killer whale (race:true).
    3 and 4 show how to extend:
    choices      = how many letter bubbles float in the water
    lowercase    = show lowercase letters on the bubbles */
@@ -452,6 +452,13 @@ const Sfx = {
     this.tone(260, 1300, 0.75, 'sine', 0.1, 0.02);
     this.sparkle(0.8);
   },
+  slap(v = 0) {   // v6 cartoon SPANK: a sharp bright noise crack + a low rubbery thump + a little boing
+    if (!this.ok()) return;
+    this.noise(0.09, 'highpass', 1800, 0.8, 0.9, 0, 900);
+    this.noise(0.16, 'bandpass', 900, 1.2, 0.5, 0.01, 400);
+    this.tone(180, 70, 0.18, 'sine', 0.5, 0);
+    this.tone(420 + (v % 3) * 60, 900 + (v % 3) * 80, 0.22, 'triangle', 0.14, 0.06);
+  },
   fart(v = 0) {   // v5 cartoon fart: a fluttering low "brrrap" (sawtooth through a low-pass, square-wave flutter) + a breathy puff
     if (!this.ok()) return;
     const c = this.ctx, t = c.currentTime, k = v % 3;
@@ -470,7 +477,7 @@ const Sfx = {
     this.noise(dur * 0.85, 'lowpass', 700, 1, 0.16, 0.02, 180);
   },
   poof() { this.noise(0.6, 'bandpass', 1800, 0.8, 0.4, 0, 250); this.tone(160, 50, 0.35, 'sine', 0.3); for (let i = 0; i < 5; i++) this.pop(0.1 + i * 0.06); },
-  roar() {    // the boss crocodile arrives: a silly low wobbly growl + "dun dun duuun" (cartoon, not scary)
+  roar() {    // the boss killer whale arrives: a silly low wobbly growl + "dun dun duuun" (cartoon, not scary)
     this.brass(98, 1.1, 0.2, 0, { lo: 220, hi: 900, q: 6, vib: 9, bend: 0.85 });
     [196, 185, 147].forEach((f, i) => this.brass(f, i === 2 ? 1.0 : 0.3, 0.16, 1.0 + i * 0.36, { lo: 300, hi: 1400, q: 3, vib: i === 2 ? 6 : 0 }));
   },
@@ -1045,110 +1052,88 @@ function drawShark(c, L, o) {
 }
 
 /* ================================================================
-   Crocodile drawing (local coords, facing +x, length L, centered). Goofy cartoon: bug eyes, blush, tiny teeth.
-   o.jaw 0..1 opens the mouth, o.eyes = normal | surprised | happy, o.bulge 0..1 = full tummy
+   v6: Killer whale (orca) drawing (local coords, facing +x, length L, centered). Goofy cartoon: big eye on the white
+   eye patch, tall dorsal fin, white belly, rosy cheek, little rounded teeth (bigger for the angry boss).
+   (The function keeps its old name drawCroc so all the game logic stays the same.)
+   o.jaw 0..1 opens the mouth, o.eyes = normal | surprised | happy | dizzy, o.bulge 0..1 = full tummy, o.angry, o.pal
    ================================================================ */
 function drawCroc(c, L, o) {
   o = o || {};
   const jaw = clamp(o.jaw || 0, 0, 1), ph = o.phase || 0, bulge = o.bulge || 0, eyes = o.eyes || 'normal';
   const lw = Math.max(1.5, L * 0.014);
-  const pal = o.pal || {}, angry = !!o.angry, tk = angry ? 1.7 : 1;   // v5 boss: angry brows + bigger teeth
-  const OUT = pal.out || '#1d6b35', BODY = pal.body || '#4fbf5f', DARK = pal.dark || '#379a4a', BELLY = pal.belly || '#dff3a0';
+  const pal = o.pal || {}, angry = !!o.angry, tk = angry ? 1.6 : 1;
+  const OUT = pal.out || '#0b1020', BODY = pal.body || '#1f2433', DARK = pal.dark || '#141824', BELLY = pal.belly || '#ffffff';
   c.save(); c.lineJoin = 'round'; c.lineCap = 'round'; c.lineWidth = lw; c.strokeStyle = OUT;
   const wig = Math.sin(ph) * L * 0.05;
-  const ry = L * 0.1 * (1 + bulge * 0.4);
-  const leg = (x, a) => { c.save(); c.translate(x, ry * 0.55); c.rotate(a); c.fillStyle = DARK; c.beginPath(); c.ellipse(0, L * 0.045, L * 0.032, L * 0.06, 0, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore(); };
-  leg(-L * 0.17, 0.35 + Math.sin(ph * 1.4) * 0.5);
-  leg(L * 0.04, 0.35 + Math.sin(ph * 1.4 + Math.PI) * 0.5);
-  // tail
+  const ry = L * 0.13 * (1 + bulge * 0.35);
+  // tail flukes
   c.fillStyle = BODY;
   c.beginPath();
-  c.moveTo(-L * 0.18, -L * 0.07);
-  c.quadraticCurveTo(-L * 0.4, -L * 0.055 + wig * 0.4, -L * 0.6, wig);
-  c.quadraticCurveTo(-L * 0.4, L * 0.055 + wig * 0.4, -L * 0.18, L * 0.08);
+  c.moveTo(-L * 0.3, -L * 0.06);
+  c.quadraticCurveTo(-L * 0.45, -L * 0.03 + wig * 0.4, -L * 0.52, wig);
+  c.quadraticCurveTo(-L * 0.6, wig - L * 0.12, -L * 0.62, wig - L * 0.13);
+  c.quadraticCurveTo(-L * 0.58, wig, -L * 0.62, wig + L * 0.13);
+  c.quadraticCurveTo(-L * 0.6, wig + L * 0.12, -L * 0.52, wig);
+  c.quadraticCurveTo(-L * 0.45, L * 0.04 + wig * 0.4, -L * 0.3, L * 0.07);
   c.closePath(); c.fill(); c.stroke();
-  // back ridges
-  c.fillStyle = DARK;
-  for (let i = 0; i < 8; i++) {
-    const x = -L * 0.52 + i * L * 0.075;
-    let y;
-    if (x < -L * 0.18) { const f = (x + L * 0.6) / (L * 0.42); y = lerp(wig, -L * 0.07, f) - L * 0.008 * Math.sin(f * Math.PI); }
-    else { const u = (x + L * 0.05) / (L * 0.21); y = -ry * Math.sqrt(Math.max(0, 1 - u * u)) + L * 0.012; }
-    const r = L * (0.016 + 0.012 * Math.min(1, i / 4));
-    c.beginPath(); c.moveTo(x - r, y + r * 0.7); c.lineTo(x, y - r * 1.25); c.lineTo(x + r, y + r * 0.7); c.closePath(); c.fill(); c.stroke();
-  }
-  // body + belly
-  const bodyP = new Path2D(); bodyP.ellipse(-L * 0.05, L * 0.01, L * 0.21, ry, 0, 0, Math.PI * 2);
+  // tall dorsal fin
+  c.fillStyle = BODY;
+  c.beginPath(); c.moveTo(-L * 0.12, -ry * 0.85); c.quadraticCurveTo(-L * 0.06, -ry - L * 0.12, -L * 0.13, -ry - L * 0.2 + Math.sin(ph * 0.7) * L * 0.01);
+  c.quadraticCurveTo(L * 0.02, -ry - L * 0.08, L * 0.06, -ry * 0.88); c.closePath(); c.fill(); c.stroke();
+  // body
+  const bodyP = new Path2D(); bodyP.ellipse(L * 0.04, L * 0.01, L * 0.4, ry, 0, 0, Math.PI * 2);
   c.fillStyle = BODY; c.fill(bodyP);
   c.save(); c.clip(bodyP);
-  c.fillStyle = BELLY; c.beginPath(); c.ellipse(-L * 0.05, L * 0.01 + ry * 0.85, L * 0.23, ry * 0.58, 0, 0, Math.PI * 2); c.fill();
-  c.strokeStyle = 'rgba(120,150,60,0.45)'; c.lineWidth = lw * 0.8;
-  for (let i = 0; i < 4; i++) { const x = -L * 0.17 + i * L * 0.07; c.beginPath(); c.moveTo(x, L * 0.01 + ry * 0.5); c.lineTo(x + L * 0.008, L * 0.01 + ry); c.stroke(); }
-  c.fillStyle = 'rgba(30,120,55,0.4)';
-  [[-0.12, -0.035, 0.024], [0.0, -0.055, 0.018], [-0.2, -0.005, 0.017]].forEach(([x, y, r]) => { c.beginPath(); c.arc(x * L, y * L, r * L, 0, Math.PI * 2); c.fill(); });
+  c.fillStyle = BELLY;   // white belly + chin
+  c.beginPath(); c.moveTo(L * 0.5, L * 0.03); c.quadraticCurveTo(L * 0.2, L * 0.04, -L * 0.05, ry * 0.45 + L * 0.02);
+  c.quadraticCurveTo(-L * 0.25, ry * 0.4, -L * 0.36, ry * 0.9); c.lineTo(L * 0.5, ry * 1.4); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(200,210,225,0.85)';   // grey saddle patch behind the fin
+  c.beginPath(); c.ellipse(-L * 0.13, -ry * 0.85, L * 0.1, ry * 0.25, -0.15, 0, Math.PI * 2); c.fill();
+  c.fillStyle = BELLY;   // the white eye patch
+  c.beginPath(); c.ellipse(L * 0.22, -ry * 0.32, L * 0.085, ry * 0.26, -0.18, 0, Math.PI * 2); c.fill();
   c.restore();
   c.strokeStyle = OUT; c.lineWidth = lw; c.stroke(bodyP);
-  // head: jaws hinge at H
-  const H = { x: L * 0.11, y: L * 0.025 }, aU = -jaw * 0.6, aD = jaw * 0.32;
-  const rot = (p, a) => ({ x: H.x + (p.x - H.x) * Math.cos(a) - (p.y - H.y) * Math.sin(a), y: H.y + (p.x - H.x) * Math.sin(a) + (p.y - H.y) * Math.cos(a) });
-  if (jaw > 0.03) {   // inside of the mouth + tongue
-    const u1 = rot({ x: L * 0.53, y: L * 0.03 }, aU), d1 = rot({ x: L * 0.49, y: L * 0.04 }, aD);
-    const m = new Path2D(); m.moveTo(H.x - L * 0.03, H.y); m.lineTo(u1.x, u1.y); m.lineTo(d1.x, d1.y); m.closePath();
-    c.fillStyle = '#5c2148'; c.fill(m);   // dark plum (not blood-red)
-    c.save(); c.clip(m);
-    const tg = rot({ x: L * 0.3, y: L * 0.04 }, aD);
-    c.fillStyle = '#ff7f9a'; c.beginPath(); c.ellipse(tg.x, tg.y, L * 0.12, L * 0.03, aD, 0, Math.PI * 2); c.fill();
-    c.restore();
+  // pectoral fin (flaps)
+  c.save(); c.translate(L * 0.12, ry * 0.55); c.rotate(0.5 + Math.sin(ph * 1.4) * 0.35);
+  c.fillStyle = BODY; c.beginPath(); c.ellipse(-L * 0.06, 0, L * 0.09, L * 0.04, 0, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore();
+  // mouth: lower jaw hinges at H
+  const H = { x: L * 0.24, y: L * 0.035 }, aD = jaw * 0.45;
+  if (jaw > 0.03) {
+    const m = new Path2D(); m.moveTo(H.x, H.y);
+    const e = { x: H.x + L * 0.2 * Math.cos(aD), y: H.y + L * 0.2 * Math.sin(aD) };
+    m.lineTo(L * 0.44, L * 0.03); m.lineTo(e.x + L * 0.02, e.y); m.closePath();
+    c.fillStyle = '#5c2148'; c.fill(m);
+    c.save(); c.clip(m); c.fillStyle = '#ff7f9a'; c.beginPath(); c.ellipse(H.x + L * 0.1, H.y + L * 0.05 * jaw, L * 0.07, L * 0.025, aD, 0, Math.PI * 2); c.fill(); c.restore();
   }
-  const toothStroke = 'rgba(30,80,40,0.55)';
-  // lower jaw + teeth (pointing up)
-  c.save(); c.translate(H.x, H.y); c.rotate(aD); c.translate(-H.x, -H.y);
-  c.fillStyle = '#fff'; c.strokeStyle = toothStroke; c.lineWidth = lw * 0.5;
-  for (let x = 0.2; x <= 0.45; x += 0.08) { c.beginPath(); c.moveTo(L * (x - 0.016 * tk), L * 0.04); c.lineTo(L * x, L * (0.04 - 0.032 * tk)); c.lineTo(L * (x + 0.016 * tk), L * 0.04); c.closePath(); c.fill(); c.stroke(); }
-  c.fillStyle = BODY; c.strokeStyle = OUT; c.lineWidth = lw;
-  c.beginPath(); c.moveTo(L * 0.05, L * 0.03); c.lineTo(L * 0.46, L * 0.035); c.quadraticCurveTo(L * 0.53, L * 0.045, L * 0.47, L * 0.078); c.quadraticCurveTo(L * 0.3, L * 0.1, L * 0.06, L * 0.095); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle = '#fff'; c.strokeStyle = 'rgba(20,30,60,0.6)'; c.lineWidth = lw * 0.5;   // upper teeth (rounded, cartoon)
+  for (let x = 0.29; x <= 0.42; x += 0.045) { c.beginPath(); c.moveTo(L * (x - 0.013 * tk), L * 0.031); c.quadraticCurveTo(L * x, L * (0.031 + 0.045 * tk), L * (x + 0.013 * tk), L * 0.031); c.closePath(); c.fill(); c.stroke(); }
+  c.save(); c.translate(H.x, H.y); c.rotate(aD); c.translate(-H.x, -H.y);   // lower jaw (white chin) + teeth
+  c.fillStyle = '#fff';
+  if (jaw > 0.03) for (let x = 0.31; x <= 0.42; x += 0.045) { c.beginPath(); c.moveTo(L * (x - 0.012 * tk), L * 0.045); c.quadraticCurveTo(L * x, L * (0.045 - 0.04 * tk), L * (x + 0.012 * tk), L * 0.045); c.closePath(); c.fill(); c.stroke(); }
+  c.fillStyle = BELLY; c.strokeStyle = OUT; c.lineWidth = lw;
+  c.beginPath(); c.moveTo(H.x, H.y); c.lineTo(L * 0.43, L * 0.04); c.quadraticCurveTo(L * 0.44, L * 0.075, L * 0.38, L * 0.085); c.quadraticCurveTo(L * 0.3, L * 0.09, H.x, H.y + L * 0.05); c.closePath();
+  if (jaw > 0.03) { c.fill(); c.stroke(); }
   c.restore();
-  // upper jaw (snout) + teeth (pointing down) + eyes
-  c.save(); c.translate(H.x, H.y); c.rotate(aU); c.translate(-H.x, -H.y);
-  c.fillStyle = '#fff'; c.strokeStyle = toothStroke; c.lineWidth = lw * 0.5;
-  for (let x = 0.17; x <= 0.48; x += 0.075) { c.beginPath(); c.moveTo(L * (x - 0.018 * tk), L * 0.026); c.lineTo(L * x, L * (0.026 + 0.036 * tk)); c.lineTo(L * (x + 0.018 * tk), L * 0.026); c.closePath(); c.fill(); c.stroke(); }
-  c.fillStyle = BODY; c.strokeStyle = OUT; c.lineWidth = lw;
-  c.beginPath();
-  c.moveTo(L * 0.02, -L * 0.07);
-  c.quadraticCurveTo(L * 0.12, -L * 0.115, L * 0.24, -L * 0.07);
-  c.lineTo(L * 0.46, -L * 0.045);
-  c.quadraticCurveTo(L * 0.57, -L * 0.05, L * 0.56, 0);
-  c.quadraticCurveTo(L * 0.55, L * 0.035, L * 0.5, L * 0.032);
-  c.lineTo(L * 0.06, L * 0.03);
-  c.closePath(); c.fill(); c.stroke();
-  c.fillStyle = DARK; c.beginPath(); c.arc(L * 0.5, -L * 0.048, L * 0.022, 0, Math.PI * 2); c.fill();
-  c.fillStyle = '#1d3b25'; c.beginPath(); c.arc(L * 0.507, -L * 0.054, L * 0.007, 0, Math.PI * 2); c.fill();
-  c.fillStyle = 'rgba(255,140,160,0.6)'; c.beginPath(); c.ellipse(L * 0.2, -L * 0.008, L * 0.036, L * 0.02, 0, 0, Math.PI * 2); c.fill();
-  const eye = (x, y, r) => {
-    c.fillStyle = BODY; c.strokeStyle = OUT; c.lineWidth = lw;
-    c.beginPath(); c.arc(x, y + r * 0.3, r * 1.2, Math.PI, 0); c.closePath(); c.fill(); c.stroke();
-    if (eyes === 'happy') { c.strokeStyle = '#1b2440'; c.lineWidth = Math.max(2, L * 0.012); c.beginPath(); c.arc(x, y + r * 0.4, r * 0.62, Math.PI * 1.12, Math.PI * 1.88); c.stroke(); return; }
-    c.fillStyle = '#fff'; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); c.stroke();
-    if (eyes === 'dizzy') {   // cartoon X eyes (the boss is beaten)
+  c.strokeStyle = OUT; c.lineWidth = lw; c.beginPath(); c.moveTo(H.x - L * 0.02, H.y - L * 0.005); c.quadraticCurveTo(L * 0.34, L * 0.045, L * 0.43, L * 0.025); c.stroke();   // smile line
+  c.fillStyle = 'rgba(255,140,170,0.65)'; c.beginPath(); c.ellipse(L * 0.3, -L * 0.005, L * 0.03, L * 0.017, 0, 0, Math.PI * 2); c.fill();   // cheek
+  // the eye (on the white patch)
+  const x = L * 0.22, y = -ry * 0.32, r = L * 0.05;
+  if (eyes === 'happy') { c.strokeStyle = '#1b2440'; c.lineWidth = Math.max(2, L * 0.012); c.beginPath(); c.arc(x, y + r * 0.4, r * 0.62, Math.PI * 1.12, Math.PI * 1.88); c.stroke(); }
+  else {
+    c.fillStyle = '#fff'; c.strokeStyle = OUT; c.lineWidth = lw; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); c.stroke();
+    if (eyes === 'dizzy') {
       c.strokeStyle = '#1b2440'; c.lineWidth = Math.max(2, L * 0.011);
       c.beginPath(); c.moveTo(x - r * 0.5, y - r * 0.5); c.lineTo(x + r * 0.5, y + r * 0.5); c.moveTo(x + r * 0.5, y - r * 0.5); c.lineTo(x - r * 0.5, y + r * 0.5); c.stroke();
-      return;
+    } else {
+      const sur = eyes === 'surprised', pr = sur ? r * 0.32 : r * 0.55, px = sur ? 0 : r * 0.3, py = sur ? 0 : r * 0.1;
+      c.fillStyle = '#1b2440'; c.beginPath(); c.arc(x + px, y + py, pr, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#fff'; c.beginPath(); c.arc(x + px + pr * 0.35, y + py - pr * 0.4, pr * 0.36, 0, Math.PI * 2); c.fill();
+      if (angry && !sur) {   // grumpy slanted eyebrow (silly-mean, not scary)
+        c.strokeStyle = '#000'; c.lineWidth = Math.max(3, r * 0.4);
+        c.beginPath(); c.moveTo(x - r * 1.2, y - r * 1.5); c.lineTo(x + r * 1.2, y - r * 0.8); c.stroke();
+      }
     }
-    const sur = eyes === 'surprised', pr = sur ? r * 0.32 : r * 0.55, px = sur ? 0 : r * 0.3, py = sur ? 0 : r * 0.1;
-    c.fillStyle = '#1b2440'; c.beginPath(); c.arc(x + px, y + py, pr, 0, Math.PI * 2); c.fill();
-    c.fillStyle = '#fff'; c.beginPath(); c.arc(x + px + pr * 0.35, y + py - pr * 0.4, pr * 0.36, 0, Math.PI * 2); c.fill();
-    if (angry && !sur) {   // grumpy lid + big slanted eyebrow (down toward the snout)
-      c.save(); c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.clip();
-      c.fillStyle = BODY; c.beginPath(); c.moveTo(x - r * 1.3, y - r * 1.3); c.lineTo(x + r * 1.3, y - r * 1.3); c.lineTo(x + r * 1.3, y - r * 0.05); c.lineTo(x - r * 1.3, y - r * 0.75); c.closePath(); c.fill();
-      c.restore();
-      c.strokeStyle = OUT; c.lineWidth = lw; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.stroke();
-      c.strokeStyle = '#1b2a1f'; c.lineWidth = Math.max(3, r * 0.42);
-      c.beginPath(); c.moveTo(x - r * 1.25, y - r * 1.55); c.lineTo(x + r * 1.15, y - r * 0.85); c.stroke();
-    }
-  };
-  eye(L * 0.085, -L * 0.115, L * 0.045);
-  eye(L * 0.165, -L * 0.11, L * 0.048);
-  c.restore();
+  }
   c.restore();
 }
 
@@ -1167,7 +1152,7 @@ let RACE = null;                                                    // Level 2 l
 const shark = { x: 0, y: 0, px: 0, py: 0, heading: 0, speed: 0, tailPhase: 0, spin: 1, attn: 0, blinkT: 2, blink: 0, faceFwd: false, anim: null,
   scale: L1_START_SCALE, chomp: 0, dead: 0, hidden: false, scripted: false, faceAng: null };
 const particles = []; // confetti + bubble bursts + stars + v5 gas puffs / poof clouds
-const crocs = [];     // cartoon crocodiles. role: 'snack' (L1 break), 'free' (20-croc ending), 'eater' (game over), 'racer' (Level 2), 'boss' (v5)
+const crocs = [];     // cartoon killer whales. role: 'snack' (L1 break), 'free' (20-croc ending), 'eater' (game over), 'racer' (Level 2), 'boss' (v5)
 const popTexts = [];  // cartoon "CHOMP!" words
 const tweens = [];
 const friends = [];   // v5: Aaron's shark friends (parties) / cousins (boss battle)
@@ -1203,7 +1188,7 @@ function updateTweens(dt) {
   }
 }
 
-/* ---- HUD: hearts, mute, crocodile counter ---- */
+/* ---- HUD: hearts, mute, killer whale counter ---- */
 const livesEl = $('lives'), muteBtn = $('mute');
 const HEART_SVG = '<svg viewBox="0 0 32 30" aria-hidden="true"><path d="M16 28.5C16 28.5 2 19.5 2 10.5 2 6 5.5 2.5 9.5 2.5c3 0 5.5 2 6.5 4.5 1-2.5 3.5-4.5 6.5-4.5 4 0 7.5 3.5 7.5 8 0 9-14 18-14 18z" fill="#ff4f6d" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/><ellipse cx="9.5" cy="9" rx="3" ry="2" fill="#fff" opacity=".75"/></svg>';
 for (let i = 0; i < MAX_LIVES; i++) { const sp = document.createElement('span'); sp.className = 'h'; sp.innerHTML = HEART_SVG; livesEl.appendChild(sp); }
@@ -1326,7 +1311,7 @@ function onWrong(l) {
   if (game.lives <= 0) { gameOver(); return; }
   const line = 'wrong' + (((game.bounces - 1) % 3) + 1);   // rotate the gentle "try again" lines
   later(() => { if (game.state === 'play') Voice.play(line); }, 180);
-  if (isRace()) {   // Level 2: bounce back toward home (the crocodile waits while the shark bounces)
+  if (isRace()) {   // Level 2: bounce back toward home (the killer whale waits while the shark bounces)
     const home = RACE.sharkHome;
     shark.scripted = true; shark.faceAng = 0;
     tween(shark, { x: lerp(shark.x, home.x, 0.75), y: lerp(shark.y, home.y, 0.75) }, 0.8, easeOutCubic, () => { shark.scripted = false; shark.faceAng = null; });
@@ -1363,7 +1348,7 @@ function onCorrect(l) {
   const cr = cell.getBoundingClientRect();
   flyer = { ch: show(ch), x0: pos.x, y0: pos.y, x1: cr.left + cr.width / 2, y1: cr.top + cr.height / 2, r0: curR(), r1: cr.width / 2, t: 0, dur: 0.9 * Math.max(SPEED, .3), idx };
   sharkChomp();
-  if (isRace()) {   // Level 2: the shark got there first -> CHOMP the letter, happy sounds, the crocodile swims back surprised
+  if (isRace()) {   // Level 2: the shark got there first -> CHOMP the letter, happy sounds, the killer whale swims back surprised
     Sfx.chomp(); Sfx.sparkle(0.25);
     popText('YUM!', pos.x, pos.y - curR() * 1.1, Math.max(34, Math.min(W, H) * 0.08));
     game.sharkWins = (game.sharkWins || 0) + 1;
@@ -1386,6 +1371,7 @@ function endCelebration(l) {
   hideCard();
   if (game.index >= ALPHABET.length) { later(isRace() ? startBoss : finalCelebration, 400); return; }
   if (!isRace()) game.sinceBreak++;
+  if (mikeDue()) { later(startMike, 250); return; }   // v6: Uncle Mike's surprise party after B (a snack break due now waits)
   if (partyDue()) { later(startParty, 250); return; }   // v5: shark party after G and P (a snack break due now waits one more letter)
   if (isRace()) {   // Level 2: back to the start, next letter
     later(() => swimHome(() => { if (game.state === 'celebrate') newRound({ prompt: true }); }, 0.9), 150);
@@ -1428,7 +1414,7 @@ function growShark(to) {
   next();
 }
 
-/* ---- crocodiles ---- */
+/* ---- killer whales ---- */
 function makeCroc(o) { return Object.assign({ x: 0, y: 0, L: 100, dir: -1, jaw: 0, jawAuto: true, phase: rand(0, 6), eyes: 'normal', bulge: 0, vx: 0, role: 'free', enterK: 1, flip: 0 }, o); }
 function removeCroc(c) { const i = crocs.indexOf(c); if (i >= 0) crocs.splice(i, 1); }
 function sharkChomp() { shark.chomp = 0; tween(shark, { chomp: 1 }, 0.07, easeLinear, () => tween(shark, { chomp: 0 }, 0.35, easeOutCubic)); }
@@ -1439,7 +1425,7 @@ function eatCrocFx(c, k) {
   popText('CHOMP!', c.x, c.y - c.L * 0.22, Math.max(34, Math.min(W, H) * 0.09) * (k || 1));
 }
 
-/* ---- crocodiles that swim in and wander around on screen (snack breaks + the ending) ---- */
+/* ---- killer whales that swim in and wander around on screen (snack breaks + the ending) ---- */
 function crocBounds(Lc) {
   const top = stripBottom + Lc * 0.25, bot = (scene.sandTop || H) - Lc * 0.08;
   return { x0: SA.l + Lc * 0.55, x1: Math.max(SA.l + Lc * 0.55 + 1, W - SA.r - Lc * 0.55), y0: top, y1: Math.max(top + 1, bot) };
@@ -1455,7 +1441,7 @@ const inEatZone = c => zoneVal(c, c.L * 0.3) <= 1;
 const onScreen = c => c.x > 0 && c.x < W && c.y > 0 && c.y < H;
 function spawnWanderCroc(role) {
   const sc = Math.max(0.6, Math.min(W, H) / 700);
-  // snack crocodiles are a bit smaller than the (v5: smaller) shark; the ending keeps the v4 sizes
+  // snack killer whales are a bit smaller than the (v5: smaller) shark; the ending keeps the v4 sizes
   const Lc = role === 'snack' ? Math.max(G.L * 0.36, sharkLen() * rand(0.62, 0.8)) : G.L * rand(0.62, 0.82);
   const b = crocBounds(Lc);
   // pick a spot within reach on screen, outside the shark's mouth zone (so the child gets to chase it)
@@ -1494,7 +1480,7 @@ function swimAway(c) {
   tween(c, { x: dir < 0 ? -c.L : W + c.L }, 1.2, easeInCubic, () => removeCroc(c));
 }
 
-/* ---- Level 1 snack break: after a random 2-4 letters, eat 2-3 crocodiles that swim in; at the end he GROWS ---- */
+/* ---- Level 1 snack break: after a random 2-4 letters, eat 2-3 killer whales that swim in; at the end he GROWS ---- */
 function pickBreak() { return BREAK_FIXED ? clamp(BREAK_FIXED, 1, 26) : BREAK_MIN + Math.floor(Math.random() * (BREAK_MAX - BREAK_MIN + 1)); }
 const l1ScaleAfter = breaks => Math.min(L1_MAX_SCALE, L1_START_SCALE + L1_GROW_BREAK * breaks);
 function startSnack() {
@@ -1526,7 +1512,7 @@ function eatSnack(c) {
   eatCrocFx(c, 0.9); sharkChomp(); shark.attn = 1;
   snack.eaten++; game.snackEaten++; renderCounter(true);
   if (snack.eaten >= snack.goal) { endSnack(); return; }
-  if (game.snackEaten === 1) Voice.play('chomp');   // first ever: "Chomp! You ate a crocodile! Eat them all to grow bigger!" (v5: he grows after the break)
+  if (game.snackEaten === 1) Voice.play('chomp');   // first ever: "Chomp! You ate a killer whale! Eat them all to grow bigger!" (v5: he grows after the break)
   else if (!Voice.src) Voice.play('yum' + ((game.yum++ % 3) + 1));
 }
 function endSnack() {
@@ -1553,7 +1539,7 @@ function finishSnackNow() {   // e.g. the iPad was rotated while the shark swam 
   resetSharkToStart(); setHud('play'); newRound({ prompt: true });
 }
 
-/* ---- out of hearts: sad tune, belly-up shark floats up, a crocodile gobbles him, Try Again ---- */
+/* ---- out of hearts: sad tune, belly-up shark floats up, a killer whale gobbles him, Try Again ---- */
 function gameOver() {
   game.state = 'gameover'; game.seq++;
   game.dragging = false; game.pointerId = null; game.target = null;
@@ -1606,7 +1592,7 @@ function showTryAgain() {
 }
 function skipToOver() { game.seq++; tweens.length = 0; crocs.length = 0; race.croc = null; shark.hidden = true; shark.scripted = true; showTryAgain(); }
 
-/* ---- A to Z done: celebration, then the free-swim crocodile feast ---- */
+/* ---- A to Z done: celebration, then the free-swim killer whale feast ---- */
 function finalCelebration() {
   game.state = 'final'; game.finalT = 0; game.seq++;
   game.letters = [];
@@ -1622,7 +1608,7 @@ function finalCelebration() {
   seqLater(() => { minDone = true; go(); }, 4);
   setTimeout(() => { if (game.state === 'final') $('final').classList.remove('hidden'); }, 700);
 }
-/* ---- the 20-crocodile ending: each crocodile makes him bigger; #20 covers the whole screen = WIN ---- */
+/* ---- the 20-killer whale ending: each killer whale makes him bigger; #20 covers the whole screen = WIN ---- */
 const hitCv = document.createElement('canvas'), hctx = hitCv.getContext('2d');
 function coverAng() { return portrait ? -Math.PI / 2 : 0; }   // portrait screens: he faces up (covers a tall screen sooner)
 function coverPos(scale, ang) {   // centre of his body on the centre of the screen
@@ -1659,9 +1645,9 @@ function startFree() {
   game.spawnT = 0.8; game.dragging = false;
   setHud('free');
   Music.start('main');
-  Voice.play('free');   // "Bonus time! Eat twenty crocodiles and grow super big!"
+  Voice.play('free');   // "Bonus time! Eat twenty killer whales and grow super big!"
 }
-function skipToEnding() {   // ?skip=end and the tests: straight to the 20-crocodile ending (as if A-Z was done)
+function skipToEnding() {   // ?skip=end and the tests: straight to the 20-killer whale ending (as if A-Z was done)
   game.index = ALPHABET.length; game.letters = [];
   cells.forEach(c => { delete c.dataset.pending; });
   shark.scale = L1_MAX_SCALE; resetSharkToStart();
@@ -1716,7 +1702,7 @@ function confettiShower(dt) {   // continuous confetti rain from the top (never 
   if (Math.random() < dt * 0.7) burst(rand(0.15, 0.85) * W, rand(0.2, 0.55) * H, 40, true);
 }
 
-/* ---- Level 2: race the crocodile to the letter ---- */
+/* ---- Level 2: race the killer whale to the letter ---- */
 function buildRace() {
   if (!G) return;
   const barH = clamp(Math.min(W, H) * 0.04, 18, 30), barW = clamp(W * 0.36, 160, 440);
@@ -1735,7 +1721,7 @@ function startRaceRound(opts) {
   race.dur = crocSec(game.index) * (retry ? L2_RETRY_SLOWER : 1);
   race.wait = opts && opts.intro ? 4.8 : 1.9;   // the croc waits for the "Find the letter" prompt (and the Level 2 intro line)
   race.slot = game.letters.find(l => l.correct).branch;
-  if (!race.croc || crocs.indexOf(race.croc) < 0) {   // a (new) crocodile swims in from the right
+  if (!race.croc || crocs.indexOf(race.croc) < 0) {   // a (new) killer whale swims in from the right
     race.croc = makeCroc({ role: 'racer', L: RACE.Lc, dir: -1, enterK: 0 }); crocs.push(race.croc);
     tween(race.croc, { enterK: 1 }, 1.1, easeOutCubic);
   }
@@ -1759,7 +1745,7 @@ function updateRace(dt) {
   }
   if (race.croc && (game.state === 'play' || game.state === 'celebrate' || game.state === 'crocwin')) placeRacer();
 }
-function crocWins() {   // the crocodile got there first: it eats the letter, one heart, then the same letter again (slower)
+function crocWins() {   // the killer whale got there first: it eats the letter, one heart, then the same letter again (slower)
   if (game.state !== 'play') return;
   game.state = 'crocwin'; game.seq++;
   game.dragging = false; game.pointerId = null; game.target = null;
@@ -1773,7 +1759,7 @@ function crocWins() {   // the crocodile got there first: it eats the letter, on
     c.eyes = 'happy'; c.bulge = 0.6;
     loseLife();
     if (game.lives <= 0) { seqLater(gameOver, 0.7); return; }
-    later(() => Voice.play('crocgot'), 250);   // "Oh no! The crocodile got it! Let's try again!"
+    later(() => Voice.play('crocgot'), 250);   // "Oh no! The killer whale got it! Let's try again!"
     seqLater(() => {
       c.jawAuto = true; c.eyes = 'normal'; tween(c, { bulge: 0 }, 0.8);
       const home = RACE.sharkHome;
@@ -1799,7 +1785,7 @@ function makeFriend(d, i) {
 }
 function friendBase() { return G.L * 0.56; }
 // 8 spots: 'dance' (party: 2 rows of 4 / portrait 4 rows of 2, Aaron swims in the middle), 'cheer' (after the boss: around Aaron),
-// 'hover' (boss battle: 4 above and 4 below the crocodile)
+// 'hover' (boss battle: 4 above and 4 below the killer whale)
 function partyLayout(kind) {
   const top = stripBottom + 8, bot = H - SA.b - 8, left = SA.l + 8, right = W - SA.r - 8, w = right - left, h = bot - top;
   let rows, aaron = null;
@@ -1988,7 +1974,7 @@ function partyEnd() {
   game.dragging = false; game.pointerId = null; game.target = null;
   Music.start('main');
   const next = () => { if (game.state === 'partyEnd') { setHud(isRace() ? 'race' : 'play'); newRound({ prompt: true }); } };
-  if (!isRace()) { swimHome(next, 1.0); return; }
+  if (!isRace() || party.n === 3) { swimHome(next, 1.0); return; }   // v6: Uncle Mike's party = no growth
   // Level 2 has no snack breaks: he grows a bit at each party
   let voiced = false, moved = false;
   const fin = () => { if (voiced && moved) next(); };
@@ -1998,10 +1984,111 @@ function partyEnd() {
   seqLater(() => swimHome(() => { moved = true; fin(); }, 0.9), 1.3);
 }
 
-/* ---- v5: Level 2 finale: the BIG crocodile. Aaron + his 8 cousins bite it until its health bar is empty (no hearts lost) ---- */
-const BOSS_PAL = { out: '#14512a', body: '#3a9e4c', dark: '#2a7a3a', belly: '#d4ea8c' };
-const BOSS_HURT = { out: '#14512a', body: '#9be8a5', dark: '#68c977', belly: '#f6ffd6' };
-const BOSS_YS = 1.3;   // chunkier than a normal crocodile
+
+/* ---- v6: Uncle Mike's surprise party after B (both levels): a big goofy shark with sunglasses + a mustache.
+   Aaron swims (drag/tap) into Uncle Mike's bottom = a cartoon tail-slap: SLAP! + "Ow!" + his bottom flashes pink.
+   After MIKE_SLAPS slaps (or MIKE_MAX_SEC) he rubs his bottom, "Okay, okay! You got me!", and swims off. ---- */
+const MIKE_AT = 2, MIKE_SLAPS = 5, MIKE_MAX_SEC = 15;
+const MIKE_SKIN = { top: '#7a9a2e', bot: '#b9d65a', fin: '#6a8a24', out: '#3c5212', belly: '#fbffe9' };
+const mike = { on: false, x: 0, y: 0, hx: 0, hy: 0, L: 100, state: 'off', slaps: 0, flash: 0, jump: 0, cd: 0, t: 0, tail: 0, rub: 0, la: 0, log: [] };
+const MIKE_OFF = params.get('mike') === '0';   // test hook: ?mike=0 skips Uncle Mike's party
+const mikeDue = () => !MIKE_OFF && game.index === MIKE_AT && !game.partyDone['mike'];
+function mikeButt() { return { x: mike.x - mike.L * 0.3, y: mike.y + mike.L * 0.02, r: mike.L * 0.24 }; }
+function startMike() {
+  if (game.state !== 'celebrate') return;
+  game.partyDone['mike'] = true;
+  game.state = 'party'; game.seq++;
+  party.n = 3; party.count++; party.phase = 'mikeIntro'; party.farts = 0; party.puffs = 0; party.log = ['Uncle Mike']; party.atIndex = game.index;
+  game.letters = []; game.dragging = false; game.pointerId = null; game.target = null;
+  shark.scripted = false; shark.faceAng = null; shark.anim = null;
+  if (race.croc) { const c = race.croc; race.croc = null; c.eyes = 'surprised'; c.jawAuto = true; c.dir = 1; tween(c, { x: W + c.L }, 1.2, easeInCubic, () => removeCroc(c)); }
+  setHud('party'); updateStrip();
+  Music.start('party');
+  Sfx.toot(); Sfx.sparkle(0.3);
+  burst(W / 2, H * 0.4, 50, true);
+  popText('SURPRISE!', W / 2, H * 0.4, Math.max(36, Math.min(W, H) * 0.09));
+  const top = stripBottom + 8, bot = H - SA.b - 8;
+  Object.assign(mike, { on: true, L: Math.min(G.L * 1.25, W * 0.42, (bot - top) * 0.9), slaps: 0, flash: 0, jump: 0, cd: 0, t: 0, rub: 0, la: 0, log: [], state: 'enter' });
+  mike.hx = portrait ? W * 0.58 : W * 0.62; mike.hy = (top + bot) / 2 + (bot - top) * 0.05;
+  mike.x = W + mike.L; mike.y = mike.hy;
+  Sfx.blub();
+  tween(mike, { x: mike.hx }, 1.6, easeOutCubic, () => { if (mike.state === 'enter') { mike.state = 'wait'; Sfx.pop(); } });
+  const tok = game.seq;
+  Voice.play('mike1', () => seqLater(() => { party.phase = 'slap'; mike.state = 'slap'; mike.t = 0; Voice.play('mike2'); }, 0.2));
+  setTimeout(() => { if (tok === game.seq && party.phase === 'mikeIntro') { party.phase = 'slap'; mike.state = 'slap'; mike.t = 0; } }, 5000 * TS);   // safety net
+}
+function mikeSlap() {
+  mike.slaps++; mike.cd = 0.7; mike.flash = 1; mike.jump = 1; mike.log.push(+T.toFixed(2));
+  const b = mikeButt();
+  Sfx.slap(mike.slaps);
+  popText('SLAP!', b.x, b.y - mike.L * 0.25, Math.max(34, Math.min(W, H) * 0.085));
+  starBurst(b.x, b.y, 10);
+  shark.spin = 0;
+  Voice.play(['mikeow2', 'mikeow1', 'mikeow3'][(mike.slaps - 1) % 3]);
+  // Aaron bounces back a little so he can wind up for the next slap
+  game.dragging = false; game.pointerId = null; game.target = null;
+  shark.scripted = true;
+  tween(shark, { x: shark.x - mike.L * 0.35, y: shark.y + rand(-0.1, 0.1) * mike.L }, 0.35, easeOutCubic, () => { shark.scripted = false; });
+  if (mike.slaps >= MIKE_SLAPS) seqLater(mikeDone, 1.0);
+}
+function mikeDone() {
+  if (game.state !== 'party' || party.n !== 3 || mike.state === 'rub' || mike.state === 'leave') return;
+  mike.state = 'rub'; party.phase = 'mikeDone';
+  Voice.play('mikedone');
+  seqLater(() => {
+    mike.state = 'leave'; Sfx.blub();
+    tween(mike, { x: W + mike.L * 1.1 }, 1.8, easeInCubic, () => { mike.state = 'gone'; });
+    seqLater(() => { mike.on = false; partyEnd(); }, 2.1);
+  }, 2.2);
+}
+function updateMike(dt) {
+  if (!mike.on) return;
+  mike.tail += dt * (mike.state === 'enter' || mike.state === 'leave' ? 15 : 6);
+  mike.flash = Math.max(0, mike.flash - dt * 0.9); mike.jump = Math.max(0, mike.jump - dt * 2.2);
+  mike.cd = Math.max(0, mike.cd - dt); mike.la = Math.min(1, mike.la + dt * 3);
+  if (mike.state === 'rub') mike.rub += dt;
+  if (mike.state === 'slap' && game.state === 'party') {
+    mike.t += dt;
+    const b = mikeButt();
+    if (mike.cd <= 0 && !shark.scripted && dist(sharkNose(), b) < b.r + sharkLen() * 0.08) mikeSlap();
+    if (mike.t > MIKE_MAX_SEC * TS && mike.slaps < MIKE_SLAPS) mikeDone();
+  }
+}
+function drawMike() {
+  if (!mike.on || mike.state === 'gone') return;
+  const L = mike.L, j = Math.sin(mike.jump * Math.PI) * L * 0.18, bob = Math.sin(T * 3) * L * 0.025;
+  const wig = mike.state === 'rub' ? Math.sin(mike.rub * 14) * 0.12 : Math.sin(T * 2) * 0.04 - mike.jump * 0.25;
+  ctx.save(); ctx.translate(mike.x, mike.y + bob - j); ctx.rotate(wig);
+  drawShark(ctx, L, { skin: MIKE_SKIN, tail: Math.sin(mike.tail) * 0.3, fin: mike.state === 'rub' ? -1.2 + Math.sin(mike.rub * 18) * 0.5 : Math.sin(mike.tail * 0.5) * 0.2 });
+  // pink bottom flash (slap!) + a rosy glow while he rubs it
+  const pk = Math.max(mike.flash, mike.state === 'rub' ? 0.55 : 0);
+  if (pk > 0.02) {
+    ctx.fillStyle = `rgba(255,95,150,${0.75 * pk})`;
+    ctx.beginPath(); ctx.ellipse(-L * 0.27, L * 0.03, L * 0.13, L * 0.09, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = `rgba(255,255,255,${0.5 * pk})`; ctx.beginPath(); ctx.ellipse(-L * 0.3, L * 0.0, L * 0.035, L * 0.02, -0.4, 0, Math.PI * 2); ctx.fill();
+  }
+  // cool sunglasses
+  ctx.fillStyle = '#111827'; ctx.strokeStyle = '#000'; ctx.lineWidth = Math.max(2, L * 0.012);
+  ctx.beginPath(); ctx.ellipse(L * 0.255, -L * 0.08, L * 0.095, L * 0.06, -0.08, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(L * 0.16, -L * 0.09); ctx.lineTo(L * 0.05, -L * 0.07); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.beginPath(); ctx.ellipse(L * 0.28, -L * 0.1, L * 0.03, L * 0.014, -0.4, 0, Math.PI * 2); ctx.fill();
+  // big bushy mustache
+  ctx.fillStyle = '#4a2c14';
+  ctx.beginPath(); ctx.ellipse(L * 0.34, -L * 0.005, L * 0.07, L * 0.028, 0.25, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(L * 0.43, -L * 0.005, L * 0.06, L * 0.025, -0.25, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+  if (mike.state === 'slap') {   // a bouncing arrow at his bottom: "slap here!"
+    const b = mikeButt(), a = Math.sin(T * 6) * L * 0.04, s = Math.max(18, L * 0.08);
+    ctx.save(); ctx.translate(b.x, b.y - L * 0.32 - a); ctx.fillStyle = '#ffd84d'; ctx.strokeStyle = '#8a5a00'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(-s * 0.5, -s); ctx.lineTo(s * 0.5, -s); ctx.lineTo(s * 0.5, -s * 0.2); ctx.lineTo(s, -s * 0.2); ctx.lineTo(0, s * 0.6); ctx.lineTo(-s, -s * 0.2); ctx.lineTo(-s * 0.5, -s * 0.2); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+  }
+  labelQ.push({ text: 'Uncle Mike', x: mike.x, y: mike.y + bob - j + L * 0.33, size: Math.max(15, L * 0.11), color: MIKE_SKIN.out, a: mike.la, set: r => { mike.lbl = r; } });
+}
+
+/* ---- v5: Level 2 finale: the BIG killer whale. Aaron + his 8 cousins bite it until its health bar is empty (no hearts lost) ---- */
+const BOSS_PAL = { out: '#05070f', body: '#262a3d', dark: '#141824', belly: '#f4f6ff' };
+const BOSS_HURT = { out: '#3a1030', body: '#c27aa8', dark: '#9a5a86', belly: '#ffe8f4' };
+const BOSS_YS = 1.3;   // chunkier than a normal killer whale
 const BOSS_ZONES = [[-0.05, 0.01, 0.2], [0.19, -0.03, 0.12], [0.36, -0.01, 0.1], [0.5, -0.01, 0.07], [-0.3, 0, 0.08], [-0.45, 0, 0.06]];
 function bossBar() { const w = clamp(W * 0.5, 220, 560), h = clamp(Math.min(W, H) * 0.045, 20, 34); return { x: W / 2 - w / 2, y: stripBottom + 12, w, h }; }
 function bossLayout() {
@@ -2035,7 +2122,7 @@ function startBoss() {
   tween(shark, aaronBossHome(), 1.0, easeInOut, () => { shark.scripted = false; shark.faceAng = null; });
   friends.length = 0; FRIENDS.forEach((d, i) => friends.push(makeFriend(d, i)));
   popText('UH OH!', W / 2, H * 0.4, Math.max(36, Math.min(W, H) * 0.09));
-  Voice.play('boss', () => seqLater(bossCousins, 0.2));   // "Uh oh! Here comes the biggest crocodile!"
+  Voice.play('boss', () => seqLater(bossCousins, 0.2));   // "Uh oh! Here comes the biggest killer whale!"
   seqLater(bossCousins, 5.5);
 }
 function bossCousins() {   // "Aaron's shark cousins are here to help! Chomp chomp!" - they swim in, then the fight starts
@@ -2059,7 +2146,7 @@ function updateBoss(dt) {
   }
   if (game.state !== 'boss') return;
   boss.t += dt; boss.cd -= dt; boss.idle += dt;
-  if (boss.cd <= 0) {   // Aaron bites: his nose (or body) touching the crocodile
+  if (boss.cd <= 0) {   // Aaron bites: his nose (or body) touching the killer whale
     const z = bossHit(sharkNose(), sharkLen() * 0.06) || bossHit(shark, 0);
     if (z) { boss.cd = BOSS_AARON_CD * TS; boss.idle = 0; sharkChomp(); const n = sharkNose(); bossBite('aaron', lerp(n.x, z.x, 0.3), lerp(n.y, z.y, 0.3)); }
   }
@@ -2122,7 +2209,7 @@ function bossDefeated() {   // he flips belly-up, floats up and POOF!; everybody
   seqLater(() => { if (game.state === 'bosswon') Music.start('party'); }, 3.4);
   let panel = false;
   const showPanel = () => { if (panel || game.state !== 'bosswon') return; panel = true; $('won2').classList.remove('hidden'); };
-  seqLater(() => Voice.play('bosswin', () => seqLater(showPanel, 0.8)), 1.3);   // "You beat the big crocodile! Aaron and his cousins win!"
+  seqLater(() => Voice.play('bosswin', () => seqLater(showPanel, 0.8)), 1.3);   // "You beat the big killer whale! Aaron and his cousins win!"
   seqLater(showPanel, 8);
 }
 function relayoutFriends() {   // after a rotation / resize
@@ -2144,7 +2231,7 @@ function relayoutBoss() {
 /* ---- start / restart a level ---- */
 function setupLevel(lv) {
   levelIndex = clamp((lv | 0) || 1, 1, 2) - 1;
-  game.seq++; tweens.length = 0; crocs.length = 0; popTexts.length = 0; particles.length = 0; friends.length = 0;
+  game.seq++; tweens.length = 0; crocs.length = 0; popTexts.length = 0; particles.length = 0; friends.length = 0; mike.on = false; mike.state = 'off';
   race.croc = null; race.p = 0; boss.croc = null; boss.defeated = false;
   ['over', 'final', 'card', 'won', 'won2'].forEach(id => $(id).classList.add('hidden'));
   strip.classList.remove('gone');
@@ -2168,6 +2255,7 @@ function jumpTo(i, beforeParty) {
   game.index = clamp(i | 0, 0, 26); game.sinceBreak = 0;
   cells.forEach(c => { delete c.dataset.pending; });
   PARTY_AT.forEach(p => { if (p < game.index || (p === game.index && !beforeParty)) game.partyDone[p] = true; else delete game.partyDone[p]; });
+  if (MIKE_AT < game.index || (MIKE_AT === game.index && !beforeParty)) game.partyDone['mike'] = true; else delete game.partyDone['mike'];
   if (isRace()) shark.scale = Math.min(L2_MAX_SCALE, L2_START_SCALE + L2_GROW_PARTY * PARTY_AT.filter(p => p < game.index || (p === game.index && !beforeParty)).length);
   else shark.scale = l1ScaleAfter(Math.floor(game.index / 3));
   game.letters = [];
@@ -2254,11 +2342,12 @@ function startGame(lv) {
   Speech.prime();
   setupLevel(lv);
   const jump = isRace() && BOSS_JUMP ? 'boss' : PARTY_JUMP ? 'party' : START_AT ? 'start' : '';
-  Voice.decodeAll(jump === 'boss' ? 'boss' : jump === 'party' ? 'party' + PARTY_JUMP : isRace() ? 'level2' : 'intro');
+  Voice.decodeAll(jump === 'boss' ? 'boss' : jump === 'party' ? (PARTY_JUMP === 3 ? 'mike1' : 'party' + PARTY_JUMP) : isRace() ? 'level2' : 'intro');
   $('start').classList.add('hidden');
   Sfx.chime();
   Music.start('main');          // energetic loop starts right after the Tap to Play unlock
   if (jump === 'boss') { jumpTo(26); startBoss(); return; }                                                 // ?boss=1
+  if (jump === 'party' && PARTY_JUMP === 3) { jumpTo(MIKE_AT, true); game.state = 'celebrate'; startMike(); return; }   // ?party=B
   if (jump === 'party') { jumpTo(PARTY_AT[PARTY_JUMP - 1], true); game.state = 'celebrate'; startParty(); return; }   // ?party=G / P
   if (jump === 'start') { jumpTo(START_AT); newRound({ prompt: true }); return; }                           // ?start=G
   if (isRace()) { startRaceIntro(); return; }
@@ -2352,10 +2441,11 @@ function update(dt) {
   if (game.state === 'snack') updateSnack(dt);
   if (isRace() && RACE) updateRace(dt);
   if (friends.length) updateFriends(dt);
+  updateMike(dt);
   if (boss.croc || game.state === 'boss' || game.state === 'bosswon') updateBoss(dt);
   if (game.state === 'won' || game.state === 'bosswon') confettiShower(dt);
 
-  // crocodiles
+  // killer whales
   for (let i = crocs.length - 1; i >= 0; i--) {
     const c = crocs[i];
     c.phase += dt * 6;
@@ -2411,6 +2501,7 @@ function render() {
   // hand hint on the very first round
   if (game.state === 'play' && !game.hasDragged && game.index === 0 && !shark.scripted && !isRace()) drawHandHint();
   for (const c of crocs) if (c.role !== 'eater') drawCrocEntity(c);
+  drawMike();   // v6
   for (const f of friends) drawFriend(f);   // v5: party friends / cousins (Aaron is drawn on top)
   // shark
   if (!shark.hidden) {
@@ -2485,7 +2576,7 @@ function sharkXform() {   // where/how the shark is drawn (shared by render + th
   if (Math.abs(belly) < 0.03) belly = belly < 0 ? -0.03 : 0.03;
   return { Ls, x: shark.x, y: shark.y + bobY, ang, sx: sc, sy: (shark.flip ? -sc : sc) * belly };
 }
-function drawRaceBar() {   // Level 2: how far the crocodile is (fills from the right as it swims toward the letter)
+function drawRaceBar() {   // Level 2: how far the killer whale is (fills from the right as it swims toward the letter)
   const { barX: x, barY: y, barW: w, barH: h } = RACE, r = h / 2, p = race.p;
   const pill = () => { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arc(x + w - r, y + r, r, -Math.PI / 2, Math.PI / 2); ctx.lineTo(x + r, y + h); ctx.arc(x + r, y + r, r, Math.PI / 2, Math.PI * 1.5); ctx.closePath(); };
   ctx.save();
@@ -2504,7 +2595,7 @@ function drawRaceBar() {   // Level 2: how far the crocodile is (fills from the 
   for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * 0.3 : r * 0.68; ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
   ctx.closePath(); ctx.fill();
   ctx.restore();
-  // a little crocodile at the front of the fill
+  // a little killer whale at the front of the fill
   ctx.save(); ctx.translate(x + w - fw + h * 0.9, y + r); ctx.scale(-1, 1);
   drawCroc(ctx, h * 2.4, { jaw: 0.25 + 0.2 * Math.sin(T * 7), phase: T * 6 });
   ctx.restore();
@@ -2520,7 +2611,7 @@ function drawCloud(x, y, r, a, fill, edge, ph) {   // a cartoon puff (fart gas /
   ctx.fill();
   ctx.restore();
 }
-function drawBossBar() {   // the big crocodile's health bar (goes down with every bite)
+function drawBossBar() {   // the big killer whale's health bar (goes down with every bite)
   const b = bossBar(), r = b.h / 2, p = clamp(boss.shown / boss.max, 0, 1);
   ctx.save();
   roundRectPath(b.x, b.y, b.w, b.h, r); ctx.fillStyle = 'rgba(4,40,80,0.55)'; ctx.fill();
@@ -2756,13 +2847,14 @@ window.SharkABC = {
       if (scale) { shark.scale = scale; resetSharkToStart(); }
       newRound(); return true;
     },
-    startParty(n) {   // straight into the party after G (n = 1) or after P (n = 2)
+    startParty(n) {   // straight into the party after G (n = 1) or after P (n = 2); v6: n = 3 = Uncle Mike (after B)
       if (!/^(play|celebrate)$/.test(game.state)) return false;
+      if (n === 3) { jumpTo(MIKE_AT, true); game.state = 'celebrate'; startMike(); return true; }
       jumpTo(PARTY_AT[(n || 1) - 1], true); game.state = 'celebrate'; startParty(); return true;
     },
     startBoss() { if (!isRace() || !/^(play|celebrate)$/.test(game.state)) return false; jumpTo(26); startBoss(); return true; },
     bossHome() { return aaronBossHome(); },
-    spawnCroc(o) {   // a snack/ending crocodile, optionally parked at {x, y} (still: true = it stays there)
+    spawnCroc(o) {   // a snack/ending killer whale, optionally parked at {x, y} (still: true = it stays there)
       if (game.state !== 'free' && game.state !== 'snack') return false;
       const c = spawnWanderCroc(game.state);
       if (game.state === 'snack') snack.spawned++;
@@ -2776,9 +2868,10 @@ window.SharkABC = {
   get geometry() { return { L: G.L, bubbleR: G.bubbleR, R: curR(), pw: G.pw, ph: G.ph, portrait, stripBottom, start: startPos(), zone: letterZone(), grace: game.grace }; },
   get sizes() { return { base: G.L, l1Start: L1_START_SCALE, l1Grow: L1_GROW_BREAK, l1Max: L1_MAX_SCALE, l2Base: RACE ? RACE.Ls : 0, l2Start: L2_START_SCALE, l2Grow: L2_GROW_PARTY, l2Max: L2_MAX_SCALE }; },
   get growLog() { return game.growLog.slice(); },
+  get mike() { const b = mike.on ? mikeButt() : null; return { on: mike.on, state: mike.state, slaps: mike.slaps, goal: MIKE_SLAPS, x: mike.x, y: mike.y, L: mike.L, butt: b, flash: mike.flash, log: mike.log.slice(), label: mike.lbl || null }; },
   get party() {
     return { n: party.n, count: party.count, phase: party.phase, farts: party.farts, puffs: party.puffs, gas: particles.filter(p => p.kind === 'g').length, log: party.log.slice(), atIndex: party.atIndex,
-      done: Object.keys(game.partyDone).map(Number), aaronLabel: aaronLbl ? Object.assign({ text: 'Aaron' }, aaronLbl) : null,
+      done: Object.keys(game.partyDone).filter(k => k !== 'mike').map(Number), mikeDone: !!game.partyDone['mike'], aaronLabel: aaronLbl ? Object.assign({ text: 'Aaron' }, aaronLbl) : null,
       friends: friends.map(f => ({ name: f.name, princess: f.princess, boy: f.boy, state: f.state, x: f.x, y: f.y, L: f.L, label: f.lbl ? Object.assign({ text: f.name }, f.lbl) : null })) };
   },
   get boss() {
