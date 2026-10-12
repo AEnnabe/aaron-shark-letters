@@ -4,6 +4,8 @@
 (() => {
 'use strict';
 const RD = window.RUNNER_DATA;
+(() => { for (const key of ['words', 'sounds', 'math']) { const o = RD[key] || {}, n = {};   // v11: data file keeps v10 numbering; levels >= 3 moved up by 1
+  for (const k of Object.keys(o)) n[+k >= 3 ? String(+k + 1) : k] = o[k]; RD[key] = n; } })();
 const { Sfx, Music, Voice, VOICE_DATA, Speech } = window.SharkCore;
 /* ===== Dad's timing spec: seconds from answers appearing until the gates reach the runner ===== */
 const DECISION_SCHEDULE = [   // [last question number in the band, seconds]
@@ -47,43 +49,43 @@ const WORLDS = {
   ocean: { sky: ['#4fc3f7', '#9be7ff', '#e0fbff'], ground: '#2a8fbf', track: ['#7fd8ff', '#bdf0ff', '#7fd8ff'], deco: ['🐚', '🪸', '🏝️', '✨'], coin: ['🐟', '💎'], obst: '🪸' },
   desert: { sky: ['#ffb36b', '#ffd59a', '#fff1cf'], ground: '#e7b57a', track: ['#d9965a', '#e8ad72', '#d9965a'], deco: ['🌵', '🏜️', '🪨', '🌵'], coin: ['🪙', '🍉'], obst: '🪨' },
 };
-const RL = {   // v8 numbering: each kid's card is in order (runner, harder runner, swim & grow)
-  3: { ch: 'audrey', world: 'rainbow', type: 'words', bonus: 'unicorn', title: 'Runner: easy words' },
-  4: { ch: 'audrey', world: 'rainbow', type: 'words', bonus: 'unicorn', tap: 'balloon', title: 'Balloon Pop' },
-  5: { ch: 'audrey', world: 'rainbow', type: 'words', swim: true, title: 'Swim & grow' },
-  6: { ch: 'elio', world: 'volcano', type: 'math', bonus: 'dragon', title: 'Runner: adding' },
-  7: { ch: 'elio', world: 'castle', type: 'math', bonus: 'dragon', tap: 'knight', title: 'Knight Whack (take away)' },
-  8: { ch: 'elio', world: 'castle', type: 'math', swim: true, title: 'Swim & grow' },
-  9: { ch: 'mackenzie', world: 'jungle', type: 'words', bonus: 'snake', title: 'Runner: 1st grade words' },
-  10: { ch: 'mackenzie', world: 'jungle', type: 'words', bonus: 'snake', tap: 'fruit', title: 'Fruit Catch' },
-  11: { ch: 'mackenzie', world: 'jungle', type: 'words', swim: true, title: 'Swim & grow' },
-  12: { ch: 'alli', world: 'garden', type: 'words', bonus: 'spider', title: 'Runner: easy words' },
-  13: { ch: 'alli', world: 'garden', type: 'words', bonus: 'spider', title: 'Runner: more words' },
-  14: { ch: 'alli', world: 'garden', type: 'words', swim: true, title: 'Swim & grow' },
-  15: { ch: 'emma', world: 'meadow', type: 'words', bonus: 'skunk', title: 'Runner: first words' },
-  16: { ch: 'emma', world: 'meadow', type: 'words', bonus: 'skunk', title: 'Runner: more words' },
-  17: { ch: 'emma', world: 'forest', type: 'words', swim: true, title: 'Swim & grow' },
-  18: { ch: 'andrew', world: 'desert', type: 'words', bonus: 'wrestle', title: 'Runner: first words' },
-  19: { ch: 'andrew', world: 'desert', type: 'words', bonus: 'wrestle', title: 'Runner: more words' },
-  20: { ch: 'andrew', world: 'desert', type: 'words', swim: true, title: 'Swim & grow' },
-  21: { ch: 'penny', world: 'ocean', type: 'words', bonus: 'dolphin', title: 'Runner: late 1st grade words' },
-  22: { ch: 'penny', world: 'ocean', type: 'words', bonus: 'dolphin', tap: 'hoop', title: 'Hoop Jump' },
-  23: { ch: 'penny', world: 'ocean', type: 'words', swim: true, title: 'Swim & grow' },
-  24: { ch: 'oliver', world: 'jungle', type: 'words', bonus: 'gorilla', title: 'Runner: easy words' },
-  25: { ch: 'oliver', world: 'jungle', type: 'words', bonus: 'gorilla', tap: 'vine', title: 'Vine Swing' },
-  26: { ch: 'oliver', world: 'jungle', type: 'words', swim: true, title: 'Swim & grow' },
+const RL = {   // v11 numbering (Aaron 1-3; Level 3 = Spooky Word Hunt in spooky.js). v8: each kid's card is in order (runner, harder runner, swim & grow)
+  4: { ch: 'audrey', world: 'rainbow', type: 'words', bonus: 'unicorn', title: 'Runner: easy words' },
+  5: { ch: 'audrey', world: 'rainbow', type: 'words', bonus: 'unicorn', tap: 'balloon', title: 'Balloon Pop' },
+  6: { ch: 'audrey', world: 'rainbow', type: 'words', swim: true, title: 'Swim & grow' },
+  7: { ch: 'elio', world: 'volcano', type: 'math', bonus: 'dragon', title: 'Runner: adding' },
+  8: { ch: 'elio', world: 'castle', type: 'math', bonus: 'dragon', tap: 'knight', title: 'Knight Whack (take away)' },
+  9: { ch: 'elio', world: 'castle', type: 'math', swim: true, title: 'Swim & grow' },
+  10: { ch: 'mackenzie', world: 'jungle', type: 'words', bonus: 'snake', title: 'Runner: 1st grade words' },
+  11: { ch: 'mackenzie', world: 'jungle', type: 'words', bonus: 'snake', tap: 'fruit', title: 'Fruit Catch' },
+  12: { ch: 'mackenzie', world: 'jungle', type: 'words', swim: true, title: 'Swim & grow' },
+  13: { ch: 'alli', world: 'garden', type: 'words', bonus: 'spider', title: 'Runner: easy words' },
+  14: { ch: 'alli', world: 'garden', type: 'words', bonus: 'spider', title: 'Runner: more words' },
+  15: { ch: 'alli', world: 'garden', type: 'words', swim: true, title: 'Swim & grow' },
+  16: { ch: 'emma', world: 'meadow', type: 'words', bonus: 'skunk', title: 'Runner: first words' },
+  17: { ch: 'emma', world: 'meadow', type: 'words', bonus: 'skunk', title: 'Runner: more words' },
+  18: { ch: 'emma', world: 'forest', type: 'words', swim: true, title: 'Swim & grow' },
+  19: { ch: 'andrew', world: 'desert', type: 'words', bonus: 'wrestle', title: 'Runner: first words' },
+  20: { ch: 'andrew', world: 'desert', type: 'words', bonus: 'wrestle', title: 'Runner: more words' },
+  21: { ch: 'andrew', world: 'desert', type: 'words', swim: true, title: 'Swim & grow' },
+  22: { ch: 'penny', world: 'ocean', type: 'words', bonus: 'dolphin', title: 'Runner: late 1st grade words' },
+  23: { ch: 'penny', world: 'ocean', type: 'words', bonus: 'dolphin', tap: 'hoop', title: 'Hoop Jump' },
+  24: { ch: 'penny', world: 'ocean', type: 'words', swim: true, title: 'Swim & grow' },
+  25: { ch: 'oliver', world: 'jungle', type: 'words', bonus: 'gorilla', title: 'Runner: easy words' },
+  26: { ch: 'oliver', world: 'jungle', type: 'words', bonus: 'gorilla', tap: 'vine', title: 'Vine Swing' },
+  27: { ch: 'oliver', world: 'jungle', type: 'words', swim: true, title: 'Swim & grow' },
 };
-const LAST = 26;
+const LAST = 27;
 const MENU_GROUPS = [
-  { name: 'Aaron', icon: '🦈', color: '#3f78bd', levels: [1, 2] },
-  { name: 'Audrey', icon: '🦄', color: '#d96bc4', levels: [3, 4, 5] },
-  { name: 'Elio', icon: '🐉', color: '#3fa34f', levels: [6, 7, 8] },
-  { name: 'Mackenzie', icon: '🐍👑', color: '#9b4fd0', levels: [9, 10, 11] },
-  { name: 'Alli', icon: '🕷️', color: '#a0673f', levels: [12, 13, 14] },
-  { name: 'Emma', icon: '🦨', color: '#4a4a63', levels: [15, 16, 17] },
-  { name: 'Andrew', icon: '🐍😎', color: '#d98a2b', levels: [18, 19, 20] },
-  { name: 'Penny', icon: '🐬', color: '#2a9fd6', levels: [21, 22, 23] },
-  { name: 'Oliver', icon: '🦍', color: '#5a7a2a', levels: [24, 25, 26] },
+  { name: 'Aaron', icon: '🦈', color: '#3f78bd', levels: [1, 2, 3] },
+  { name: 'Audrey', icon: '🦄', color: '#d96bc4', levels: [4, 5, 6] },
+  { name: 'Elio', icon: '🐉', color: '#3fa34f', levels: [7, 8, 9] },
+  { name: 'Mackenzie', icon: '🐍👑', color: '#9b4fd0', levels: [10, 11, 12] },
+  { name: 'Alli', icon: '🕷️', color: '#a0673f', levels: [13, 14, 15] },
+  { name: 'Emma', icon: '🦨', color: '#4a4a63', levels: [16, 17, 18] },
+  { name: 'Andrew', icon: '🐍😎', color: '#d98a2b', levels: [19, 20, 21] },
+  { name: 'Penny', icon: '🐬', color: '#2a9fd6', levels: [22, 23, 24] },
+  { name: 'Oliver', icon: '🦍', color: '#5a7a2a', levels: [25, 26, 27] },
 ];
 /* v8: per-kid reward props (shown for ~1.3 s after EVERY correct answer) and swim snacks */
 const PERKS = {
@@ -276,7 +278,7 @@ function pill(label, cx, cy, maxW, want, border, opt = {}) {
     gr.levels.forEach(n => {
       const b = document.createElement('button'); b.textContent = n; b.setAttribute('aria-label', 'Level ' + n); b.dataset.level = n;
       const col = document.createElement('div'); col.className = 'rcol'; col.dataset.level = n; col.appendChild(b);
-      const s = document.createElement('small'); s.innerHTML = `Level ${n} – ${gr.name}<br><span style="opacity:.8">${n <= 2 ? (n === 1 ? 'Shark ABC' : 'Race the whale!') : RL[n].title}</span>`; b.setAttribute('aria-label', `Level ${n} – ${gr.name}`); col.appendChild(s);
+      const s = document.createElement('small'); s.innerHTML = `Level ${n} – ${gr.name}<br><span style="opacity:.8">${n <= 3 ? (n === 1 ? 'Shark ABC' : n === 2 ? 'Race the whale!' : 'Spooky Word Hunt') : RL[n].title}</span>`; b.setAttribute('aria-label', `Level ${n} – ${gr.name}`); col.appendChild(s);
       bx.appendChild(col);
     });
     wrap.appendChild(d);
@@ -284,7 +286,7 @@ function pill(label, cx, cy, maxW, want, border, opt = {}) {
   // v8: the whole card is the tap target. Tapping a number OR its caption starts that level; tapping the card's
   // name/icon starts the card's first level. (v7 only listened on the small circle, so a tap anywhere else on a
   // card fell through to the start screen's "tap anywhere = Level 1" handler and opened Aaron's shark game.)
-  const go = n => { if (n === 1 && p1) return p1.click(); if (n === 2 && p2) return p2.click(); startRunnerFromMenu(n); };
+  const go = n => { if (n === 1 && p1) return p1.click(); if (n === 2 && p2) return p2.click(); if (n === 3 && window.Spooky) { Sfx.unlock(); Speech.prime && Speech.prime(); document.getElementById('start').classList.add('hidden'); return window.Spooky.start(); } startRunnerFromMenu(n); };
   wrap.addEventListener('click', e => {
     e.stopPropagation(); e.preventDefault();
     const c = e.target.closest('.rcol'), gr = e.target.closest('.rgroup');
@@ -292,8 +294,9 @@ function pill(label, cx, cy, maxW, want, border, opt = {}) {
     if (n) go(n);
   });
   if (lv) { lv.style.display = 'none'; lv.parentNode.insertBefore(wrap, lv.nextSibling); }
-  // ?level=3..14: a tap anywhere on the start screen starts that runner level
+  // ?level=3 (Spooky Word Hunt) / ?level=4..27: a tap anywhere on the start screen starts that runner level
   const want = parseInt(P.get('level'), 10);
+  if (want === 3) start.addEventListener('click', e => { if (e.target.closest('.rpick')) return; e.stopPropagation(); go(3); }, true);
   if (RL[want]) start.addEventListener('click', e => { if (e.target.closest('.rpick')) return; e.stopPropagation(); startRunnerFromMenu(want); }, true);
 })();
 function startRunnerFromMenu(n) {
@@ -355,7 +358,7 @@ function nextQuestion() {
   if (R.qi >= QUESTIONS) return levelWon();
   const q = R.qs[R.qi]; R.state = 'prompt';
   const n = R.qi + 1;
-  if (n === 12) { /* gentle heads-up that it gets faster */ }
+  if (n === 13) { /* gentle heads-up that it gets faster */ }
   const showPrompt = () => {
     const pr = $r('rprompt');
     if (q.math) {
