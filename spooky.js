@@ -2,7 +2,7 @@
    Five sight words hide in a busy (cute) Halloween scene and pop up / duck down. The narrator calls a word;
    find it 3 times in a row (shuffle after each find) to print it on a dollar for the piggy bank, then shop:
    a $1–2 prize, a $5 booby trap, or save. Bank + prizes persist in localStorage ('spooky.v1').
-   Debug: ?level=3 (tap anywhere), ?bank=N (set bank), ?sw=word (first target), ?trap=ghost|witch|mummy (play one). */
+   Debug: ?level=3 (tap anywhere), ?bank=N (set bank), ?sw=word (first target), ?trap=stink|door (&victim=mama|papa|renee|nena|foze|omar|evan|andrew|audrey; no victim = show the picker). */
 (() => {
 'use strict';
 const SD = window.SPOOKY_DATA, RD = window.RUNNER_DATA || { lines: {} };
@@ -33,8 +33,21 @@ const PRIZES = [
   { e: '🕷️', name: 'Spider ring', price: 2 }, { e: '🪄', name: 'Glow stick', price: 2 }, { e: '🎃', name: 'Pumpkin hat', price: 2 },
   { e: '🦇', name: 'Bat buddy', price: 1 }, { e: '🍫', name: 'Chocolate', price: 2 },
 ];
-const TRAPS = ['ghost', 'witch', 'mummy'];
-const TRAP_PRICE = 5, TRAP_SEC = 8.5, PARTY_EVERY = 8;
+const TRAPS = ['stink', 'door'];
+const TRAP_PRICE = 3, TRAP_SEC = 11.5, PARTY_EVERY = 8;
+/* v12: booby-trap victims (generic cute cartoon family) */
+const VICTIMS = [
+  { id: 'mama', name: 'Mama', skin: '#f2c6a0', hair: '#5a3220', style: 'long', shirt: '#ff6fb1', pants: '#4a4a8a', lips: 1 },
+  { id: 'papa', name: 'Papa', skin: '#e8b48a', hair: '#2a1a10', style: 'short', shirt: '#3a8ee6', pants: '#2a2a3a', beard: 1 },
+  { id: 'renee', name: 'Abue Renee', skin: '#f0c8a8', hair: '#d8d8e0', style: 'bun', shirt: '#a66bff', pants: '#5a4a6a', old: 1, glasses: 1, lips: 1 },
+  { id: 'nena', name: 'Abue Nena', skin: '#d9a07a', hair: '#c0c0c8', style: 'curly', shirt: '#2fbf9a', pants: '#3a5a5a', old: 1, glasses: 1, lips: 1 },
+  { id: 'foze', name: 'Abue Foze', skin: '#e0aa82', hair: '#e8e8ee', style: 'bald', shirt: '#e8553d', pants: '#5a4a3a', old: 1, glasses: 1, stache: 1 },
+  { id: 'omar', name: 'Tio Omar', skin: '#d29a70', hair: '#1a1a1a', style: 'spiky', shirt: '#ffb800', pants: '#2a4a7a', stache: 1 },
+  { id: 'evan', name: 'Tio Evan', skin: '#f5cfaa', hair: '#c8742a', style: 'cap', shirt: '#2fbf5a', pants: '#3a3a4a', cap: '#e8553d' },
+  { id: 'andrew', name: 'Andrew', skin: '#f0c098', hair: '#7a4a2a', style: 'short', shirt: '#ff7a2f', pants: '#2a5a9a', kid: 1 },
+  { id: 'audrey', name: 'Audrey', skin: '#f5d0b0', hair: '#e0b040', style: 'pigtails', shirt: '#ff8fc8', pants: '#a66bff', kid: 1, lips: 1, bow: '#ff5d8f' },
+];
+const VBY = Object.fromEntries(VICTIMS.map(v => [v.id, v]));
 
 /* ===== scenes ===== */
 const SCENES = {
@@ -73,6 +86,14 @@ css.textContent = `
 @media (max-height:500px){#shud .sb{font-size:15px;padding:3px 8px}#sstars{font-size:20px}#shud button{width:44px;height:44px;font-size:22px}
  #sshop{flex-direction:row;flex-wrap:wrap;gap:8px}#sshop h2{width:100%;font-size:26px}#sshop button .e{font-size:44px}#sshop button{min-width:96px;font-size:14px}#sshop button .pr{font-size:20px}}
 @media (max-width:640px){#shud{flex-wrap:wrap}#shud .sb{font-size:15px;padding:3px 8px}#sstars{font-size:20px}#shud button{width:44px;height:44px;font-size:22px}#sname{display:none}}
+#svict{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.5vmin;background:rgba(30,10,50,.72);padding:max(60px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom))}
+#svict h2{margin:0;color:#fff;font-size:min(6.5vmin,44px);text-shadow:0 3px 0 #6a2a9a;text-align:center}
+#svict .vrow{display:grid;grid-template-columns:repeat(5,auto);gap:1.6vmin;justify-content:center}
+#svict button{appearance:none;border:4px solid #fff;border-radius:22px;background:#fff6d8;padding:4px 6px 6px;display:flex;flex-direction:column;align-items:center;cursor:pointer;touch-action:manipulation;box-shadow:0 6px 0 rgba(0,0,0,.3);font-weight:900;color:#4a2a7a;font-size:min(3vmin,20px)}
+#svict button canvas{position:static;inset:auto;width:min(15vmin,110px);height:min(15vmin,110px)}
+#svict button:active{transform:translateY(4px)}
+@media (max-aspect-ratio:1/1){#svict .vrow{grid-template-columns:repeat(3,auto)}#svict button canvas{width:min(22vw,120px);height:min(22vw,120px)}#svict button{font-size:min(4vw,20px)}}
+@media (max-height:500px){#svict{flex-direction:column;padding-top:56px}#svict h2{font-size:22px}#svict .vrow{grid-template-columns:repeat(5,auto);gap:6px}#svict button canvas{width:min(17vh,76px);height:min(17vh,76px)}#svict button{font-size:13px;padding:2px 4px;border-width:3px}}
 #sreset{margin-top:8px;background:rgba(255,255,255,.25);color:#fff;border:2px solid rgba(255,255,255,.6);border-radius:16px;padding:6px 14px;font-weight:800;font-size:14px;cursor:pointer}
 `;
 document.head.appendChild(css);
@@ -80,9 +101,10 @@ const layer = document.createElement('div'); layer.id = 'slayer';
 layer.innerHTML = `<canvas id="scv"></canvas>
 <div id="shud"><div class="sb" id="sname">Level 3 – Aaron</div><div class="sb" id="sstars">☆☆☆</div><div class="sb" id="sbank">🐷 $0</div><span class="sp"></span><button id="ssay" aria-label="Hear it again">🔊</button><button id="smute" aria-label="Music on/off">🎵</button><button id="smenu" aria-label="Menu">🏠</button></div>
 <div id="sprompt"></div><div id="sshelf"></div>
-<div id="sshop"><h2>Buy a prize, or save up for a booby trap!</h2><div class="row" id="sprizes"></div><div class="row"><button class="trap" id="strap"><span class="e">💣</span>Booby trap!<span class="pr">💵💵💵💵💵</span></button><button class="save" id="ssave"><span class="e">🐷</span>Save my money!<span class="pr">&nbsp;</span></button></div></div>`;
+<div id="sshop"><h2>Buy a prize, or save up for a booby trap! 💣 = $3</h2><div class="row" id="sprizes"></div><div class="row"><button class="trap" id="strap" data-trap="stink"><span class="e">💣</span>Stink bomb!<span class="pr">💵💵💵</span></button><button class="trap" id="strap2" data-trap="door"><span class="e">🚪</span>Scary door!<span class="pr">💵💵💵</span></button><button class="save" id="ssave"><span class="e">🐷</span>Save my money!<span class="pr">&nbsp;</span></button></div></div>
+<div id="svict"><h2>Who gets the booby trap?</h2><div class="vrow" id="svrow"></div></div>`;
 document.body.appendChild(layer);
-const cv = layer.querySelector('#scv'), g = cv.getContext('2d');
+const cv = layer.querySelector('#scv'); let g = cv.getContext('2d');
 const $s = id => layer.querySelector('#' + id);
 let W = 0, H = 0, DPR = 1;
 function resize() { DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * DPR; cv.height = H * DPR; if (S.active) layout(); }
@@ -139,7 +161,7 @@ function start() {
   Object.assign(S, { active: true, state: 'intro', t: 0, streak: 0, fx: [], sessionWon: 0, trap: null, recent: [], popLog: [], visMin: 99, log: [] });
   hud(); shelf(); startMusic();
   newRound(P.get('sw') && WORDS.includes(P.get('sw')) ? P.get('sw') : null, true);
-  if (P.get('trap') && TRAPS.includes(P.get('trap'))) { S.state = 'play'; playTrap(P.get('trap'), true); return; }
+  if (P.get('trap') && TRAPS.includes(P.get('trap'))) { S.state = 'play'; if (VBY[P.get('victim')]) playTrap(P.get('trap'), P.get('victim'), true); else pickVictim(P.get('trap')); return; }
   say('sp_intro', () => { if (S.state === 'intro') { S.state = 'play'; prompt(); } });
   setTimeout(() => { if (S.state === 'intro') { S.state = 'play'; prompt(); } }, (dur('sp_intro') + 2.5) * 1000);
 }
@@ -164,37 +186,43 @@ function prompt(again) {
   if (again) sayChain(['sp_again', k]); else say(k);
 }
 
-/* ===== pop-up timing (>=2 always up, staggered random) ===== */
-const RISE = 0.35;
+/* ===== pop-up timing (v12: slower + bouncier; >=2 always up, staggered random) ===== */
+const RISE = 0.6, FALL = 0.55, UP_MIN = 3.0, UP_MAX = 3.5;
+const backOut = t => { t = clamp(t, 0, 1); const c = 2.2; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+function rise(sp) {
+  sp.st = 'rising'; sp.t0 = S.t; sp.until = S.t + RISE; sp.upAt = S.t + RISE;
+  if (S.state === 'play' || S.state === 'intro') {
+    Sfx.pop(); Sfx.pop(0.07);
+    const r = tagRect(Object.assign({}, sp, { up: 1 })), cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+    for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283; S.fx.push({ type: 'p', x: cx, y: cy + r.h * 0.4, vx: Math.cos(a) * rnd(120, 220), vy: Math.sin(a) * rnd(80, 160) - 120, t: 0, life: 0.6, col: pick(['#fff', '#ffd84d', sp.col]), r: rnd(3, 6) }); }
+  }
+}
 function tickSpots(dt) {
   if (S.state === 'shuffle') return;
   const visible = () => S.spots.filter(s => s.st === 'up' || s.st === 'rising').length;
   for (const sp of S.spots) {
     if (S.t < sp.until) continue;
-    if (sp.st === 'down') { if (sp.sinceDown !== undefined && S.t < sp.until) continue; sp.st = 'rising'; sp.t0 = S.t; sp.until = S.t + RISE; }
-    else if (sp.st === 'rising') { sp.st = 'up'; sp.t0 = S.t; sp.until = S.t + rnd(1.5, 2.5); }
+    if (sp.st === 'down') rise(sp);
+    else if (sp.st === 'rising') { sp.st = 'up'; sp.t0 = S.t; sp.until = S.t + rnd(UP_MIN, UP_MAX); }
     else if (sp.st === 'up') {
       if (visible() <= 2) {   // never fewer than 2 up: bring another word up first, then duck this one
         const down = S.spots.filter(s => s.st === 'down');
-        if (down.length) { const o = down.find(s => s.w === S.target) || pick(down); o.st = 'rising'; o.t0 = S.t; o.until = S.t + RISE; o.upAt = S.t + RISE; }
+        if (down.length) rise(down.find(s => s.w === S.target) || pick(down));
         sp.until = S.t + RISE + 0.05; continue;
       }
-      sp.st = 'falling'; sp.t0 = S.t; sp.until = S.t + RISE;
-    } else if (sp.st === 'falling') { sp.st = 'down'; sp.t0 = S.t; sp.until = S.t + rnd(0.3, 1.5); S.popLog.push({ w: sp.w, upFor: +(S.t - (sp.upAt || S.t)).toFixed(2) }); if (S.popLog.length > 200) S.popLog.shift(); }
-    if (sp.st === 'up' && !sp.upAt0) {}
-    if (sp.st === 'rising') sp.upAt = S.t + RISE;
+      sp.st = 'falling'; sp.t0 = S.t; sp.until = S.t + FALL;
+    } else if (sp.st === 'falling') { sp.st = 'down'; sp.t0 = S.t; sp.until = S.t + rnd(0.4, 1.4); S.popLog.push({ w: sp.w, upFor: +(S.t - FALL - (sp.upAt || S.t)).toFixed(2) }); if (S.popLog.length > 200) S.popLog.shift(); }
   }
-  // keep >=2 visible: force-pop a hidden one (target first if it's been down a while)
   let v = visible();
-  while (v < 2) {
-    const down = S.spots.filter(s => s.st === 'down'); if (!down.length) break;
-    const tgt = down.find(s => s.w === S.target && S.t - s.t0 > 1.2) || pick(down);
-    tgt.st = 'rising'; tgt.t0 = S.t; tgt.until = S.t + RISE; tgt.upAt = S.t + RISE; v++;
-  }
+  while (v < 2) { const down = S.spots.filter(s => s.st === 'down'); if (!down.length) break; rise(down.find(s => s.w === S.target && S.t - s.t0 > 1.2) || pick(down)); v++; }
   const tsp = S.spots.find(s => s.w === S.target);
-  if (tsp && tsp.st === 'down' && S.t - tsp.t0 > 2.5) { tsp.st = 'rising'; tsp.t0 = S.t; tsp.until = S.t + RISE; tsp.upAt = S.t + RISE; }
-  for (const sp of S.spots) sp.up = sp.st === 'up' ? 1 : sp.st === 'down' ? 0 : sp.st === 'rising' ? ease((S.t - sp.t0) / RISE) : 1 - ease((S.t - sp.t0) / RISE);
-  if (S.state === 'play' && S.t > 3) S.visMin = Math.min(S.visMin, S.spots.filter(s => s.up > 0.5).length + S.spots.filter(s => s.st === 'rising' || s.st === 'falling').length * 0);
+  if (tsp && tsp.st === 'down' && S.t - tsp.t0 > 2.5) rise(tsp);
+  for (const sp of S.spots) {
+    const k = sp.st === 'rising' ? (S.t - sp.t0) / RISE : sp.st === 'falling' ? (S.t - sp.t0) / FALL : 0;
+    sp.up = sp.st === 'up' ? 1 : sp.st === 'down' ? 0 : sp.st === 'rising' ? Math.min(1, backOut(k)) : 1 - ease(k);
+    sp.sc = sp.st === 'rising' ? 0.55 + 0.45 * backOut(k) : sp.st === 'falling' ? 1 - 0.3 * ease(k) : 1;   // bouncy overshoot (~1.15) then settles
+  }
+  if (S.state === 'play' && S.t > 3) S.visMin = Math.min(S.visMin, S.spots.filter(s => s.up > 0.5).length);
 }
 
 /* ===== tag geometry (also the hit box) ===== */
@@ -301,15 +329,14 @@ function drawParty() {
 function openShop() {
   S.state = 'shop'; S.shopShown++;
   const box = $s('sprizes'); box.innerHTML = '';
-  const one = pick(PRIZES.filter(p => p.price === 1)); const opts = shuffle([one, ...shuffle(PRIZES.filter(p => p !== one)).slice(0, 2)]);   // always one $1 prize
+  const one = pick(PRIZES.filter(p => p.price === 1)); const opts = shuffle([one, ...shuffle(PRIZES.filter(p => p !== one)).slice(0, 1)]);   // always one $1 prize
   opts.forEach(pz => {
     const b = document.createElement('button'); b.className = 'prize' + (S.bank < pz.price ? ' no' : ''); b.dataset.price = pz.price;
     b.innerHTML = `<span class="e">${pz.e}</span>${pz.name}<span class="pr">${'💵'.repeat(pz.price)}</span>`;
     b.addEventListener('click', e => { e.stopPropagation(); buy(pz); });
     box.appendChild(b);
   });
-  $s('strap').classList.toggle('no', S.bank < TRAP_PRICE);
-  $s('strap').querySelector('.pr').textContent = '💵'.repeat(TRAP_PRICE);
+  ['strap', 'strap2'].forEach(id => $s(id).classList.toggle('no', S.bank < TRAP_PRICE));
   $s('sshop').style.display = 'flex';
   say('sp_shop');
 }
@@ -324,71 +351,169 @@ function buy(pz) {
   setTimeout(() => { S.gift = null; nextWord(); }, 2200);
 }
 $s('ssave').addEventListener('click', e => { e.stopPropagation(); if (S.state !== 'shop') return; closeShop(); Sfx.sparkle(); S.state = 'saving'; say('sp_save'); setTimeout(nextWord, 1600); });
-$s('strap').addEventListener('click', e => {
+['strap', 'strap2'].forEach(id => $s(id).addEventListener('click', e => {
   e.stopPropagation(); if (S.state !== 'shop') return;
   if (S.bank < TRAP_PRICE) { Sfx.tone(300, 200, 0.15, 'sine', 0.2); say('sp_need'); return; }
-  S.bank -= TRAP_PRICE; store.save(S); hud(); closeShop(); S.trapIdx = ((S.trapIdx | 0) + 1) % TRAPS.length; store.save(S); playTrap(TRAPS[S.trapIdx]);
-});
+  S.bank -= TRAP_PRICE; store.save(S); hud(); closeShop(); pickVictim($s(id).dataset.trap);
+}));
+/* victim picker: big picture buttons (canvas portraits) with names */
+function pickVictim(kind) {
+  S.state = 'victim'; S.pendingTrap = kind;
+  const row = $s('svrow'); row.innerHTML = '';
+  VICTIMS.forEach(v => {
+    const b = document.createElement('button'); b.dataset.victim = v.id;
+    const c = document.createElement('canvas'); c.width = 160; c.height = 160; b.appendChild(c);
+    const n = document.createElement('span'); n.textContent = v.name; b.appendChild(n);
+    const cg = c.getContext('2d'); const og = g; g = cg; g.setTransform(1, 0, 0, 1, 0, 0); drawPerson(v, 80, v.kid ? 262 : 255, v.kid ? 250 : 210, { face: 'happy', t: 0, bust: true }); g = og;
+    b.addEventListener('click', e => { e.stopPropagation(); if (S.state !== 'victim') return; $s('svict').style.display = 'none'; playTrap(S.pendingTrap, v.id); });
+    row.appendChild(b);
+  });
+  $s('svict').style.display = 'flex';
+  say('sp_who');
+}
 function nextWord() {
   if (!S.active) return;
   newRound(null, false); S.state = 'play'; prompt();
 }
 
-/* ===== booby traps (~8 s) ===== */
-function playTrap(kind, debug) {
-  S.state = 'trap'; S.trap = { kind, t0: S.t, debug, ev: {} }; S.trapsPlayed = (S.trapsPlayed || 0) + 1;
+/* ===== v12 booby traps: stink bomb + scary door, starring the victim Aaron picked (~11.5 s) ===== */
+function drawPerson(v, x, y, s, o = {}) {
+  const k = v.kid ? 0.78 : 1; s *= k;
+  const face = o.face || 'happy', t = o.t || 0, hr = s * 0.17, hx = x, hy = y - s * 0.8;
+  g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  if (!o.bust) {   // legs + shoes
+    const sw = o.walk ? Math.sin(t * 12) * s * 0.06 : 0;
+    g.strokeStyle = v.pants; g.lineWidth = s * 0.1;
+    g.beginPath(); g.moveTo(x - s * 0.07, y - s * 0.4); g.lineTo(x - s * 0.08 + sw, y - s * 0.03); g.moveTo(x + s * 0.07, y - s * 0.4); g.lineTo(x + s * 0.08 - sw, y - s * 0.03); g.stroke();
+    ell(x - s * 0.1 + sw, y - s * 0.02, s * 0.07, s * 0.035, '#3a2a2a'); ell(x + s * 0.1 - sw, y - s * 0.02, s * 0.07, s * 0.035, '#3a2a2a');
+  }
+  // arms
+  const up = o.arms === 'up' ? 1 : 0;
+  g.strokeStyle = v.shirt; g.lineWidth = s * 0.075;
+  for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(x + sx * s * 0.15, y - s * 0.62); g.lineTo(x + sx * s * (0.26 + up * 0.04), y - s * (up ? 0.92 + Math.sin(t * 20) * 0.03 : 0.38)); g.stroke(); ell(x + sx * s * (0.26 + up * 0.04), y - s * (up ? 0.95 : 0.36), s * 0.04, s * 0.04, v.skin); }
+  // torso
+  g.fillStyle = v.shirt; rr(x - s * 0.17, y - s * 0.68, s * 0.34, s * 0.32, s * 0.08); g.fill();
+  if (v.old) { g.fillStyle = 'rgba(255,255,255,.35)'; rr(x - s * 0.03, y - s * 0.68, s * 0.06, s * 0.32, 3); g.fill(); }   // cardigan stripe
+  if (v.bow && v.kid) ell(x, y - s * 0.66, s * 0.04, s * 0.03, v.bow);
+  g.fillStyle = v.skin; g.fillRect(x - s * 0.04, y - s * 0.72, s * 0.08, s * 0.06);   // neck
+  // hair behind
+  const hairUp = face === 'scared';
+  if (v.style === 'long') { g.fillStyle = v.hair; rr(hx - hr * 1.15, hy - hr * 0.6, hr * 2.3, hr * 2.0, hr * 0.6); g.fill(); }
+  if (v.style === 'pigtails') { ell(hx - hr * 1.15, hy + hr * 0.2, hr * 0.35, hr * 0.6, v.hair); ell(hx + hr * 1.15, hy + hr * 0.2, hr * 0.35, hr * 0.6, v.hair); }
+  ell(hx, hy, hr, hr * 1.05, face === 'gag' ? '#b8d89a' : v.skin);   // head (green when gagging)
+  ell(hx - hr, hy + hr * 0.1, hr * 0.18, hr * 0.25, v.skin); ell(hx + hr, hy + hr * 0.1, hr * 0.18, hr * 0.25, v.skin);
+  // hair on top
+  g.fillStyle = v.hair;
+  if (hairUp) { g.strokeStyle = v.hair; g.lineWidth = hr * 0.18; for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(hx + i * hr * 0.22, hy - hr * 0.8); g.lineTo(hx + i * hr * 0.35, hy - hr * 1.7 - Math.abs(Math.sin(t * 30 + i)) * hr * 0.2); g.stroke(); } }
+  else if (v.style === 'bald') { ell(hx - hr * 0.95, hy - hr * 0.1, hr * 0.25, hr * 0.4, v.hair); ell(hx + hr * 0.95, hy - hr * 0.1, hr * 0.25, hr * 0.4, v.hair); }
+  else if (v.style === 'bun') { g.beginPath(); g.arc(hx, hy - hr * 0.1, hr * 1.05, Math.PI * 1.05, Math.PI * 1.95); g.fill(); ell(hx, hy - hr * 1.15, hr * 0.42, hr * 0.38, v.hair); }
+  else if (v.style === 'curly') { for (let i = 0; i < 9; i++) { const a = Math.PI * (1.0 + i / 8); ell(hx + Math.cos(a) * hr * 1.0, hy - hr * 0.05 + Math.sin(a) * hr * 1.0, hr * 0.32, hr * 0.32, v.hair); } }
+  else if (v.style === 'spiky') { g.beginPath(); g.moveTo(hx - hr, hy - hr * 0.3); for (let i = 0; i <= 6; i++) g.lineTo(hx - hr + i * hr / 3, hy - hr * (i % 2 ? 1.45 : 0.9)); g.lineTo(hx + hr, hy - hr * 0.3); g.fill(); }
+  else if (v.style === 'cap') { g.beginPath(); g.arc(hx, hy - hr * 0.15, hr * 1.02, Math.PI, 0); g.fillStyle = v.cap; g.fill(); g.fillRect(hx, hy - hr * 0.25, hr * 1.5, hr * 0.2); }
+  else { g.beginPath(); g.arc(hx, hy - hr * 0.1, hr * 1.04, Math.PI * 1.02, Math.PI * 1.98); g.fill(); if (v.style === 'long' || v.style === 'pigtails') ell(hx + hr * 0.3, hy - hr * 0.75, hr * 0.6, hr * 0.3, v.hair, 0.3); }
+  if (v.bow) ell(hx + hr * 0.75, hy - hr * 0.8, hr * 0.28, hr * 0.18, v.bow);
+  // face
+  const ex = hr * 0.38, ey = hy - hr * 0.1;
+  g.strokeStyle = '#2a1a1a'; g.lineWidth = Math.max(2, hr * 0.1); g.fillStyle = '#2a1a1a';
+  if (face === 'gag') { for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(hx + sx * ex - hr * 0.15, ey - hr * 0.12); g.lineTo(hx + sx * ex + hr * 0.15 * sx * 0 , ey); g.lineTo(hx + sx * ex - hr * 0.15, ey + hr * 0.12); g.stroke(); }
+    g.beginPath(); for (let i = 0; i <= 6; i++) g.lineTo(hx - hr * 0.35 + i * hr * 0.12, hy + hr * 0.45 + (i % 2 ? -1 : 1) * hr * 0.07); g.stroke(); ell(hx + hr * 0.08, hy + hr * 0.62, hr * 0.12, hr * 0.16, '#ff7a9a'); }
+  else if (face === 'faint') { for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(hx + sx * ex - hr * 0.13, ey - hr * 0.13); g.lineTo(hx + sx * ex + hr * 0.13, ey + hr * 0.13); g.moveTo(hx + sx * ex + hr * 0.13, ey - hr * 0.13); g.lineTo(hx + sx * ex - hr * 0.13, ey + hr * 0.13); g.stroke(); } ell(hx, hy + hr * 0.5, hr * 0.14, hr * 0.12, '#5a2a2a'); }
+  else if (face === 'scared') { for (const sx of [-1, 1]) { ell(hx + sx * ex, ey, hr * 0.24, hr * 0.28, '#fff'); g.lineWidth = 2; g.beginPath(); g.ellipse(hx + sx * ex, ey, hr * 0.24, hr * 0.28, 0, 0, 6.283); g.stroke(); ell(hx + sx * ex, ey, hr * 0.08, hr * 0.08, '#2a1a1a'); } ell(hx, hy + hr * 0.55, hr * 0.24, hr * 0.3, '#5a1a1a'); }
+  else { ell(hx - ex, ey, hr * 0.09, hr * 0.11, '#2a1a1a'); ell(hx + ex, ey, hr * 0.09, hr * 0.11, '#2a1a1a'); g.beginPath(); g.arc(hx, hy + hr * 0.3, hr * 0.32, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); ell(hx - hr * 0.6, hy + hr * 0.3, hr * 0.13, hr * 0.08, 'rgba(255,120,140,.45)'); ell(hx + hr * 0.6, hy + hr * 0.3, hr * 0.13, hr * 0.08, 'rgba(255,120,140,.45)'); }
+  if (v.glasses) { g.strokeStyle = '#5a3a2a'; g.lineWidth = Math.max(2, hr * 0.07); for (const sx of [-1, 1]) { g.beginPath(); g.arc(hx + sx * ex, ey, hr * 0.27, 0, 6.283); g.stroke(); } g.beginPath(); g.moveTo(hx - ex + hr * 0.27, ey); g.lineTo(hx + ex - hr * 0.27, ey); g.stroke(); }
+  if (v.stache) { ell(hx - hr * 0.17, hy + hr * 0.24, hr * 0.2, hr * 0.08, v.old ? '#e8e8ee' : v.hair, 0.2); ell(hx + hr * 0.17, hy + hr * 0.24, hr * 0.2, hr * 0.08, v.old ? '#e8e8ee' : v.hair, -0.2); }
+  if (v.beard) { g.fillStyle = 'rgba(42,26,16,.45)'; g.beginPath(); g.arc(hx, hy + hr * 0.2, hr * 0.85, 0.1 * Math.PI, 0.9 * Math.PI); g.fill(); }
+  if (v.old && face === 'happy') { g.strokeStyle = 'rgba(120,70,50,.4)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(hx - hr * 0.3, hy - hr * 0.55); g.lineTo(hx + hr * 0.3, hy - hr * 0.55); g.stroke(); }
+  g.restore();
+}
+function nameLabel(v, x, y, size) { g.font = FONT(size); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 6; g.strokeStyle = '#3a1a5a'; g.strokeText(v.name, x, y); g.fillStyle = '#fff'; g.fillText(v.name, x, y); }
+function playTrap(kind, victim, debug) {
+  const v = VBY[victim] || VICTIMS[0];
+  S.state = 'trap'; S.trap = { kind, v, t0: S.t, debug, ev: {} }; S.trapsPlayed = (S.trapsPlayed || 0) + 1;
   Music.start('party');
-  sayChain(['sp_trap', 'sp_trap_' + kind]);
-  setTimeout(() => { if (!S.active) return; S.trap = null; Music.start('spooky'); nextWord(); }, TRAP_SEC * 1000);
+  say('sp_' + kind + '_' + v.id);
+  const tok = S.trapTok = (S.trapTok || 0) + 1;
+  setTimeout(() => { if (!S.active || S.trapTok !== tok) return; S.trap = null; Music.start('spooky'); nextWord(); }, TRAP_SEC * 1000);
 }
 function once(id, fn) { if (!S.trap.ev[id]) { S.trap.ev[id] = 1; fn(); } }
+function bigText(txt, x, y, size, col) { g.font = FONT(size); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 8; g.strokeStyle = '#3a1a5a'; g.strokeText(txt, x, y); g.fillStyle = col || '#fff'; g.fillText(txt, x, y); }
+const thud = () => { Sfx.tone(140, 50, 0.25, 'sine', 0.35); Sfx.noise(0.18, 'lowpass', 400, 0.8, 0.35); };
+const scream = () => { Sfx.tone(500, 1300, 0.55, 'sawtooth', 0.07); Sfx.tone(520, 1350, 0.55, 'square', 0.04, 0.02); Sfx.noise(0.4, 'bandpass', 2400, 1.2, 0.12); };
+const slam = () => { Sfx.noise(0.2, 'lowpass', 300, 0.7, 0.6); Sfx.tone(90, 40, 0.3, 'sine', 0.4); };
 function drawTrap() {
-  const T = S.trap, t = S.t - T.t0, sz = Math.min(W, H) * 0.26, gy = H * 0.78;
+  const T = S.trap, v = T.v, t = S.t - T.t0;
+  const top = S.areaTop || 120, gy = H - Math.max(40, H * 0.08), sz = Math.min((gy - top) * 0.85, W * 0.32);
   g.fillStyle = 'rgba(20,0,40,.35)'; g.fillRect(0, 0, W, H);
-  g.font = FONT(Math.min(W * 0.07, 54)); g.textAlign = 'center'; g.fillStyle = '#fff'; g.strokeStyle = '#6a2a9a'; g.lineWidth = 7;
-  g.strokeText('BOOBY TRAP!', W / 2, H * 0.24); g.fillText('BOOBY TRAP!', W / 2, H * 0.24);
-  const walk = clamp(t / 2.6, 0, 1), x = -sz + (W / 2 + sz) * ease(walk), bob = Math.sin(t * 9) * (walk < 1 ? 10 : 0);
-  if (T.kind === 'ghost') {
-    // bucket hangs over the middle, tips at 2.8 s, slime falls on the ghost
-    const tip = clamp((t - 2.7) / 0.4, 0, 1);
-    g.strokeStyle = '#5a3a2a'; g.lineWidth = 5; g.beginPath(); g.moveTo(W / 2 - sz * 0.2, 0); g.lineTo(W / 2 - sz * 0.2, gy - sz * 1.9); g.stroke();
-    g.save(); g.translate(W / 2 - sz * 0.2, gy - sz * 1.75); g.rotate(tip * 2.2); emoji('🪣', 0, 0, sz * 0.6); g.restore();
-    const slimed = t > 3.2;
-    g.save(); g.translate(x, gy - sz * 0.6 + bob); if (t > 3.2) g.rotate(Math.sin(t * 14) * 0.15);
-    emoji('👻', 0, 0, sz * 1.1);
-    if (slimed) { g.globalAlpha = 0.85; ell(0, -sz * 0.25, sz * 0.48, sz * 0.32, '#5ee07a'); for (let i = -3; i <= 3; i++) ell(i * sz * 0.12, -sz * 0.05 + Math.abs(Math.sin(i + t)) * sz * 0.35 * clamp(t - 3.2, 0, 1), sz * 0.06, sz * 0.12, '#3fc95a'); g.globalAlpha = 1; }
-    g.restore();
-    if (t > 2.9 && t < 3.25) { const f = (t - 2.9) / 0.35; ell(W / 2, gy - sz * 1.6 + f * sz, sz * 0.3, sz * 0.25, '#5ee07a'); }
-    if (t > 3.2) once('splat', () => { Sfx.noise(0.5, 'lowpass', 600, 0.8, 0.6); Sfx.tone(200, 60, 0.4, 'sine', 0.3); for (let i = 0; i < 40; i++) S.fx.push({ type: 'p', x: W / 2, y: gy - sz * 0.8, vx: rnd(-380, 380), vy: rnd(-500, -100), t: 0, life: 1.4, col: pick(['#5ee07a', '#3fc95a', '#b8ff9a']), r: rnd(5, 12) }); S.fx.push({ type: 'txt', text: 'SPLAT!', x: W / 2, y: gy - sz * 1.4, t: 0, life: 1.6, size: 70, col: '#b8ff9a' }); });
-    if (t > 4.5) { g.font = FONT(sz * 0.2); g.fillStyle = '#fff'; g.fillText('Ewww, slimy!', W / 2 + sz * 0.9, gy - sz * 1.2); }
-  } else if (T.kind === 'witch') {
-    const cush = { x: W / 2 + sz * 0.15, y: gy };
-    if (t < 3.1) { ell(cush.x, cush.y, sz * 0.32, sz * 0.12, '#ff6fb1'); ell(cush.x - sz * 0.33, cush.y, sz * 0.08, sz * 0.05, '#e04d90'); }
-    else { ell(cush.x, cush.y + 4, sz * 0.34, sz * 0.05, '#ff6fb1'); }
-    const jump = t > 3.1 && t < 3.9 ? Math.sin((t - 3.1) / 0.8 * Math.PI) * sz * 0.5 : 0;
-    g.save(); g.translate(x, gy - sz * 0.55 + bob - jump); emoji('🧙', 0, 0, sz * 1.1);
-    if (t > 4.5) { ell(0, -sz * 0.2, sz * 0.32, sz * 0.26, '#fff8e8'); ell(-sz * 0.1, -sz * 0.25, sz * 0.06, sz * 0.05, '#ffd0d8'); ell(sz * 0.12, -sz * 0.15, sz * 0.07, sz * 0.05, '#ffe9a8'); }
-    g.restore();
-    if (t > 3.1) once('pfft', () => { Sfx.fart && Sfx.fart(); S.fx.push({ type: 'txt', text: 'PFFFFT!', x: cush.x, y: gy - sz * 0.9, t: 0, life: 1.5, size: 64, col: '#ff9ad0' }); });
-    if (t > 3.8 && t < 4.5) { const f = (t - 3.8) / 0.7; g.save(); g.translate(W + sz * 0.3 - (W + sz * 0.3 - W / 2) * f, gy - sz * 0.75 - Math.sin(f * Math.PI) * sz * 0.5); g.rotate(f * 8); emoji('🥧', 0, 0, sz * 0.5); g.restore(); }
-    if (t > 4.5) once('pie', () => { Sfx.slap ? Sfx.slap() : Sfx.boop(); for (let i = 0; i < 30; i++) S.fx.push({ type: 'p', x: W / 2, y: gy - sz * 0.7, vx: rnd(-300, 300), vy: rnd(-400, -50), t: 0, life: 1.2, col: pick(['#fff8e8', '#ffd0d8', '#ffe9a8']), r: rnd(5, 11) }); S.fx.push({ type: 'txt', text: 'SPLAT!', x: W / 2, y: gy - sz * 1.3, t: 0, life: 1.5, size: 70, col: '#fff' }); });
-    if (t > 5) { g.font = FONT(sz * 0.2); g.fillStyle = '#fff'; g.fillText('Hee hee! Pie face!', W / 2, gy - sz * 1.5); }
-  } else {   // mummy: feathers tickle, the bandages fly off
-    const unr = clamp((t - 3.5) / 3, 0, 1), lx = x, ly = gy - sz * 0.6 + bob + (t > 3 ? Math.sin(t * 20) * 6 : 0);
-    g.save(); g.translate(lx, ly); g.rotate(t > 3 ? Math.sin(t * 16) * 0.12 : 0);
-    ell(0, 0, sz * 0.32, sz * 0.5, '#efe6cf'); ell(0, -sz * 0.6, sz * 0.25, sz * 0.24, '#efe6cf');
-    g.strokeStyle = '#c8b994'; g.lineWidth = 5;
-    for (let i = 0; i < 9; i++) { if (i / 9 < unr) continue; const yy = -sz * 0.75 + i * sz * 0.14; g.beginPath(); g.moveTo(-sz * 0.3, yy); g.lineTo(sz * 0.3, yy + sz * 0.05); g.stroke(); }
-    ell(-sz * 0.09, -sz * 0.62, sz * 0.05, sz * 0.06, '#222'); ell(sz * 0.09, -sz * 0.62, sz * 0.05, sz * 0.06, '#222');
-    g.fillStyle = '#7a2a2a'; g.beginPath(); g.arc(0, -sz * 0.5, sz * (t > 3 ? 0.08 : 0.03), 0, Math.PI); g.fill();
-    if (unr > 0.5) emoji('🩲', 0, sz * 0.15, sz * 0.32);
-    g.restore();
-    if (t > 2.6) for (let i = 0; i < 3; i++) emoji('🪶', lx + Math.cos(t * 9 + i * 2) * sz * 0.45, ly + Math.sin(t * 11 + i * 2) * sz * 0.4, sz * 0.25);
-    for (let i = 0; i < 9; i++) if (i / 9 < unr) { const f = clamp((unr - i / 9) * 3, 0, 1); g.strokeStyle = '#efe6cf'; g.lineWidth = 8; g.beginPath(); g.moveTo(lx, ly - sz * 0.6 + i * sz * 0.14); g.quadraticCurveTo(lx + (i % 2 ? 1 : -1) * sz * f * 1.2, ly - sz * f, lx + (i % 2 ? 1 : -1) * sz * f * 2.2, ly - sz * 0.4 * f + i * 6); g.stroke(); }
-    if (t > 3) { once('lol', () => { for (let i = 0; i < 8; i++) Sfx.tone(700 + i * 40, 900 + i * 60, 0.09, 'triangle', 0.12, i * 0.13); }); g.font = FONT(sz * 0.22); g.fillStyle = '#fff'; g.fillText('HA HA HEE HEE!', lx, ly - sz * 1.05); }
+  g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(0, gy, W, H - gy);
+  bigText(T.kind === 'stink' ? 'STINK BOMB! 💣' : 'SCARY DOOR! 🚪', W / 2, top + Math.min(W * 0.05, 34), Math.min(W * 0.07, 50));
+  if (T.kind === 'stink') {
+    // timeline: 0-1.2 bomb arcs in; 1.2-2.8 gagging; then 3+ faint / get up / crawl cycles; 10.4 gotcha
+    const C0 = 2.8, CY = 2.5, nC = 3;
+    let x = W * 0.3, rot = 0, face = 'happy', walk = false, shake = 0;
+    const ci = Math.floor((t - C0) / CY), ct = (t - C0) - ci * CY;
+    const crawled = clamp(ci, 0, nC) * sz * 0.45 + (ci >= 0 && ci < nC ? clamp((ct - 1.4) / 0.8, 0, 1) * sz * 0.45 : 0);
+    x += t > C0 ? crawled : 0;
+    if (t > 1.2) face = 'gag';
+    if (t > 1.2 && t < C0) shake = Math.sin(t * 40) * 4;
+    if (t >= C0 && ci < nC) {
+      if (ct < 0.45) { rot = ease(ct / 0.45) * Math.PI / 2 * (ci === 0 ? 1 : 1); face = 'faint'; if (ct < 0.45 && ct > 0.4) {} }
+      else if (ct < 1.1) { rot = Math.PI / 2; face = 'faint'; }
+      else if (ct < 1.4) { rot = Math.PI / 2 - ease((ct - 1.1) / 0.3) * (Math.PI / 2 - 1.05); face = 'gag'; }
+      else if (ct < 2.2) { rot = 1.05 + Math.sin(ct * 14) * 0.06; face = 'gag'; walk = true; }
+      else { rot = 1.05 - ease((ct - 2.2) / 0.3) * 0.5; face = 'gag'; }
+      if (ct > 0.42) once('thud' + ci, () => { thud(); S.fx.push({ type: 'txt', text: ['THUD!', 'BONK!', 'FLOP!'][ci % 3], x: x + sz * 0.6, y: gy - sz * 0.4, t: 0, life: 1, size: 44, col: '#ffd84d' }); if (ci === 0) say('sp_faint'); if (ci === 1) say('sp_crawl'); });
+    } else if (t >= C0) { rot = Math.PI / 2; face = 'faint'; }
+    // bomb
+    const bx = W * 0.3 + sz * 0.55, land = clamp(t / 1.2, 0, 1);
+    const bpx = W + 40 + (bx - W - 40) * land, bpy = (top + 40) + (gy - 20 - top - 40) * land - Math.sin(land * Math.PI) * sz * 0.5;
+    g.save(); g.translate(bpx, bpy); g.rotate(land * 8); emoji('💣', 0, 0, sz * 0.28); g.restore();
+    if (t > 1.2) once('land', () => { Sfx.poof(); say('sp_smelly'); });
+    // stink clouds + flies (follow the victim)
+    if (t > 1.2) {
+      const n = Math.min(14, Math.floor((t - 1.2) * 6));
+      for (let i = 0; i < n; i++) { const a = i * 2.4 + t * 0.6, rr2 = sz * (0.25 + (i % 4) * 0.12); g.globalAlpha = 0.45; ell((bx + x) / 2 + Math.cos(a) * rr2 * 1.4, gy - sz * 0.45 + Math.sin(a * 1.3) * rr2 * 0.8, sz * 0.16, sz * 0.12, i % 2 ? '#7ed957' : '#a8e86a'); g.globalAlpha = 1; }
+      for (let i = 0; i < 5; i++) emoji('🪰', x + Math.cos(t * (5 + i) + i * 2) * sz * 0.45, gy - sz * 0.9 + Math.sin(t * (7 + i) + i) * sz * 0.3, sz * 0.09);
+      for (let i = 0; i < 3; i++) { g.strokeStyle = 'rgba(110,200,80,.8)'; g.lineWidth = 5; g.beginPath(); const sx = bx - sz * 0.1 + i * sz * 0.1; for (let j = 0; j < 8; j++) g.lineTo(sx + Math.sin(t * 6 + j + i) * 8, gy - 30 - j * sz * 0.07); g.stroke(); }
+    }
+    g.save(); g.translate(x + shake, gy); g.rotate(rot); drawPerson(v, 0, 0, sz, { face, t, walk }); g.restore();
+    if (face === 'faint') for (let i = 0; i < 3; i++) { const a = t * 6 + i * 2.1; emoji(i % 2 ? '💫' : '⭐', x + sz * 0.8 + Math.cos(a) * sz * 0.15, gy - sz * 0.25 + Math.sin(a) * sz * 0.06, sz * 0.1); }
+    if (t > 1.3 && t < C0) bigText('Pee-yew! 🤢', x, gy - sz * 1.15, Math.min(W * 0.05, 36), '#b8ff9a');
+    nameLabel(v, x, Math.min(H - 16, gy + 22), Math.min(W * 0.045, 30));
+  } else {
+    // scary door: 3 cycles of open -> BOO -> jump + scream -> slam -> tiptoe back
+    const dx = W * 0.32, dw = sz * 0.55, dh = sz * 1.05, C0 = 1.0, CY = 3.3, nC = 3;
+    const ci = Math.floor((t - C0) / CY), ct = (t - C0) - ci * CY, act = t >= C0 && ci < nC;
+    let open = 0, jump = 0, face = 'happy', arms = '', back = 0, walk = false;
+    if (act) {
+      open = ct < 0.8 ? ease(ct / 0.8) : ct < 1.9 ? 1 : ct < 2.1 ? 1 - ease((ct - 1.9) / 0.2) : 0;
+      if (ct > 0.85 && ct < 2.2) { face = 'scared'; arms = 'up'; jump = ct < 1.5 ? Math.sin((ct - 0.85) / 0.65 * Math.PI) * sz * 0.45 : 0; }
+      back = ct < 0.85 ? 0 : ct < 1.5 ? ease((ct - 0.85) / 0.65) * sz * 0.35 : ct < 2.4 ? sz * 0.35 : sz * 0.35 * (1 - ease((ct - 2.4) / 0.8));
+      walk = ct > 2.4;
+      if (ct > 2.2 && ct < 2.4) face = 'scared';
+      if (ct > 0.85) once('boo' + ci, () => { scream(); S.fx.push({ type: 'txt', text: 'AAAAH!', x: dx + dw * 1.6, y: gy - sz * 1.2, t: 0, life: 1.1, size: 54, col: '#ff5d8f' }); if (ci === 0) say('sp_scream'); });
+      if (ct > 2.05) once('slam' + ci, () => { slam(); S.fx.push({ type: 'txt', text: 'SLAM!', x: dx, y: gy - dh - 10, t: 0, life: 0.9, size: 44, col: '#ffd84d' }); });
+      if (ct > 2.6 && ci < nC - 1) once('again' + ci, () => say('sp_again_door'));
+    }
+    // wall + door frame
+    g.fillStyle = '#6a4a8a'; g.fillRect(dx - dw * 0.75, gy - dh - sz * 0.15, dw * 1.5, dh + sz * 0.15);
+    g.fillStyle = '#1a0a2a'; g.fillRect(dx - dw / 2, gy - dh, dw, dh);
+    // scarer pops out of the dark doorway
+    if (act && open > 0.3 && ct > 0.75 && ct < 2.1) {
+      const sc = ease(clamp((ct - 0.75) / 0.25, 0, 1)) * (1 + 0.1 * Math.sin(ct * 20)), who = ['👻', '🎃', '🕷️'][ci % 3];
+      if (who === '🕷️') { g.strokeStyle = '#ddd'; g.lineWidth = 2; g.beginPath(); g.moveTo(dx, gy - dh); g.lineTo(dx, gy - dh * 0.55); g.stroke(); }
+      g.save(); g.translate(dx + dw * 0.1, gy - dh * 0.5); g.scale(sc, sc); emoji(who, 0, 0, dw * 1.1); g.restore();
+      if (ct < 1.4) bigText('BOO!', dx + dw * 0.1, gy - dh - 24, Math.min(W * 0.06, 44), '#ffd84d');
+    }
+    // door panel (hinged on the left, swings open)
+    const pw = dw * (1 - open * 0.85);
+    g.fillStyle = '#c8742a'; g.fillRect(dx - dw / 2, gy - dh, pw, dh); g.strokeStyle = '#7a4a1a'; g.lineWidth = 4; g.strokeRect(dx - dw / 2, gy - dh, pw, dh);
+    ell(dx - dw / 2 + pw * 0.85, gy - dh * 0.5, Math.max(2, dw * 0.05 * (1 - open)), dw * 0.05, '#ffd84d');
+    emoji('🎃', dx + dw * 0.75, gy - sz * 0.12, sz * 0.2);
+    const vx = dx + dw * 1.25 + back;
+    g.save(); g.translate(vx, gy - jump); if (face === 'scared') g.translate(Math.sin(t * 50) * 3, 0); drawPerson(v, 0, 0, sz * 0.95, { face, t, arms, walk }); g.restore();
+    nameLabel(v, vx, Math.min(H - 16, gy + 22), Math.min(W * 0.045, 30));
   }
-  if (t > 3.2 && Math.random() < 0.7) confetti(4);
-  if (t > 6.5) once('tada', () => Sfx.victory && Sfx.victory());
+  if (t > TRAP_SEC - 1.6) { once('done', () => { say('sp_trapdone'); Sfx.victory && Sfx.victory(); }); bigText('GOTCHA! 😂', W / 2, H * 0.42, Math.min(W * 0.09, 64), '#ffd84d'); if (Math.random() < 0.8) confetti(4); }
 }
 
 /* ===== scene drawing ===== */
@@ -451,7 +576,9 @@ function drawTags() {
       const r = tagRect(sp), c = sp.cell; sp.rect = r;
       g.save(); g.beginPath(); g.rect(c.x - c.w / 2, c.y - 4, c.w, c.h * 0.58 + c.h * 0.3); g.clip();
       const wob = S.t - sp.wob < 0.7 ? Math.sin((S.t - sp.wob) * 30) * 0.12 * (1 - (S.t - sp.wob) / 0.7) : 0;
-      g.translate(r.x + r.w / 2, r.y + r.h / 2); g.rotate(wob); tag(sp.w, 0, 0, sp.col, 1); g.restore();
+      g.translate(r.x + r.w / 2, r.y + r.h / 2); g.rotate(wob); const sc = sp.sc || 1; g.scale(sc, sc);
+      if (sp.st === 'up' || sp.st === 'rising') { g.shadowColor = sp.col; g.shadowBlur = 14 + 12 * Math.sin(S.t * 5 + sp.cell.x); }   // glow pulse while up
+      tag(sp.w, 0, 0, sp.col, 1 + (sp.st === 'up' ? 0.04 * Math.sin(S.t * 5 + sp.cell.x) : 0)); g.restore();
       // peeking eyes
       if (sp.up > 0.6) { ell(c.x - 12, r.y + r.h + 10, 7, 8, '#fff'); ell(c.x + 12, r.y + r.h + 10, 7, 8, '#fff'); ell(c.x - 12, r.y + r.h + 12, 3.5, 4, '#222'); ell(c.x + 12, r.y + r.h + 12, 3.5, 4, '#222'); }
     } else sp.rect = null;
@@ -529,7 +656,7 @@ function frame() {
   tickSpots(dt);
   drawScene();
   if (S.state === 'trap' && S.trap) drawTrap();
-  else if (!/^(shop|saving|gift)$/.test(S.state)) drawTags();
+  else if (!/^(shop|saving|gift|victim)$/.test(S.state)) drawTags();
   if (S.state === 'party') drawParty();
   if (S.gift) { const k = ease((S.t - S.gift.t0) / 0.6); emoji(S.gift.e, W / 2, H * 0.5 - k * 30, Math.min(W, H) * 0.12 + 140 * k); if (Math.random() < 0.5) confetti(2); }
   drawDollar();

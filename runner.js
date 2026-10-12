@@ -133,7 +133,8 @@ function buildQuestions(n) {
     if (!bag.length) bag = shuffle(pool);
     let item = bag.pop();
     const prev = qs[qs.length - 1];
-    if (prev && prev.id === JSON.stringify(item) && bag.length) { bag.unshift(item); item = bag.pop(); }
+    const same = x => prev && (prev.id === JSON.stringify(x) || (L.type === 'math' && prev.ans === x.ans));   // v12: no back-to-back repeats (math: not even the same answer)
+    for (let tries = 0; same(item) && bag.length && tries < bag.length; tries++) { bag.unshift(item); item = bag.pop(); }
     let q;
     if (L.type === 'words') {
       q = { id: JSON.stringify(item), ans: item, opts: [item, ...wordDistractors(item, pool)], k: wkey(item) };
