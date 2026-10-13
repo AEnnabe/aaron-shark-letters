@@ -122,7 +122,7 @@ addEventListener('resize', resize);
 function rr(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 function ell(x, y, rx, ry, c, rot = 0) { g.fillStyle = c; g.beginPath(); g.ellipse(x, y, Math.max(0.1, rx), Math.max(0.1, ry), rot, 0, 6.283); g.fill(); }
 function emoji(e, x, y, s) { g.font = `${Math.round(s)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(e, x, y); }
-const FONT = s => `900 ${Math.round(s)}px ui-rounded, "Arial Rounded MT Bold", "Comic Sans MS", system-ui, sans-serif`;
+const FONT = s => `700 ${Math.round(s)}px 'Fredoka', ui-rounded, "Arial Rounded MT Bold", "Comic Sans MS", system-ui, sans-serif`;
 const TAGC = ['#ff7a2f', '#a66bff', '#2fbf5a', '#ff5d8f', '#2a9fd6', '#ffb800'];
 
 /* ===== layout: 5 non-overlapping cells below the HUD ===== */
@@ -130,7 +130,7 @@ function hudBottom() { const h = $s('shud').getBoundingClientRect(); return h.bo
 function layout() {
   const top = hudBottom() + 8;
   const pr = $s('sprompt'); pr.style.top = top + 'px'; pr.innerHTML = `<small>Find:</small>${S.target || 'little'}`; pr.style.visibility = 'visible';
-  const pb = pr.getBoundingClientRect().bottom + 8;
+  const pb = pr.getBoundingClientRect().bottom + 14; S._prH = pr.offsetHeight;
   const sa = getComputedStyle(document.documentElement);
   const l = 10, r = W - 10, b = H - 40;
   const portrait = H > W * 1.05;
@@ -587,8 +587,10 @@ function drawTags() {
 }
 function tag(w, cx, cy, col, sc) {
   const fs = S.fs * sc; g.font = FONT(fs); const tw = g.measureText(w).width, bw = Math.max(tw + fs * 1.0, fs * 2.6, 70 * sc), bh = Math.max(fs * 1.45, 64 * sc);
-  g.fillStyle = 'rgba(0,0,0,.25)'; rr(cx - bw / 2 + 3, cy - bh / 2 + 5, bw, bh, bh * 0.35); g.fill();
-  g.fillStyle = '#fff'; rr(cx - bw / 2, cy - bh / 2, bw, bh, bh * 0.35); g.fill(); g.lineWidth = Math.max(5, fs * 0.12); g.strokeStyle = col; g.stroke();
+  g.fillStyle = 'rgba(20,0,40,.28)'; rr(cx - bw / 2 + 2, cy - bh / 2 + 6, bw, bh, bh * 0.42); g.fill();   // v13: soft drop shadow
+  const tg = g.createLinearGradient(0, cy - bh / 2, 0, cy + bh / 2); tg.addColorStop(0, '#ffffff'); tg.addColorStop(1, '#f3eeff');
+  g.fillStyle = tg; rr(cx - bw / 2, cy - bh / 2, bw, bh, bh * 0.42); g.fill(); g.lineWidth = Math.max(5, fs * 0.12); g.strokeStyle = col; g.stroke();
+  g.fillStyle = 'rgba(255,255,255,.8)'; rr(cx - bw / 2 + 8, cy - bh / 2 + 5, bw - 16, bh * 0.28, bh * 0.14); g.fill();
   g.fillStyle = '#2a1840'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(w, cx, cy + fs * 0.04);
 }
 const CONF = ['#ff7a2f', '#a66bff', '#5ee07a', '#ffd84d', '#ff5d8f', '#4dc4ff'];
@@ -598,7 +600,14 @@ function drawFx(dt) {
     const f = S.fx[i]; f.t += dt; if (f.t > f.life || f.y > H + 50) { S.fx.splice(i, 1); continue; }
     const a = 1 - f.t / f.life;
     if (f.type === 'p') { f.vy += 600 * dt; f.x += f.vx * dt; f.y += f.vy * dt; g.globalAlpha = a; ell(f.x, f.y, f.r, f.r, f.col); }
-    else if (f.type === 'c') { f.x += f.vx * dt; f.y += f.vy * dt; f.rot += dt * 5; g.save(); g.translate(f.x, f.y); g.rotate(f.rot); g.fillStyle = f.col; g.fillRect(-f.r, -f.r / 2, f.r * 2, f.r); g.restore(); }
+    else if (f.type === 'c') {   // v13: fluttering confetti: ribbons, dots and little stars with a shine
+      f.x += (f.vx + Math.sin(f.t * 3 + f.rot) * 40) * dt; f.y += f.vy * dt; f.rot += dt * 4; const fl = Math.cos(f.t * 9 + f.r); g.globalAlpha = 1;
+      g.save(); g.translate(f.x, f.y); g.rotate(f.rot); g.scale(1, fl); g.fillStyle = f.col; const sh = (f.r * 7 | 0) % 3;
+      if (sh === 0) { g.beginPath(); g.roundRect ? g.roundRect(-f.r, -f.r * 0.4, f.r * 2, f.r * 0.8, f.r * 0.3) : g.rect(-f.r, -f.r * 0.4, f.r * 2, f.r * 0.8); g.fill(); }
+      else if (sh === 1) { g.beginPath(); g.arc(0, 0, f.r * 0.6, 0, 6.283); g.fill(); }
+      else { g.beginPath(); for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5, rr2 = i % 2 ? f.r * 0.45 : f.r; g.lineTo(Math.cos(a) * rr2, Math.sin(a) * rr2); } g.closePath(); g.fill(); }
+      if (fl > 0.6) { g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(-f.r * 0.6, -f.r * 0.3, f.r * 0.5, f.r * 0.25); }
+      g.restore(); }
     else { g.globalAlpha = a; f.y -= 40 * dt; if (/^\p{Extended_Pictographic}/u.test(f.text)) emoji(f.text, f.x, f.y, f.size || 48); else { g.font = FONT(f.size || 40); g.textAlign = 'center'; g.lineWidth = 6; g.strokeStyle = '#4a2a7a'; g.strokeText(f.text, f.x, f.y); g.fillStyle = f.col || '#ffd84d'; g.fillText(f.text, f.x, f.y); } }
     g.globalAlpha = 1;
   }
@@ -660,6 +669,8 @@ function frame() {
   if (S.state === 'party') drawParty();
   if (S.gift) { const k = ease((S.t - S.gift.t0) / 0.6); emoji(S.gift.e, W / 2, H * 0.5 - k * 30, Math.min(W, H) * 0.12 + 140 * k); if (Math.random() < 0.5) confetti(2); }
   drawDollar();
+  if (!S.vig || S.vig.w !== W || S.vig.h !== H) { const r = g.createRadialGradient(W / 2, H * 0.5, Math.min(W, H) * 0.35, W / 2, H * 0.5, Math.max(W, H) * 0.75); r.addColorStop(0, 'rgba(0,0,0,0)'); r.addColorStop(1, 'rgba(15,0,35,.32)'); S.vig = { w: W, h: H, r }; }
+  g.fillStyle = S.vig.r; g.fillRect(0, 0, W, H);   // v13: soft vignette
   drawFx(dt);
   hud();
 }
@@ -673,6 +684,7 @@ requestAnimationFrame(frame);
   st.appendChild(b);
 })();
 
+if (window.ResizeObserver) new ResizeObserver(() => requestAnimationFrame(() => { const pr = $s('sprompt'); if (S.active && pr && pr.offsetHeight !== S._prH) layout(); })).observe($s('sprompt'));
 S.start = start; S.tagRect = tagRect; S.layoutNow = layout;
 S.cheatWin = () => { S.streak = 2; const sp = S.spots.find(s => s.w === S.target); sp.st = 'up'; sp.up = 1; tap(sp); };
 })();
