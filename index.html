@@ -249,7 +249,7 @@
    ================================================================ */
 const params = new URLSearchParams(location.search);
 // Timing multiplier (used by automated tests: ?speed=0.2 makes celebrations faster)
-const BUILD = '13';   // bump to bust caches for audio/icons
+const BUILD = '14';   // bump to bust caches for audio/icons
 const SPEED = Math.min(1, Math.max(0.05, parseFloat(params.get('speed')) || 1));
 const TS = Math.max(SPEED, 0.25);   // time scale for scripted scenes (killer whale reward / game over); ?speed shortens them in tests
 const MAX_LIVES = 5;
@@ -2897,6 +2897,6 @@ window.SharkABC = {
 };
 })();
 </script>
-<script>(function(){var B=window.SharkCore.BUILD;document.write('<script src="runner-data.js?v='+B+'"><\/script><script src="spooky-data.js?v='+B+'"><\/script><script src="runner.js?v='+B+'"><\/script><script src="spooky.js?v='+B+'"><\/script><script src="theme.js?v='+B+'"><\/script>')})()</script>
+<script>(function(){var B=window.SharkCore.BUILD;document.write('<script src="runner-data.js?v='+B+'"><\/script><script src="spooky-data.js?v='+B+'"><\/script><script src="runner.js?v='+B+'"><\/script><script src="spooky.js?v='+B+'"><\/script><script src="cat-data.js?v='+B+'"><\/script><script src="catchase.js?v='+B+'"><\/script><script src="theme.js?v='+B+'"><\/script>')})()</script>
 </body>
 </html>

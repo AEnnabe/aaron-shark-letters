@@ -86,6 +86,7 @@ const MENU_GROUPS = [
   { name: 'Andrew', icon: '🐍😎', color: '#d98a2b', levels: [19, 20, 21] },
   { name: 'Penny', icon: '🐬', color: '#2a9fd6', levels: [22, 23, 24] },
   { name: 'Oliver', icon: '🦍', color: '#5a7a2a', levels: [25, 26, 27] },
+  { name: 'Cat Chase', icon: '🐱🐈', color: '#e0607e', levels: [28], family: 1 },   // v14: whole family (catchase.js)
 ];
 /* v8: per-kid reward props (shown for ~1.3 s after EVERY correct answer) and swim snacks */
 const PERKS = {
@@ -282,7 +283,7 @@ function pill(label, cx, cy, maxW, want, border, opt = {}) {
     gr.levels.forEach(n => {
       const b = document.createElement('button'); b.textContent = n; b.setAttribute('aria-label', 'Level ' + n); b.dataset.level = n;
       const col = document.createElement('div'); col.className = 'rcol'; col.dataset.level = n; col.appendChild(b);
-      const s = document.createElement('small'); s.innerHTML = `Level ${n} – ${gr.name}<br><span style="opacity:.8">${n <= 3 ? (n === 1 ? 'Shark ABC' : n === 2 ? 'Race the whale!' : 'Spooky Word Hunt') : RL[n].title}</span>`; b.setAttribute('aria-label', `Level ${n} – ${gr.name}`); col.appendChild(s);
+      const s = document.createElement('small'); s.innerHTML = n === 28 ? `Level 28 – Everyone<br><span style="opacity:.8">Eat, bite &amp; add!</span>` : `Level ${n} – ${gr.name}<br><span style="opacity:.8">${n <= 3 ? (n === 1 ? 'Shark ABC' : n === 2 ? 'Race the whale!' : 'Spooky Word Hunt') : RL[n].title}</span>`; b.setAttribute('aria-label', `Level ${n} – ${gr.name}`); col.appendChild(s);
       bx.appendChild(col);
     });
     wrap.appendChild(d);
@@ -290,7 +291,7 @@ function pill(label, cx, cy, maxW, want, border, opt = {}) {
   // v8: the whole card is the tap target. Tapping a number OR its caption starts that level; tapping the card's
   // name/icon starts the card's first level. (v7 only listened on the small circle, so a tap anywhere else on a
   // card fell through to the start screen's "tap anywhere = Level 1" handler and opened Aaron's shark game.)
-  const go = n => { if (n === 1 && p1) return p1.click(); if (n === 2 && p2) return p2.click(); if (n === 3 && window.Spooky) { Sfx.unlock(); Speech.prime && Speech.prime(); document.getElementById('start').classList.add('hidden'); return window.Spooky.start(); } startRunnerFromMenu(n); };
+  const go = n => { if (n === 1 && p1) return p1.click(); if (n === 2 && p2) return p2.click(); if (n === 28 && window.CatChase) { Sfx.unlock(); Speech.prime && Speech.prime(); return window.CatChase.start(); } if (n === 3 && window.Spooky) { Sfx.unlock(); Speech.prime && Speech.prime(); document.getElementById('start').classList.add('hidden'); return window.Spooky.start(); } startRunnerFromMenu(n); };
   wrap.addEventListener('click', e => {
     e.stopPropagation(); e.preventDefault();
     const c = e.target.closest('.rcol'), gr = e.target.closest('.rgroup');
@@ -300,6 +301,7 @@ function pill(label, cx, cy, maxW, want, border, opt = {}) {
   if (lv) { lv.style.display = 'none'; lv.parentNode.insertBefore(wrap, lv.nextSibling); }
   // ?level=3 (Spooky Word Hunt) / ?level=4..27: a tap anywhere on the start screen starts that runner level
   const want = parseInt(P.get('level'), 10);
+  if (want === 28) start.addEventListener('click', e => { if (e.target.closest('.rpick')) return; e.stopPropagation(); go(28); }, true);
   if (want === 3) start.addEventListener('click', e => { if (e.target.closest('.rpick')) return; e.stopPropagation(); go(3); }, true);
   if (RL[want]) start.addEventListener('click', e => { if (e.target.closest('.rpick')) return; e.stopPropagation(); startRunnerFromMenu(want); }, true);
 })();

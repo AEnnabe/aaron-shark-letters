@@ -24,7 +24,7 @@ body,button{font-family:var(--font) !important;}
   box-shadow:0 10px 26px rgba(4,20,60,.32),0 2px 6px rgba(4,20,60,.2),inset 0 1px 0 rgba(255,255,255,.55) !important;
   transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .18s;animation:v13pop .45s cubic-bezier(.2,.8,.2,1) both}
 .rgroup:nth-child(2){animation-delay:.03s}.rgroup:nth-child(3){animation-delay:.06s}.rgroup:nth-child(4){animation-delay:.09s}.rgroup:nth-child(5){animation-delay:.12s}
-.rgroup:nth-child(6){animation-delay:.15s}.rgroup:nth-child(7){animation-delay:.18s}.rgroup:nth-child(8){animation-delay:.21s}.rgroup:nth-child(9){animation-delay:.24s}
+.rgroup:nth-child(6){animation-delay:.15s}.rgroup:nth-child(7){animation-delay:.18s}.rgroup:nth-child(8){animation-delay:.21s}.rgroup:nth-child(9){animation-delay:.24s}.rgroup:nth-child(10){animation-delay:.27s}
 .rgroup:active{transform:scale(.97)}
 .rgroup .gname{font-weight:700 !important;text-shadow:0 1px 0 rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.18) !important}
 .rgroup .gicon{filter:drop-shadow(0 4px 6px rgba(0,0,0,.22))}
