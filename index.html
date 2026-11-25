@@ -157,6 +157,15 @@
   #lvl b{font-size:26px;}
   #lvl.land{left:calc(env(safe-area-inset-left,0px) + 78px);top:calc(var(--stripB,60px) + 10px);}
   #lvl.port{right:calc(env(safe-area-inset-right,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 78px);}
+
+  /* Ennabe Casino prank link (standalone page; does not affect levels) */
+  .casino-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    margin:2.2vmin 0 0;padding:10px 22px;min-height:44px;border-radius:999px;text-decoration:none;
+    font-weight:900;color:#3a2200;background:linear-gradient(180deg,#ffe9a3,#f0c14b 55%,#d4a017);
+    border:2px solid rgba(255,255,255,.75);box-shadow:0 4px 0 #8a5a00,0 8px 18px rgba(0,0,0,.3);
+    touch-action:manipulation;pointer-events:auto;font-size:min(3.6vmin,18px);letter-spacing:.02em;
+    z-index:6;}
+  .casino-link:active{transform:translateY(3px);box-shadow:0 1px 0 #8a5a00,0 4px 10px rgba(0,0,0,.3);}
 </style>
 </head>
 <body>
@@ -186,6 +195,7 @@
     </div>
   </div>
   <div class="sub">Pick your level!</div>
+  <a id="casinoLink" class="casino-link" href="casino.html">♠ Ennabe Casino — Apply Now</a>
   <div class="credit">Designed by Dad (Adam Ennabe) for Aaron
     <span class="tip" id="a2hs">Tip: tap Share, then “Add to Home Screen” for full screen</span></div>
 </div>
@@ -2658,6 +2668,7 @@ function startGame(lv) {
 // Only debug links (?level=1|2, ?boss, ?party, ?start) keep "tap anywhere to start".
 const TAP_ANYWHERE = /^[12]$/.test(params.get('level') || '') || BOSS_JUMP || params.has('party') || params.has('start');
 $('start').addEventListener('click', () => { if (TAP_ANYWHERE) startGame(startLevel); });
+$('casinoLink') && $('casinoLink').addEventListener('click', e => { e.stopPropagation(); });
 $('play').addEventListener('click', e => { e.stopPropagation(); startGame(1); });
 $('play2').addEventListener('click', e => { e.stopPropagation(); startGame(2); });
 $('tryagain').addEventListener('click', e => { e.stopPropagation(); restartGame(level().id); });

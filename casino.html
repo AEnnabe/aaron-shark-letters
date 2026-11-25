@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#071910">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="Ennabe Casino Credit Application — private credit desk.">
+<title>Ennabe Casino Credit Application</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+  :root{
+    --felt:#0a2a1c;
+    --felt-2:#0d3b27;
+    --gold:#e6c35a;
+    --gold-2:#f8e7a0;
+    --gold-dk:#9a6f14;
+    --ink:#140f08;
+    --ivory:#f7f1de;
+    --panel:#161109;
+    --red:#b4232c;
+    --ok:#1f8a4c;
+    --safe-t:env(safe-area-inset-top,0px);
+    --safe-r:env(safe-area-inset-right,0px);
+    --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-l:env(safe-area-inset-left,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;min-height:100%;background:#071910;color:var(--ivory);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    -webkit-text-size-adjust:100%;}
+  body{min-height:100dvh;overflow-x:hidden;}
+  button{font-family:inherit;appearance:none;-webkit-appearance:none;border:0;cursor:pointer;touch-action:manipulation;}
+
+  /* ===== Casino backdrop: felt, lamps, chips, cards ===== */
+  .felt{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 0%, rgba(232,196,90,.18), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 50% 110%, rgba(0,0,0,.55), transparent 60%),
+      radial-gradient(circle at 18% 22%, rgba(255,220,120,.08), transparent 28%),
+      radial-gradient(circle at 82% 18%, rgba(255,180,60,.07), transparent 26%),
+      repeating-linear-gradient(45deg, rgba(255,255,255,.025) 0 2px, transparent 2px 11px),
+      radial-gradient(ellipse at 50% 40%, #145536, var(--felt) 70%);
+  }
+  .felt::before{
+    content:"";position:absolute;inset:18px;border:2px solid rgba(230,195,90,.35);
+    border-radius:28px;box-shadow:inset 0 0 0 6px rgba(10,30,18,.45), inset 0 0 0 8px rgba(230,195,90,.18);
+  }
+  .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0,0,0,.55) 100%);}
+
+  /* Neon sign */
+  .neon{position:fixed;top:calc(var(--safe-t) + 14px);left:50%;transform:translateX(-50%);z-index:2;
+    pointer-events:none;letter-spacing:.42em;text-indent:.42em;font-weight:700;
+    font-size:clamp(11px,2.6vw,16px);color:#ffe9a8;
+    text-shadow:0 0 6px #ffd56a,0 0 16px #e6a31a,0 0 32px #c47a00;
+    animation:flicker 5.5s ease-in-out infinite;}
+  @keyframes flicker{0%,92%,100%{opacity:1}93%{opacity:.55}94.5%{opacity:1}96%{opacity:.7}97%{opacity:1}}
+
+  /* Decorative SVG layer */
+  .deco{position:fixed;inset:0;z-index:1;pointer-events:none;width:100%;height:100%;}
+
+  main{position:relative;z-index:3;min-height:100dvh;display:flex;align-items:center;justify-content:center;
+    padding:calc(var(--safe-t) + 64px) calc(var(--safe-l) + 16px) calc(var(--safe-b) + 28px) calc(var(--safe-r) + 16px);}
+
+  .plaque{width:min(640px,100%);background:linear-gradient(180deg,#2a2114,#120e09 40%,#0c0a07);
+    border:1px solid var(--gold);border-radius:22px;
+    box-shadow:0 0 0 3px #5a4010, 0 0 0 6px rgba(230,195,90,.55), 0 24px 60px rgba(0,0,0,.55);
+    padding:28px 22px 26px;text-align:center;position:relative;}
+  .plaque::before{content:"";position:absolute;inset:8px;border:1px solid rgba(230,195,90,.35);border-radius:16px;pointer-events:none;}
+
+  .crest{width:72px;height:72px;margin:0 auto 10px;display:grid;place-items:center;
+    border-radius:50%;background:radial-gradient(circle at 35% 30%, #fff3c2, var(--gold) 45%, var(--gold-dk));
+    color:#2a1a00;font-weight:800;font-size:30px;letter-spacing:-1px;
+    box-shadow:0 6px 16px rgba(0,0,0,.4), inset 0 -4px 8px rgba(90,50,0,.35);}
+  h1{margin:0 0 4px;font-size:clamp(26px,7vw,42px);font-weight:800;letter-spacing:.04em;color:var(--gold-2);
+    text-shadow:0 2px 0 #5a4010, 0 0 24px rgba(230,195,90,.35);}
+  .kicker{margin:0 0 18px;font-size:clamp(13px,3.4vw,16px);letter-spacing:.28em;text-transform:uppercase;
+    color:#d7c48a;font-weight:700;}
+  .lede{margin:0 auto 22px;max-width:36em;color:#efe6c9;font-size:clamp(15px,3.8vw,18px);line-height:1.45;}
+
+  .step{display:none;}
+  .step.active{display:block;animation:rise .45s ease;}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;width:100%;max-width:420px;
+    min-height:58px;padding:14px 22px;border-radius:999px;font-size:clamp(18px,5vw,24px);font-weight:800;
+    letter-spacing:.08em;text-transform:uppercase;color:#2a1a00;
+    background:linear-gradient(180deg,#fff3c4,#e6c35a 55%,#c4921c);
+    box-shadow:0 5px 0 #7a5408, 0 12px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.7);
+    transition:transform .12s ease;}
+  .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #7a5408, 0 6px 14px rgba(0,0,0,.3);}
+  .btn.ghost{background:transparent;color:var(--gold-2);box-shadow:none;border:1px solid rgba(230,195,90,.45);
+    letter-spacing:.06em;font-size:16px;min-height:48px;margin-top:10px;width:auto;padding:10px 18px;}
+
+  .grid{display:grid;gap:12px;margin:8px 0 4px;}
+  .amt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    min-height:72px;padding:14px 12px;border-radius:14px;color:var(--ivory);
+    background:linear-gradient(180deg,#2c2418,#1a140e);border:1px solid rgba(230,195,90,.45);
+    box-shadow:0 4px 0 #3a2a10, inset 0 1px 0 rgba(255,255,255,.08);
+    font-size:clamp(20px,5.4vw,26px);font-weight:800;letter-spacing:.02em;}
+  .amt small{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#cbb98a;font-weight:700;}
+  .amt:active{transform:translateY(3px);box-shadow:0 1px 0 #3a2a10;}
+  .amt.omar{grid-column:1/-1;min-height:96px;position:relative;overflow:hidden;
+    background:linear-gradient(135deg,#3a2a0a,#120c04 40%,#4a340c);
+    border:2px solid #f3d67a;color:#ffe9a8;
+    box-shadow:0 6px 0 #5a4010, 0 0 24px rgba(230,195,90,.35), inset 0 0 24px rgba(230,195,90,.12);
+    font-size:clamp(28px,8vw,40px);letter-spacing:.16em;text-transform:uppercase;}
+  .amt.omar small{color:#ffe9a8;font-size:12px;}
+  .amt.omar::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);
+    animation:shine 3.2s ease-in-out infinite;}
+  @keyframes shine{0%,100%{transform:translateX(-40%)}50%{transform:translateX(40%)}}
+
+  @media (min-width:520px){
+    .grid.amounts{grid-template-columns:1fr 1fr;}
+  }
+
+  .note{margin:0 0 18px;font-size:clamp(17px,4.4vw,22px);line-height:1.4;color:#fff6d8;}
+  .note em{color:var(--gold-2);font-style:normal;font-weight:800;}
+
+  .family{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (min-width:520px){ .family{grid-template-columns:repeat(3,1fr);} .family .fam:last-child:nth-child(5){grid-column:2;} }
+  .fam{min-height:70px;border-radius:14px;padding:14px 10px;font-size:clamp(18px,4.6vw,22px);font-weight:800;
+    color:#fff6d8;background:linear-gradient(180deg,#2c2418,#1a140e);border:1px solid rgba(230,195,90,.45);
+    box-shadow:0 4px 0 #3a2a10;}
+  .fam:active{transform:translateY(3px);box-shadow:0 1px 0 #3a2a10;}
+
+  .stamp{display:inline-block;margin:8px 0 16px;padding:8px 18px;border:6px solid currentColor;border-radius:8px;
+    font-weight:900;letter-spacing:.18em;text-transform:uppercase;transform:rotate(-8deg);
+    font-size:clamp(28px,9vw,56px);line-height:1;}
+  .stamp.no{color:#ff6b6b;box-shadow:0 0 0 3px rgba(180,35,44,.25);}
+  .stamp.yes{color:#f3d67a;transform:rotate(-6deg);
+    text-shadow:0 0 18px rgba(230,195,90,.55);box-shadow:0 0 0 3px rgba(230,195,90,.2);}
+  .result p{margin:0 0 18px;font-size:clamp(16px,4vw,19px);color:#efe6c9;}
+
+  .home{display:inline-block;margin-top:18px;color:#cbb98a;text-decoration:none;font-size:14px;letter-spacing:.04em;
+    touch-action:manipulation;}
+  .home:active{color:#ffe9a8;}
+
+  #fx{position:fixed;inset:0;z-index:20;pointer-events:none;width:100%;height:100%;}
+
+  @media (prefers-reduced-motion:reduce){
+    .neon,.amt.omar::after{animation:none;}
+    .step.active{animation:none;}
+  }
+</style>
+</head>
+<body>
+  <div class="felt" aria-hidden="true"></div>
+  <div class="neon">PRIVATE CREDIT DESK</div>
+  <svg class="deco" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <!-- chandelier glow -->
+    <defs>
+      <radialGradient id="lamp" cx="50%" cy="20%" r="40%"><stop offset="0%" stop-color="#ffd36a" stop-opacity=".22"/><stop offset="100%" stop-color="#ffd36a" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="1000" height="800" fill="url(#lamp)"/>
+    <!-- left chips -->
+    <g transform="translate(70,520) rotate(-18)">
+      <circle r="42" fill="#b4232c" stroke="#f7f1de" stroke-width="6"/>
+      <circle r="28" fill="none" stroke="#f7f1de" stroke-width="3" stroke-dasharray="6 7"/>
+      <circle cx="38" cy="48" r="36" fill="#1d4e89" stroke="#f7f1de" stroke-width="6"/>
+      <circle cx="38" cy="48" r="24" fill="none" stroke="#f7f1de" stroke-width="3" stroke-dasharray="5 6"/>
+      <circle cx="8" cy="90" r="30" fill="#e6c35a" stroke="#3a2a10" stroke-width="5"/>
+    </g>
+    <!-- right chips -->
+    <g transform="translate(920,560) rotate(16)">
+      <circle r="40" fill="#1f8a4c" stroke="#f7f1de" stroke-width="6"/>
+      <circle r="26" fill="none" stroke="#f7f1de" stroke-width="3" stroke-dasharray="6 7"/>
+      <circle cx="-44" cy="36" r="34" fill="#b4232c" stroke="#f7f1de" stroke-width="6"/>
+      <circle cx="-20" cy="80" r="28" fill="#222" stroke="#e6c35a" stroke-width="5"/>
+    </g>
+    <!-- cards, left -->
+    <g transform="translate(80,160) rotate(-22)">
+      <rect x="-32" y="-46" width="64" height="90" rx="6" fill="#f7f1de" stroke="#2a1a00" stroke-width="2"/>
+      <text x="0" y="-16" text-anchor="middle" font-size="20" font-weight="700" fill="#b4232c">A</text>
+      <text x="0" y="16" text-anchor="middle" font-size="22" fill="#b4232c">♥</text>
+      <rect x="10" y="-36" width="64" height="90" rx="6" fill="#f7f1de" stroke="#2a1a00" stroke-width="2" transform="rotate(14)"/>
+    </g>
+    <!-- cards, right -->
+    <g transform="translate(910,150) rotate(24)">
+      <rect x="-32" y="-46" width="64" height="90" rx="6" fill="#f7f1de" stroke="#2a1a00" stroke-width="2"/>
+      <text x="0" y="-16" text-anchor="middle" font-size="20" font-weight="700" fill="#1a1a1a">K</text>
+      <text x="0" y="16" text-anchor="middle" font-size="22" fill="#1a1a1a">♠</text>
+      <rect x="-50" y="-30" width="64" height="90" rx="6" fill="#f7f1de" stroke="#2a1a00" stroke-width="2" transform="rotate(-16)"/>
+    </g>
+  </svg>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <main>
+    <div class="plaque">
+      <div class="crest" aria-hidden="true">E</div>
+      <h1>Ennabe Casino</h1>
+      <p class="kicker">Credit Application</p>
+
+      <section class="step active" id="step-welcome" aria-labelledby="welcome-title">
+        <h2 id="welcome-title" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Welcome</h2>
+        <p class="lede">Welcome to the Ennabe private credit desk. Please complete this confidential application to request a house credit line. Membership is by review only.</p>
+        <button type="button" class="btn" id="apply">Apply Now</button>
+      </section>
+
+      <section class="step" id="step-amount" aria-labelledby="amount-title">
+        <p class="kicker" id="amount-title">Select a credit line</p>
+        <p class="lede">Choose the courtesy line you would like the house to consider.</p>
+        <div class="grid amounts" role="list">
+          <button type="button" class="amt" data-tier="25000" data-label="$25,000"><span>$25,000</span><small>Standard</small></button>
+          <button type="button" class="amt" data-tier="50000" data-label="$50,000"><span>$50,000</span><small>Preferred</small></button>
+          <button type="button" class="amt" data-tier="100000" data-label="$100,000"><span>$100,000</span><small>Executive</small></button>
+          <button type="button" class="amt" data-tier="500000" data-label="$500,000"><span>$500,000</span><small>Chairman</small></button>
+          <button type="button" class="amt omar" data-tier="omar" data-label="Omar"><span>Omar</span><small>Highest tier · VIP exclusive</small></button>
+        </div>
+      </section>
+
+      <section class="step" id="step-budget" aria-labelledby="budget-title">
+        <p class="kicker" id="budget-title">Credit review</p>
+        <p class="note" id="budget-msg"></p>
+        <button type="button" class="btn" id="accept">Accept and continue</button>
+      </section>
+
+      <section class="step" id="step-family" aria-labelledby="family-title">
+        <p class="kicker" id="family-title">Family verification</p>
+        <p class="lede">Select your favorite family member.</p>
+        <div class="family" role="list">
+          <button type="button" class="fam" data-name="Arlene">Arlene</button>
+          <button type="button" class="fam" data-name="Faiez">Faiez</button>
+          <button type="button" class="fam" data-name="Adam">Adam</button>
+          <button type="button" class="fam" data-name="Renee">Renee</button>
+          <button type="button" class="fam" data-name="Theo">Theo</button>
+        </div>
+      </section>
+
+      <section class="step result" id="step-declined" aria-labelledby="declined-title">
+        <div class="stamp no" id="declined-title">Declined</div>
+        <p>We’re sorry. Your Ennabe Casino credit application has been declined. The house cannot extend a line at this time.</p>
+        <button type="button" class="btn" id="retry">Try again</button>
+      </section>
+
+      <section class="step result" id="step-approved" aria-labelledby="approved-title">
+        <div class="stamp yes" id="approved-title">Approved</div>
+        <p id="approved-msg">Congratulations. Your Ennabe Casino credit line has been approved.</p>
+        <button type="button" class="btn ghost" id="again">File another application</button>
+      </section>
+
+      <a class="home" href="./">← Back to Aaron’s Shark ABCs</a>
+    </div>
+  </main>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+(function () {
+  'use strict';
+
+  const steps = {
+    welcome: document.getElementById('step-welcome'),
+    amount: document.getElementById('step-amount'),
+    budget: document.getElementById('step-budget'),
+    family: document.getElementById('step-family'),
+    declined: document.getElementById('step-declined'),
+    approved: document.getElementById('step-approved')
+  };
+
+  const SUGGEST = {
+    omar:    { value: '500000', label: '$500,000' },
+    '500000':{ value: '100000', label: '$100,000' },
+    '100000':{ value: '50000',  label: '$50,000' },
+    '50000': { value: '25000',  label: '$25,000' },
+    '25000': { value: '10000',  label: '$10,000' }
+  };
+
+  let picked = null;
+  let approvedLine = null;
+
+  function show(name) {
+    Object.keys(steps).forEach(function (k) {
+      steps[k].classList.toggle('active', k === name);
+    });
+    const heading = steps[name].querySelector('h2, .kicker, .stamp');
+    if (heading) heading.focus && heading.scrollIntoView({ block: 'nearest' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('apply').addEventListener('click', function () {
+    show('amount');
+  });
+
+  document.querySelectorAll('.amt').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const tier = btn.getAttribute('data-tier');
+      const label = btn.getAttribute('data-label');
+      picked = { value: tier, label: label };
+      const next = SUGGEST[tier];
+      approvedLine = next;
+      const chosen = tier === 'omar' ? 'the Omar line — our highest VIP tier' : label;
+      document.getElementById('budget-msg').innerHTML =
+        'You selected <em>' + chosen + '</em>. This might be a little out of your budget. ' +
+        'May we suggest <em>' + next.label + '</em> instead?';
+      document.getElementById('accept').textContent = 'Accept ' + next.label + ' and continue';
+      show('budget');
+    });
+  });
+
+  document.getElementById('accept').addEventListener('click', function () {
+    show('family');
+  });
+
+  document.querySelectorAll('.fam').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const name = btn.getAttribute('data-name');
+      if (name === 'Adam') {
+        document.getElementById('approved-msg').textContent =
+          'Congratulations. The house is pleased to approve a ' + approvedLine.label +
+          ' courtesy line. Welcome to Ennabe Casino.';
+        show('approved');
+        fireConfetti();
+      } else {
+        show('declined');
+      }
+    });
+  });
+
+  document.getElementById('retry').addEventListener('click', function () {
+    show('family');
+  });
+
+  document.getElementById('again').addEventListener('click', function () {
+    picked = null;
+    approvedLine = null;
+    show('welcome');
+  });
+
+  /* ===== Full-screen confetti: multiple cannons, several seconds ===== */
+  const canvas = document.getElementById('fx');
+  const ctx = canvas.getContext('2d');
+  let parts = [];
+  let running = false;
+  let raf = 0;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  const COLORS = ['#e6c35a','#fff3c4','#ffffff','#b4232c','#1d4e89','#1f8a4c','#f4a261','#111','#ff6b6b','#f8e7a0'];
+
+  function burst(opts) {
+    const x = opts.x, y = opts.y, n = opts.n || 140;
+    const angle = opts.angle != null ? opts.angle : -Math.PI / 2;
+    const spread = opts.spread != null ? opts.spread : Math.PI;
+    const speed = opts.speed || 14;
+    for (let i = 0; i < n; i++) {
+      const a = angle + (Math.random() - 0.5) * spread;
+      const s = speed * (0.45 + Math.random() * 0.9);
+      parts.push({
+        x: x, y: y,
+        vx: Math.cos(a) * s,
+        vy: Math.sin(a) * s - (2 + Math.random() * 6),
+        w: 6 + Math.random() * 10,
+        h: 8 + Math.random() * 14,
+        r: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.4,
+        color: COLORS[(Math.random() * COLORS.length) | 0],
+        shape: Math.random() < 0.22 ? 'circle' : (Math.random() < 0.15 ? 'chip' : 'rect'),
+        life: 1,
+        decay: 0.004 + Math.random() * 0.007,
+        grav: 0.14 + Math.random() * 0.08
+      });
+    }
+  }
+
+  function tick() {
+    const w = window.innerWidth, h = window.innerHeight;
+    ctx.clearRect(0, 0, w, h);
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.vy += p.grav;
+      p.vx *= 0.992;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.r += p.vr;
+      p.life -= p.decay;
+      if (p.life <= 0 || p.y > h + 40) { parts.splice(i, 1); continue; }
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.r);
+      ctx.fillStyle = p.color;
+      if (p.shape === 'circle') {
+        ctx.beginPath(); ctx.arc(0, 0, p.w * 0.45, 0, Math.PI * 2); ctx.fill();
+      } else if (p.shape === 'chip') {
+        ctx.beginPath(); ctx.arc(0, 0, p.w * 0.55, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#f7f1de'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(0, 0, p.w * 0.32, 0, Math.PI * 2); ctx.stroke();
+      } else {
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      }
+      ctx.restore();
+    }
+    if (parts.length || running) raf = requestAnimationFrame(tick);
+    else { ctx.clearRect(0, 0, w, h); raf = 0; }
+  }
+
+  function fireConfetti() {
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const w = window.innerWidth, h = window.innerHeight;
+    running = true;
+    if (!raf) raf = requestAnimationFrame(tick);
+
+    const vol = reduce ? 0.35 : 1;
+    const salvos = reduce ? 4 : 14;
+    const span = reduce ? 1800 : 5200;
+
+    function volley(i) {
+      burst({ x: w * 0.5, y: h * 0.18, n: Math.floor(220 * vol), angle: Math.PI / 2, spread: Math.PI * 1.15, speed: 16 });
+      burst({ x: 0, y: h * 0.75, n: Math.floor(180 * vol), angle: -0.7, spread: 1.1, speed: 18 });
+      burst({ x: w, y: h * 0.75, n: Math.floor(180 * vol), angle: Math.PI + 0.7, spread: 1.1, speed: 18 });
+      if (i % 2 === 0) {
+        burst({ x: w * 0.2, y: h * 0.05, n: Math.floor(120 * vol), angle: Math.PI / 2, spread: 1.4, speed: 13 });
+        burst({ x: w * 0.8, y: h * 0.05, n: Math.floor(120 * vol), angle: Math.PI / 2, spread: 1.4, speed: 13 });
+      }
+    }
+
+    volley(0);
+    for (let i = 1; i < salvos; i++) {
+      setTimeout(function () { volley(i); }, (span / salvos) * i);
+    }
+    setTimeout(function () { running = false; }, span + 2500);
+  }
+})();
+</script>
+</body>
+</html>
